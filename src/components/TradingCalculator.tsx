@@ -22,6 +22,10 @@ interface AssetConfig {
   pipValuePerLot: number;   // valor em $ de 1 pip/ponto por 1 lote padrão
   stopRange: string;        // referência de stop médio
   decimals: number;         // casas decimais do preço
+  multiplier: number;       // multiplicador de precisão para evitar floating point (1/pipSize)
+  lotToUnits: number;       // conversão de lote para unidades (TradingView)
+  stepSize: number;         // step de quantidade do símbolo no broker
+  unitLabel: string;        // label para unidades no TradingView
 }
 
 const ASSETS: Record<string, AssetConfig> = {
@@ -30,45 +34,65 @@ const ASSETS: Record<string, AssetConfig> = {
     type: "forex",
     pipSize: 0.0001,
     pipLabel: "pips",
-    pipValuePerLot: 10,      // 1 pip = $10 por lote padrão (100k)
+    pipValuePerLot: 10,
     stopRange: "20-35 pips",
     decimals: 5,
+    multiplier: 10000,
+    lotToUnits: 100000,
+    stepSize: 1000,
+    unitLabel: "unidades",
   },
   USDJPY: {
     label: "USD/JPY",
     type: "forex",
     pipSize: 0.01,
     pipLabel: "pips",
-    pipValuePerLot: 6.67,    // ~$6.67 por pip por lote (varia com preço)
+    pipValuePerLot: 6.67,
     stopRange: "20-35 pips",
     decimals: 3,
+    multiplier: 100,
+    lotToUnits: 100000,
+    stepSize: 1000,
+    unitLabel: "unidades",
   },
   XAUUSD: {
     label: "XAU/USD",
     type: "commodity",
     pipSize: 0.01,
     pipLabel: "pontos",
-    pipValuePerLot: 0.01,    // 1 ponto (0.01) = $0.01 por oz → $1 por 100oz (1 lote)
+    pipValuePerLot: 0.01,
     stopRange: "300-600 pontos",
     decimals: 2,
+    multiplier: 100,
+    lotToUnits: 100,
+    stepSize: 1,
+    unitLabel: "oz",
   },
   NASDAQ: {
     label: "NASDAQ",
     type: "index",
     pipSize: 1,
     pipLabel: "pontos",
-    pipValuePerLot: 1,       // $1 por ponto por 1 contrato (varia por broker)
+    pipValuePerLot: 1,
     stopRange: "20-40 pontos",
     decimals: 1,
+    multiplier: 1,
+    lotToUnits: 1,
+    stepSize: 0.1,
+    unitLabel: "contratos",
   },
   BTCUSD: {
     label: "BTC/USD",
     type: "crypto",
     pipSize: 1,
     pipLabel: "pontos",
-    pipValuePerLot: 1,       // $1 por ponto por 1 lote
+    pipValuePerLot: 1,
     stopRange: "1000-5000 pontos",
     decimals: 1,
+    multiplier: 1,
+    lotToUnits: 1,
+    stepSize: 0.01,
+    unitLabel: "BTC",
   },
 };
 
@@ -76,8 +100,9 @@ const RISK_PRESETS = [10, 20, 30, 40, 50];
 
 interface TradeResult {
   direction: "long" | "short";
-  stopDistance: number;      // em pips/pontos
+  stopDistance: number;
   lotSize: number;
+  units: number;
   valuePerPip: number;
   tp2: number;
   tp3: number;
@@ -106,7 +131,11 @@ export default function TradingCalculator() {
 
     const direction: "long" | "short" = entry > sl ? "long" : "short";
     const priceDiff = Math.abs(entry - sl);
-    const stopDistance = Math.round(priceDiff / asset.pipSize);
+
+    // Use multiplier to avoid floating point precision issues
+    const entryInt = Math.round(entry * asset.multiplier);
+    const slInt = Math.round(sl * asset.multiplier);
+    const stopDistance = Math.abs(entryInt - slInt);
 
     if (stopDistance <= 0) return null;
 
@@ -114,9 +143,16 @@ export default function TradingCalculator() {
     const valuePerPip = riskAmt / stopDistance;
 
     // Lot size = valor por pip / valor por pip por lote
-    const lotSize = valuePerPip / asset.pipValuePerLot;
+    const rawLotSize = valuePerPip / asset.pipValuePerLot;
 
-    // TPs baseados na distância do stop
+    // Quantidade em unidades (para TradingView)
+    const rawUnits = rawLotSize * asset.lotToUnits;
+    // Arredondar para o step do símbolo
+    const units = Math.floor(rawUnits / asset.stepSize) * asset.stepSize;
+    // Lot size arredondado baseado nas unidades
+    const lotSize = units / asset.lotToUnits;
+
+    // TPs baseados na distância do stop (em preço)
     const tpOffset2 = priceDiff * 2;
     const tpOffset3 = priceDiff * 3;
     const tpOffset4 = priceDiff * 4;
@@ -130,6 +166,7 @@ export default function TradingCalculator() {
       direction,
       stopDistance,
       lotSize,
+      units,
       valuePerPip,
       tp2,
       tp3,
@@ -137,7 +174,7 @@ export default function TradingCalculator() {
       profit2: riskAmt * 2,
       profit3: riskAmt * 3,
       profit4: riskAmt * 4,
-      rr: 3, // mínimo do plano
+      rr: 3,
     };
   }, [entryPrice, stopLossPrice, risk, asset]);
 
@@ -253,11 +290,16 @@ export default function TradingCalculator() {
               </div>
 
               {/* Key metrics */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-lg bg-secondary/60 p-3 text-center border border-border">
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Stop</p>
                   <p className="text-lg font-bold text-destructive">{result.stopDistance}</p>
                   <p className="text-[10px] text-muted-foreground">{asset.pipLabel}</p>
+                </div>
+                <div className="rounded-lg bg-secondary/60 p-3 text-center border border-border">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">$/pip</p>
+                  <p className="text-lg font-bold text-foreground">${result.valuePerPip.toFixed(4)}</p>
+                  <p className="text-[10px] text-muted-foreground">por {asset.pipLabel.slice(0, -1)}</p>
                 </div>
                 <div className="rounded-lg bg-secondary/60 p-3 text-center border border-border">
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Lot Size</p>
@@ -265,9 +307,9 @@ export default function TradingCalculator() {
                   <p className="text-[10px] text-muted-foreground">lotes</p>
                 </div>
                 <div className="rounded-lg bg-secondary/60 p-3 text-center border border-border">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">$/pip</p>
-                  <p className="text-lg font-bold text-foreground">${result.valuePerPip.toFixed(2)}</p>
-                  <p className="text-[10px] text-muted-foreground">por {asset.pipLabel.slice(0, -1)}</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Quantidade (TV)</p>
+                  <p className="text-lg font-bold text-primary">{asset.type === "forex" ? result.units.toLocaleString() : result.units}</p>
+                  <p className="text-[10px] text-muted-foreground">{asset.unitLabel}</p>
                 </div>
               </div>
 
@@ -335,8 +377,9 @@ export default function TradingCalculator() {
                 ["Stop Loss", formatPrice(parseFloat(stopLossPrice))],
                 ["Stop", `${result.stopDistance} ${asset.pipLabel}`],
                 ["Lot Size", result.lotSize.toFixed(2)],
+                ["Quantidade (TV)", asset.type === "forex" ? result.units.toLocaleString() + " " + asset.unitLabel : result.units + " " + asset.unitLabel],
                 ["Risco", `$${parseFloat(risk).toFixed(0)}`],
-                ["$/pip", `$${result.valuePerPip.toFixed(2)}`],
+                ["$/pip", `$${result.valuePerPip.toFixed(4)}`],
                 ["TP 1:2", formatPrice(result.tp2)],
                 ["TP 1:3", formatPrice(result.tp3)],
                 ["TP 1:4", formatPrice(result.tp4)],
