@@ -79,7 +79,9 @@ export default function Home() {
                 </span>
               </div>
               <ThemeToggle />
-              <Badge className="bg-primary text-primary-foreground">Ativo</Badge>
+              <Button variant="ghost" size="icon" onClick={signOut} className="rounded-full" title="Sair">
+                <LogOut className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
