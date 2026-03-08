@@ -311,6 +311,9 @@ export function TradingCalendar({ activeAccountId: propAccountId }: TradingCalen
         </div>
       </div>
 
+      {/* Equity Curve Chart */}
+      <EquityCurveChart activeAccountId={accountId} />
+
       {/* Trading Dashboard with KPIs */}
       <TradingDashboard activeAccountId={accountId} />
 
