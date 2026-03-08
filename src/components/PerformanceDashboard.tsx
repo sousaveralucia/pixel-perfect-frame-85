@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 import { subDays, subMonths, parseISO, isAfter } from "date-fns";
+import { exportInsightsPdf } from "@/lib/insightsPdfExporter";
+import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAccountManager } from "@/hooks/useAccountManager";
