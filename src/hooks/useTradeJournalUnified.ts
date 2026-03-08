@@ -69,6 +69,7 @@ function mapRowToTrade(row: any): TradeWithChecklist {
     notes: row.notes || "",
     isFavorite: row.is_favorite || false,
     moneyResult: row.money_result ? Number(row.money_result) : undefined,
+    riskReward: row.risk_reward != null ? Number(row.risk_reward) : undefined,
     operational: row.operational || { chochValidoHTF: false, caixaGannTracada: false, regiaoDescontada50: false, orderBlockIdentificado: false, entrada50OB: false, stopRiskManagement: false, tempoGraficoOperacional: false },
     emotional: row.emotional || { hydration: false, breathing: false, mentalClarity: false },
     rational: row.rational || { analysisConfirmed: false, planRespected: false, riskManaged: false },
