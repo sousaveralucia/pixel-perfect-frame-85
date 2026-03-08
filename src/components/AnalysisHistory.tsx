@@ -267,8 +267,10 @@ export default function AnalysisHistory() {
     }
   };
 
-  const handleDeleteAnalysis = (id: string) => {
-    saveAnalyses(analyses.filter((a) => a.id !== id));
+  const handleDeleteAnalysis = async (id: string) => {
+    if (!user) return;
+    await supabase.from("analyses").delete().eq("id", id).eq("user_id", user.id);
+    setAnalyses(analyses.filter((a) => a.id !== id));
   };
 
   const handleExportAnalyses = () => {
