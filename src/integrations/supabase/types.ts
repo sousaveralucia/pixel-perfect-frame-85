@@ -290,6 +290,48 @@ export type Database = {
         }
         Relationships: []
       }
+      withdrawals: {
+        Row: {
+          account_key: string
+          amount: number
+          capital_at_withdrawal: number
+          created_at: string
+          date: string
+          id: string
+          notes: string | null
+          profit_percentage: number
+          proof_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_key: string
+          amount: number
+          capital_at_withdrawal: number
+          created_at?: string
+          date: string
+          id?: string
+          notes?: string | null
+          profit_percentage?: number
+          proof_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_key?: string
+          amount?: number
+          capital_at_withdrawal?: number
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          profit_percentage?: number
+          proof_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

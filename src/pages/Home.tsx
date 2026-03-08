@@ -23,6 +23,7 @@ import AssetPerformanceAnalysis from "@/components/AssetPerformanceAnalysis";
 import { TradingCalendar } from "@/components/TradingCalendar";
 import CalculationHistory from "@/components/CalculationHistory";
 import { EquityAndPerformanceCharts } from "@/components/EquityAndPerformanceCharts";
+import Withdrawals from "@/components/Withdrawals";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -106,7 +107,7 @@ export default function Home() {
             <TabsTrigger value="insights" className="text-xs whitespace-nowrap">Insights</TabsTrigger>
             <TabsTrigger value="comparacao" className="text-xs whitespace-nowrap">Comparação</TabsTrigger>
             <TabsTrigger value="relatorio" className="text-xs whitespace-nowrap">Relatório</TabsTrigger>
-            <TabsTrigger value="gestao" className="text-xs whitespace-nowrap">Gestão</TabsTrigger>
+            <TabsTrigger value="saques" className="text-xs whitespace-nowrap">Saques</TabsTrigger>
           </TabsList>
 
           <TabsContent value="calendario-trading" className="space-y-6">
@@ -280,37 +281,8 @@ export default function Home() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="gestao" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-primary" />
-                  Gestão de Risco
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-3 gap-4">
-                  <Card className="border-l-4 border-l-primary">
-                    <CardContent className="pt-6">
-                      <p className="text-3xl font-bold text-primary">1:3</p>
-                      <p className="text-sm text-muted-foreground">R:R Mínimo</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-l-4 border-l-destructive">
-                    <CardContent className="pt-6">
-                      <p className="text-3xl font-bold text-destructive">2</p>
-                      <p className="text-sm text-muted-foreground">Stops para Parar</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-l-4 border-l-success">
-                    <CardContent className="pt-6">
-                      <p className="text-3xl font-bold text-success">5</p>
-                      <p className="text-sm text-muted-foreground">Ativos Monitorados</p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="saques" className="space-y-6">
+            <Withdrawals />
           </TabsContent>
 
           <TabsContent value="rotina" className="space-y-6">
