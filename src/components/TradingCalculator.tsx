@@ -100,8 +100,9 @@ const RISK_PRESETS = [10, 20, 30, 40, 50];
 
 interface TradeResult {
   direction: "long" | "short";
-  stopDistance: number;      // em pips/pontos
+  stopDistance: number;
   lotSize: number;
+  units: number;
   valuePerPip: number;
   tp2: number;
   tp3: number;
