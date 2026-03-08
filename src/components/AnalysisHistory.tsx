@@ -177,92 +177,108 @@ export default function AnalysisHistory() {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    let yPosition = 20;
+    const margin = 20;
+    const contentWidth = pageWidth - margin * 2;
+    let y = 20;
 
-    // Título
-    doc.setFontSize(16);
-    doc.text(`Análise - ${analysis.asset}`, pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 10;
-
-    // Informações básicas
-    doc.setFontSize(11);
-    doc.text(`Data: ${analysis.date}`, 20, yPosition);
-    yPosition += 7;
-    doc.text(`Timeframe: ${analysis.timeframe}`, 20, yPosition);
-    yPosition += 7;
-    doc.text(`Status: ${analysis.status}`, 20, yPosition);
-    yPosition += 12;
-
-    // Detalhes da análise
-    doc.setFontSize(12);
+    // === Header bar ===
+    doc.setFillColor(16, 185, 129); // emerald-500
+    doc.rect(0, 0, pageWidth, 40, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
     doc.setFont(undefined as any, "bold");
-    doc.text("Detalhes da Análise", 20, yPosition);
-    yPosition += 8;
-
+    doc.text(`Análise — ${analysis.asset}`, margin, 26);
     doc.setFontSize(10);
     doc.setFont(undefined as any, "normal");
-    
-    // Fibonacci com quebra de linha
-    doc.text("Nível Fibonacci:", 20, yPosition);
-    yPosition += 6;
-    const fibonacciLines = doc.splitTextToSize(analysis.fibonacciLevel || "N/A", pageWidth - 40);
-    doc.text(fibonacciLines as string[], 30, yPosition);
-    yPosition += fibonacciLines.length * 5 + 5;
-    
-    // Order Block com quebra de linha
-    doc.text("Nível Order Block:", 20, yPosition);
-    yPosition += 6;
-    const orderBlockLines = doc.splitTextToSize(analysis.orderBlockLevel || "N/A", pageWidth - 40);
-    doc.text(orderBlockLines as string[], 30, yPosition);
-    yPosition += orderBlockLines.length * 5 + 5;
-    
-    // Zona de Liquidez com quebra de linha
-    doc.text("Zona de Liquidez:", 20, yPosition);
-    yPosition += 6;
-    const liquidityLines = doc.splitTextToSize(analysis.liquidityZone || "N/A", pageWidth - 40);
-    doc.text(liquidityLines as string[], 30, yPosition);
-    yPosition += liquidityLines.length * 5 + 10;
+    doc.text(`${analysis.date}  •  ${analysis.timeframe}  •  ${analysis.status}`, margin, 35);
 
-    // Notas
-    if (analysis.notes) {
+    y = 52;
+    doc.setTextColor(30, 41, 59); // slate-800
+
+    // === Helper: section block ===
+    const drawSection = (title: string, content: string) => {
+      if (!content) return;
+      // Check page break
+      const lines = doc.splitTextToSize(content, contentWidth - 16);
+      const blockHeight = 10 + lines.length * 5 + 8;
+      if (y + blockHeight > pageHeight - 20) {
+        doc.addPage();
+        y = 20;
+      }
+      // Section title
+      doc.setFillColor(241, 245, 249); // slate-100
+      doc.roundedRect(margin, y, contentWidth, blockHeight, 3, 3, "F");
+      doc.setFontSize(10);
       doc.setFont(undefined as any, "bold");
-      doc.text("Notas:", 20, yPosition);
-      yPosition += 6;
+      doc.setTextColor(16, 185, 129);
+      doc.text(title, margin + 8, y + 7);
+      // Section content
       doc.setFont(undefined as any, "normal");
-      const noteLines = doc.splitTextToSize(analysis.notes, pageWidth - 40);
-      doc.text(noteLines as string[], 20, yPosition);
-      yPosition += noteLines.length * 5 + 10;
-    }
+      doc.setTextColor(51, 65, 85); // slate-600
+      doc.setFontSize(9);
+      doc.text(lines as string[], margin + 8, y + 14);
+      y += blockHeight + 6;
+    };
 
-    // Imagens se existirem
+    drawSection("Nível de Fibonacci", analysis.fibonacciLevel || "N/A");
+    drawSection("Nível de Order Block", analysis.orderBlockLevel || "N/A");
+    drawSection("Zona de Liquidez", analysis.liquidityZone || "N/A");
+    drawSection("Notas e Observações", analysis.notes || "");
+
+    // === Images ===
     const images = [analysis.imageUrl1, analysis.imageUrl2, analysis.imageUrl3].filter(Boolean);
     if (images.length > 0) {
-      doc.setFont(undefined as any, "bold");
-      doc.text("Imagens da Análise:", 20, yPosition);
-      yPosition += 10;
-      doc.setFont(undefined as any, "normal");
-      
       let imagesLoaded = 0;
+      
+      if (y + 10 > pageHeight - 20) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFontSize(11);
+      doc.setFont(undefined as any, "bold");
+      doc.setTextColor(16, 185, 129);
+      doc.text("Imagens da Análise", margin, y + 5);
+      y += 12;
+
       images.forEach((imgUrl, idx) => {
         const img = new Image();
+        img.crossOrigin = "anonymous";
         img.src = imgUrl!;
         img.onload = () => {
-          if (yPosition + 80 > pageHeight) {
+          if (y + 100 > pageHeight - 20) {
             doc.addPage();
-            yPosition = 20;
+            y = 20;
           }
-          doc.text(`Imagem ${idx + 1}:`, 20, yPosition);
-          yPosition += 5;
-          doc.addImage(imgUrl!, "JPEG", 20, yPosition, 170, 100);
-          yPosition += 110;
+          doc.setFontSize(9);
+          doc.setTextColor(100, 116, 139);
+          doc.setFont(undefined as any, "normal");
+          doc.text(`Imagem ${idx + 1}`, margin, y + 4);
+          y += 7;
+          // Border around image
+          doc.setDrawColor(203, 213, 225);
+          doc.roundedRect(margin, y, contentWidth, 95, 2, 2, "S");
+          doc.addImage(imgUrl!, "JPEG", margin + 2, y + 2, contentWidth - 4, 91);
+          y += 102;
           imagesLoaded++;
-          
+
           if (imagesLoaded === images.length) {
+            // Footer
+            const totalPages = doc.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+              doc.setPage(i);
+              doc.setFontSize(8);
+              doc.setTextColor(148, 163, 184);
+              doc.text(`Página ${i} de ${totalPages}`, pageWidth / 2, pageHeight - 8, { align: "center" });
+            }
             doc.save(`analise_${analysis.asset}_${analysis.date}.pdf`);
           }
         };
       });
     } else {
+      // Footer
+      doc.setFontSize(8);
+      doc.setTextColor(148, 163, 184);
+      doc.text("Página 1 de 1", pageWidth / 2, pageHeight - 8, { align: "center" });
       doc.save(`analise_${analysis.asset}_${analysis.date}.pdf`);
     }
   };
@@ -395,137 +411,140 @@ export default function AnalysisHistory() {
                   Nova Análise
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Registrar Nova Análise</DialogTitle>
+              <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+                <DialogHeader className="flex-shrink-0">
+                  <DialogTitle>{editingId ? 'Editar Análise' : 'Registrar Nova Análise'}</DialogTitle>
                   <DialogDescription>Registre sua análise de Fibonacci e Order Blocks</DialogDescription>
                 </DialogHeader>
 
-                <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="flex-1 overflow-y-auto pr-2 space-y-4 min-h-0">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Ativo</Label>
+                      <Select value={formData.asset} onValueChange={(value) => setFormData({ ...formData, asset: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {assets.map((asset) => (
+                            <SelectItem key={asset} value={asset}>
+                              {asset}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Timeframe</Label>
+                      <Select value={formData.timeframe} onValueChange={(value) => setFormData({ ...formData, timeframe: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="H4">H4</SelectItem>
+                          <SelectItem value="Diário">Diário</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
                   <div>
-                    <Label>Ativo</Label>
-                    <Select value={formData.asset} onValueChange={(value) => setFormData({ ...formData, asset: value })}>
+                    <Label>Nível de Fibonacci (ex: 75%-85%)</Label>
+                    <Input
+                      value={formData.fibonacciLevel}
+                      onChange={(e) => setFormData({ ...formData, fibonacciLevel: e.target.value })}
+                      placeholder="1.2500 - 1.2600"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Nível de Order Block (ex: H4, H2, H1)</Label>
+                    <Input
+                      value={formData.orderBlockLevel}
+                      onChange={(e) => setFormData({ ...formData, orderBlockLevel: e.target.value })}
+                      placeholder="1.2550 (H4) → 1.2545 (H2) → 1.2548 (H1)"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Zona de Liquidez</Label>
+                    <Input
+                      value={formData.liquidityZone}
+                      onChange={(e) => setFormData({ ...formData, liquidityZone: e.target.value })}
+                      placeholder="Descreva a zona de liquidez"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Notas e Observações</Label>
+                    <Textarea
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      placeholder="Detalhes da análise, confluências observadas..."
+                      rows={3}
+                      className="resize-none"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Status</Label>
+                    <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value as any })}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {assets.map((asset) => (
-                          <SelectItem key={asset} value={asset}>
-                            {asset}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="ATIVO">Ativa (Aguardando Preco)</SelectItem>
+                        <SelectItem value="TESTADO">Testada (Trade Executado)</SelectItem>
+                        <SelectItem value="DESCARTADO">Descartada (Nao Validada)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+
                   <div>
-                    <Label>Timeframe</Label>
-                    <Select value={formData.timeframe} onValueChange={(value) => setFormData({ ...formData, timeframe: value })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="H4">H4</SelectItem>
-                        <SelectItem value="Diário">Diário</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div>
-                  <Label>Nível de Fibonacci (ex: 75%-85%)</Label>
-                  <Input
-                    value={formData.fibonacciLevel}
-                    onChange={(e) => setFormData({ ...formData, fibonacciLevel: e.target.value })}
-                    placeholder="1.2500 - 1.2600"
-                  />
-                </div>
-
-                <div>
-                  <Label>Nível de Order Block (ex: H4, H2, H1)</Label>
-                  <Input
-                    value={formData.orderBlockLevel}
-                    onChange={(e) => setFormData({ ...formData, orderBlockLevel: e.target.value })}
-                    placeholder="1.2550 (H4) → 1.2545 (H2) → 1.2548 (H1)"
-                  />
-                </div>
-
-                <div>
-                  <Label>Zona de Liquidez</Label>
-                  <Input
-                    value={formData.liquidityZone}
-                    onChange={(e) => setFormData({ ...formData, liquidityZone: e.target.value })}
-                    placeholder="Descreva a zona de liquidez"
-                  />
-                </div>
-
-                <div>
-                  <Label>Notas e Observações</Label>
-                  <Textarea
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    placeholder="Detalhes da análise, confluências observadas..."
-                    rows={3}
-                  />
-                </div>
-
-                <div>
-                  <Label>Status</Label>
-                  <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value as any })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ATIVO">Ativa (Aguardando Preco)</SelectItem>
-                      <SelectItem value="TESTADO">Testada (Trade Executado)</SelectItem>
-                      <SelectItem value="DESCARTADO">Descartada (Nao Validada)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label>Upload de Imagens (Máximo 3)</Label>
-                  <div className="space-y-3">
-                    {[1, 2, 3].map((num) => {
-                      const key = `imageUrl${num}` as keyof typeof formData;
-                      return (
-                        <div key={num}>
-                          <Label className="text-sm">Imagem {num}</Label>
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                const reader = new FileReader();
-                                reader.onload = (event) => {
-                                  setFormData({ ...formData, [key]: event.target?.result as string });
-                                };
-                                reader.readAsDataURL(file);
-                              }
-                            }}
-                          />
-                          {formData[key] && (
-                            <div className="mt-2 relative w-full h-32 bg-muted rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity" onClick={() => {
-                              const img = document.createElement('div');
-                              img.innerHTML = `<div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999;" onclick="this.remove()"><img src="${formData[key]}" style="max-width: 90vw; max-height: 90vh; object-fit: contain;" /></div>`;
-                              document.body.appendChild(img.firstChild as Node);
-                            }}>
-                              <img src={formData[key]} alt={`Preview ${num}`} className="w-full h-full object-cover" />
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity">
-                                <span className="text-white text-sm">Clique para ampliar</span>
+                    <Label>Upload de Imagens (Máximo 3)</Label>
+                    <div className="space-y-3">
+                      {[1, 2, 3].map((num) => {
+                        const key = `imageUrl${num}` as keyof typeof formData;
+                        return (
+                          <div key={num}>
+                            <Label className="text-sm">Imagem {num}</Label>
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onload = (event) => {
+                                    setFormData({ ...formData, [key]: event.target?.result as string });
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                            />
+                            {formData[key] && (
+                              <div className="mt-2 relative w-full h-28 bg-muted rounded-lg overflow-hidden">
+                                <img src={formData[key]} alt={`Preview ${num}`} className="w-full h-full object-cover" />
+                                <button
+                                  type="button"
+                                  onClick={() => setFormData({ ...formData, [key]: "" })}
+                                  className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs hover:opacity-80"
+                                >
+                                  ✕
+                                </button>
                               </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
 
-                <Button onClick={handleAddAnalysis} className="w-full bg-primary hover:bg-primary/90">
-                  Registrar Análise
-                </Button>
+                <div className="flex-shrink-0 pt-4 border-t border-border">
+                  <Button onClick={handleAddAnalysis} className="w-full bg-primary hover:bg-primary/90">
+                    {editingId ? 'Salvar Alterações' : 'Registrar Análise'}
+                  </Button>
                 </div>
               </DialogContent>
             </Dialog>
