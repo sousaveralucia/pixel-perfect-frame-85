@@ -40,10 +40,10 @@ export interface TradeWithChecklist {
     riskManaged: boolean;
   };
   routine: {
-    hydration: boolean;
-    breathing: boolean;
+    nightAnalysis: boolean;
+    morningReview: boolean;
+    regionsValidated: boolean;
     sleep: boolean;
-    meditation: boolean;
   };
   preTradeImage?: string;
   tradingImage?: string;

@@ -1653,56 +1653,78 @@ export default function TradeJournalEnhanced() {
               </div>
             </div>
 
-            {/* Routine and Health Checklist */}
+            {/* Routine Checklist */}
             <div className="space-y-3 bg-blue-50 p-4 rounded-lg border border-blue-200">
               <div className="flex items-center gap-2">
-                <span className="text-2xl">🏃</span>
+                <span className="text-2xl">📋</span>
                 <h3 className="font-bold text-blue-900">
-                  Checklist Rotina e Saúde
+                  Checklist Rotina Operacional
                 </h3>
               </div>
 
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="hydrationRoutine"
-                  checked={formData.routine.hydration}
+                  id="nightAnalysis"
+                  checked={formData.routine.nightAnalysis}
                   onCheckedChange={checked =>
                     setFormData({
                       ...formData,
                       routine: {
                         ...formData.routine,
-                        hydration: checked as boolean,
+                        nightAnalysis: checked as boolean,
                       },
                     })
                   }
                 />
                 <Label
-                  htmlFor="hydrationRoutine"
+                  htmlFor="nightAnalysis"
                   className="text-sm text-blue-900 cursor-pointer"
                 >
-                  💧 Bebi água e estou hidratado
+                  🌙 Fiz análise de mercado na noite anterior (20h-20h30)
                 </Label>
               </div>
 
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="breathingRoutine"
-                  checked={formData.routine.breathing}
+                  id="morningReview"
+                  checked={formData.routine.morningReview}
                   onCheckedChange={checked =>
                     setFormData({
                       ...formData,
                       routine: {
                         ...formData.routine,
-                        breathing: checked as boolean,
+                        morningReview: checked as boolean,
                       },
                     })
                   }
                 />
                 <Label
-                  htmlFor="breathingRoutine"
+                  htmlFor="morningReview"
                   className="text-sm text-blue-900 cursor-pointer"
                 >
-                  🧘 Respirei profundamente e relaxei
+                  🌅 Revisei as marcações da noite ao acordar
+                </Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="regionsValidated"
+                  checked={formData.routine.regionsValidated}
+                  onCheckedChange={checked =>
+                    setFormData({
+                      ...formData,
+                      routine: {
+                        ...formData.routine,
+                        regionsValidated: checked as boolean,
+                      },
+                    })
+                  }
+                />
+                <Label
+                  htmlFor="regionsValidated"
+                  className="text-sm text-blue-900 cursor-pointer"
+                >
+                  🎯 Verifiquei se as regiões traçadas estão sendo buscadas/respeitadas
                 </Label>
               </div>
 
