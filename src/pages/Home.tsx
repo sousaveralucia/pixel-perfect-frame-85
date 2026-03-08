@@ -39,8 +39,13 @@ function ThemeToggle() {
 }
 
 export default function Home() {
-  const { activeAccountId } = useAccountManager();
+  const { activeAccountId, getActiveAccount } = useAccountManager();
   const { trades } = useTradeJournalUnified(activeAccountId);
+  const activeAccount = getActiveAccount();
+  const currentBalance = activeAccount?.currentBalance ?? 0;
+  const initialBalance = activeAccount?.initialBalance ?? 0;
+  const balancePct = initialBalance > 0 ? ((currentBalance - initialBalance) / initialBalance * 100) : 0;
+  const isPositive = balancePct >= 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,7 +57,14 @@ export default function Home() {
               <h1 className="text-3xl font-bold text-foreground">Trading Dashboard</h1>
               <p className="text-sm text-muted-foreground mt-1">Plano Operacional - HackTrading Plan</p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-secondary/50">
+                <span className="text-xs text-muted-foreground">{activeAccount?.name}</span>
+                <span className="text-sm font-bold text-foreground">${currentBalance.toFixed(2)}</span>
+                <span className={`text-xs font-semibold ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                  {isPositive ? '+' : ''}{balancePct.toFixed(1)}%
+                </span>
+              </div>
               <ThemeToggle />
               <Badge className="bg-primary text-primary-foreground">Ativo</Badge>
             </div>

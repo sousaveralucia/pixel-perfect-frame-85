@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Download, FileText, AlertCircle, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
 import { exportCompleteReportToExcel } from "@/lib/excelExporter";
+import { useAccountManager } from "@/hooks/useAccountManager";
 
 interface TradeWithChecklist {
   id: string;
@@ -60,11 +61,14 @@ interface ReportExportEnhancedProps {
 }
 
 export default function ReportExportEnhanced({ trades }: ReportExportEnhancedProps) {
+  const { getActiveAccount, accounts } = useAccountManager();
   const [filterAccount, setFilterAccount] = useState<string>("all");
   const [filterAsset, setFilterAsset] = useState<string>("all");
   const [isGenerating, setIsGenerating] = useState(false);
   const allAssets = ["EUR/USD", "USDJPY", "XAUUSD", "NASDAQ", "BTC USD"];
-  const allAccounts = ["Conta 1 ($100)", "Conta 2 ($1000)", "Conta 3 ($10000)"];
+  const allAccounts = accounts.map(a => a.name);
+  const activeAccount = getActiveAccount();
+  const initialBalance = activeAccount?.initialBalance ?? 0;
 
   // Filtrar trades
   const filteredTrades = useMemo(() => {
@@ -87,6 +91,8 @@ export default function ReportExportEnhanced({ trades }: ReportExportEnhancedPro
       return sum + moneyResult;
     }, 0);
 
+    const pnlPercentage = initialBalance > 0 ? ((totalPnL / initialBalance) * 100) : 0;
+
     return {
       total: filteredTrades.length,
       wins,
@@ -94,9 +100,10 @@ export default function ReportExportEnhanced({ trades }: ReportExportEnhancedPro
       breakEven,
       winRate: filteredTrades.length > 0 ? ((wins / filteredTrades.length) * 100).toFixed(1) : 0,
       totalPnL: totalPnL.toFixed(2),
+      pnlPercentage: pnlPercentage.toFixed(1),
       avgPnL: filteredTrades.length > 0 ? (totalPnL / filteredTrades.length).toFixed(2) : 0,
     };
-  }, [filteredTrades]);
+  }, [filteredTrades, initialBalance]);
 
   const generatePDFReport = async () => {
     if (filteredTrades.length === 0) {
@@ -158,7 +165,8 @@ export default function ReportExportEnhanced({ trades }: ReportExportEnhancedPro
       doc.setFont("" as any, "normal" as any);
       const summaryData = [
         [`Total de Trades: ${stats.total}`, `Vitórias: ${stats.wins}`, `Derrotas: ${stats.losses}`],
-        [`Taxa de Acerto: ${stats.winRate}%`, `P&L Total: $${stats.totalPnL}`, `P&L Médio: $${stats.avgPnL}`],
+        [`Taxa de Acerto: ${stats.winRate}%`, `P&L Total: $${stats.totalPnL} (${stats.pnlPercentage}%)`, `P&L Médio: $${stats.avgPnL}`],
+        [`Saldo Inicial: $${initialBalance.toFixed(2)}`, `Saldo Atual: $${(initialBalance + parseFloat(stats.totalPnL)).toFixed(2)}`, ``],
       ];
 
       summaryData.forEach((row) => {
@@ -453,7 +461,7 @@ export default function ReportExportEnhanced({ trades }: ReportExportEnhancedPro
       </div>
 
       {/* Resumo */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total de Trades</CardTitle>
@@ -484,6 +492,27 @@ export default function ReportExportEnhanced({ trades }: ReportExportEnhancedPro
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.winRate}%</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">P&L Total</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className={`text-2xl font-bold ${parseFloat(stats.totalPnL) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              ${stats.totalPnL}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Retorno s/ Saldo</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className={`text-2xl font-bold ${parseFloat(stats.pnlPercentage) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {parseFloat(stats.pnlPercentage) >= 0 ? '+' : ''}{stats.pnlPercentage}%
+            </div>
+            <p className="text-xs text-muted-foreground">Base: ${initialBalance.toFixed(0)}</p>
           </CardContent>
         </Card>
       </div>
