@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle2, TrendingUp, Target, Clock, Zap, Moon, Sun } from "lucide-react";
+import { CheckCircle2, TrendingUp, Target, Clock, Zap, Moon, Sun, LogOut } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useAccountManager } from "@/hooks/useAccountManager";
 import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
 import RiskCalculator from "@/components/RiskCalculator";
@@ -39,6 +40,7 @@ function ThemeToggle() {
 }
 
 export default function Home() {
+  const { signOut } = useAuth();
   const { accounts, activeAccountId, getActiveAccount, switchAccount } = useAccountManager();
   const { trades } = useTradeJournalUnified(activeAccountId);
   const activeAccount = getActiveAccount();
@@ -77,7 +79,9 @@ export default function Home() {
                 </span>
               </div>
               <ThemeToggle />
-              <Badge className="bg-primary text-primary-foreground">Ativo</Badge>
+              <Button variant="ghost" size="icon" onClick={signOut} className="rounded-full" title="Sair">
+                <LogOut className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>

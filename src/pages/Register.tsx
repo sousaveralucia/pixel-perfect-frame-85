@@ -1,11 +1,12 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TrendingUp, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { TrendingUp } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.email || !formData.password || !formData.confirmPassword) {
-      toast.error("Por favor, preencha todos os campos");
+      toast.error("Preencha todos os campos");
       return;
     }
     if (formData.password !== formData.confirmPassword) {
@@ -31,14 +32,17 @@ export default function Register() {
       return;
     }
     setIsLoading(true);
-    try {
-      toast.success("Cadastro realizado com sucesso!");
-      navigate("/");
-    } catch {
-      toast.error("Erro ao realizar cadastro");
-    } finally {
-      setIsLoading(false);
+    const { error } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+    });
+    setIsLoading(false);
+    if (error) {
+      toast.error(error.message);
+      return;
     }
+    toast.success("Conta criada com sucesso! Fazendo login...");
+    navigate("/");
   };
 
   return (
@@ -56,7 +60,7 @@ export default function Register() {
         <CardContent className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">E-mail</Label>
               <Input id="email" name="email" type="email" placeholder="seu@email.com" value={formData.email} onChange={handleChange} disabled={isLoading} />
             </div>
             <div className="space-y-2">
@@ -68,14 +72,9 @@ export default function Register() {
               <Input id="confirmPassword" name="confirmPassword" type="password" placeholder="••••••••" value={formData.confirmPassword} onChange={handleChange} disabled={isLoading} />
             </div>
             <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
-              {isLoading ? "Cadastrando..." : "Criar Conta"}
+              {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Criando conta...</> : "Criar Conta"}
             </Button>
           </form>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
-            <div className="relative flex justify-center text-sm"><span className="px-2 bg-background text-muted-foreground">Ou</span></div>
-          </div>
 
           <div className="text-center text-sm">
             <span className="text-muted-foreground">Já tem uma conta? </span>
