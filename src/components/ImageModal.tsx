@@ -20,6 +20,7 @@ export function ImageModal({ imageUrl, onClose }: ImageModalProps) {
 
   if (!imageUrl) return null;
 
+  return (
     <div 
       className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-4"
       onClick={onClose}
