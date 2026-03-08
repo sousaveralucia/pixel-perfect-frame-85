@@ -422,17 +422,6 @@ export default function TradeJournalEnhanced() {
       toast.success("Trade registrado!");
     }
 
-    // Verificar limite diario POR CONTA: 2 vitorias ou 3 perdas na conta especifica
-    const today = new Date().toISOString().split("T")[0];
-    const todaysTrades = [...trades, newTrade].filter(
-      t => t.date === today && t.account === formData.account
-    );
-    const wins = todaysTrades.filter(t => t.result === "WIN").length;
-    const losses = todaysTrades.filter(t => t.result === "LOSS").length;
-
-    if (wins >= 2 || losses >= 3) {
-      showDailyLimitAlert(wins, losses);
-    }
 
     setIsOpen(false);
     resetForm();
