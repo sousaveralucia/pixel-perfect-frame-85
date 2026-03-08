@@ -24,7 +24,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useTradeJournal } from "@/hooks/useTradeJournal";
 import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
 import { useAccountManager } from "@/hooks/useAccountManager";
-import { Plus, Trash2, Edit2, Image, FileSpreadsheet } from "lucide-react";
+import { Plus, Trash2, Edit2, Image, FileSpreadsheet, FileDown } from "lucide-react";
 import { toast } from "sonner";
 import { useTradeAlerts } from "@/hooks/useTradeAlerts";
 import { useExportTrades } from "@/hooks/useExportTrades";
