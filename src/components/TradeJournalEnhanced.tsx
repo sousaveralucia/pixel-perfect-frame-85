@@ -453,10 +453,10 @@ export default function TradeJournalEnhanced() {
       operational: trade.operational,
       emotional: trade.emotional,
       routine: trade.routine || {
-        hydration: false,
-        breathing: false,
+        nightAnalysis: false,
+        morningReview: false,
+        regionsValidated: false,
         sleep: false,
-        meditation: false,
       },
       rational: trade.rational,
       preTradeImage: trade.preTradeImage || "",
