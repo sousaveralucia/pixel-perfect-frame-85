@@ -91,6 +91,8 @@ export default function ReportExportEnhanced({ trades }: ReportExportEnhancedPro
       return sum + moneyResult;
     }, 0);
 
+    const pnlPercentage = initialBalance > 0 ? ((totalPnL / initialBalance) * 100) : 0;
+
     return {
       total: filteredTrades.length,
       wins,
@@ -98,9 +100,10 @@ export default function ReportExportEnhanced({ trades }: ReportExportEnhancedPro
       breakEven,
       winRate: filteredTrades.length > 0 ? ((wins / filteredTrades.length) * 100).toFixed(1) : 0,
       totalPnL: totalPnL.toFixed(2),
+      pnlPercentage: pnlPercentage.toFixed(1),
       avgPnL: filteredTrades.length > 0 ? (totalPnL / filteredTrades.length).toFixed(2) : 0,
     };
-  }, [filteredTrades]);
+  }, [filteredTrades, initialBalance]);
 
   const generatePDFReport = async () => {
     if (filteredTrades.length === 0) {
