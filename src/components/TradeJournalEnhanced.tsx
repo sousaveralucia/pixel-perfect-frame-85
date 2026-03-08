@@ -1882,12 +1882,7 @@ export default function TradeJournalEnhanced() {
                       size="sm"
                       variant={trade.isFavorite ? "default" : "outline"}
                       onClick={() => {
-                        const updatedTrades = trades.map(t =>
-                          t.id === trade.id
-                            ? { ...t, isFavorite: !t.isFavorite }
-                            : t
-                        );
-                        saveTrades(updatedTrades);
+                        toggleFavoriteUnified(trade.id);
                       }}
                       title={
                         trade.isFavorite
