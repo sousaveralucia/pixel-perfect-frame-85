@@ -7,8 +7,6 @@ interface ImageModalProps {
 }
 
 export function ImageModal({ imageUrl, onClose }: ImageModalProps) {
-  if (!imageUrl) return null;
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
