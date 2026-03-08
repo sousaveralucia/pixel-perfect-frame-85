@@ -1,0 +1,301 @@
+{
+  "news": [
+    {
+      "id": 1,
+      "date": "2026-03-06",
+      "time": "13:30",
+      "title": "Nonfarm Payrolls (NFP) - February",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "BTC USD"],
+      "category": "Employment",
+      "description": "Monthly employment report showing job creation/loss - Highly volatile for USD pairs"
+    },
+    {
+      "id": 2,
+      "date": "2026-03-11",
+      "time": "13:30",
+      "title": "Consumer Price Index (CPI) - February",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "XAUUSD", "BTC USD"],
+      "category": "Inflation",
+      "description": "Monthly inflation data - Core and Headline CPI - Major impact on USD and commodities"
+    },
+    {
+      "id": 3,
+      "date": "2026-03-18",
+      "time": "18:00",
+      "title": "FOMC Decision & Powell Press Conference",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "XAUUSD", "BTC USD"],
+      "category": "Central Bank",
+      "description": "Federal Reserve interest rate decision and monetary policy announcement"
+    },
+    {
+      "id": 4,
+      "date": "2026-03-25",
+      "time": "14:00",
+      "title": "ECB Decision & Lagarde Press Conference",
+      "importance": 3,
+      "affectedAssets": ["EUR/USD"],
+      "category": "Central Bank",
+      "description": "European Central Bank monetary policy decision - Direct impact on EUR pairs"
+    },
+    {
+      "id": 5,
+      "date": "2026-04-03",
+      "time": "13:30",
+      "title": "Nonfarm Payrolls (NFP) - March",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "BTC USD"],
+      "category": "Employment",
+      "description": "Monthly employment report showing job creation/loss"
+    },
+    {
+      "id": 6,
+      "date": "2026-04-10",
+      "time": "13:30",
+      "title": "Consumer Price Index (CPI) - March",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "XAUUSD", "BTC USD"],
+      "category": "Inflation",
+      "description": "Monthly inflation data - Core and Headline CPI"
+    },
+    {
+      "id": 7,
+      "date": "2026-04-15",
+      "time": "13:30",
+      "title": "Producer Price Index (PPI) - March",
+      "importance": 2,
+      "affectedAssets": ["USDJPY", "EUR/USD", "XAUUSD"],
+      "category": "Inflation",
+      "description": "Producer-level inflation indicator - Secondary inflation measure"
+    },
+    {
+      "id": 8,
+      "date": "2026-04-22",
+      "time": "08:00",
+      "title": "Bank of Japan (BoJ) Decision",
+      "importance": 3,
+      "affectedAssets": ["USDJPY"],
+      "category": "Central Bank",
+      "description": "Japanese monetary policy decision - Direct impact on JPY pairs"
+    },
+    {
+      "id": 9,
+      "date": "2026-04-29",
+      "time": "18:00",
+      "title": "FOMC Decision & Powell Press Conference",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "XAUUSD", "BTC USD"],
+      "category": "Central Bank",
+      "description": "Federal Reserve interest rate decision and monetary policy announcement"
+    },
+    {
+      "id": 10,
+      "date": "2026-05-08",
+      "time": "13:30",
+      "title": "Nonfarm Payrolls (NFP) - April",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "BTC USD"],
+      "category": "Employment",
+      "description": "Monthly employment report showing job creation/loss"
+    },
+    {
+      "id": 11,
+      "date": "2026-05-12",
+      "time": "13:30",
+      "title": "Consumer Price Index (CPI) - April",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "XAUUSD", "BTC USD"],
+      "category": "Inflation",
+      "description": "Monthly inflation data - Core and Headline CPI"
+    },
+    {
+      "id": 12,
+      "date": "2026-05-20",
+      "time": "13:30",
+      "title": "Retail Sales - April",
+      "importance": 2,
+      "affectedAssets": ["USDJPY", "EUR/USD", "BTC USD"],
+      "category": "Economic Activity",
+      "description": "Consumer spending indicator - Reflects economic health"
+    },
+    {
+      "id": 13,
+      "date": "2026-05-27",
+      "time": "14:00",
+      "title": "ECB Decision & Lagarde Press Conference",
+      "importance": 3,
+      "affectedAssets": ["EUR/USD"],
+      "category": "Central Bank",
+      "description": "European Central Bank monetary policy decision - Direct impact on EUR pairs"
+    },
+    {
+      "id": 14,
+      "date": "2026-06-05",
+      "time": "13:30",
+      "title": "Nonfarm Payrolls (NFP) - May",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "BTC USD"],
+      "category": "Employment",
+      "description": "Monthly employment report showing job creation/loss"
+    },
+    {
+      "id": 15,
+      "date": "2026-06-10",
+      "time": "13:30",
+      "title": "Consumer Price Index (CPI) - May",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "XAUUSD", "BTC USD"],
+      "category": "Inflation",
+      "description": "Monthly inflation data - Core and Headline CPI"
+    },
+    {
+      "id": 16,
+      "date": "2026-06-17",
+      "time": "18:00",
+      "title": "FOMC Decision & Powell Press Conference",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "XAUUSD", "BTC USD"],
+      "category": "Central Bank",
+      "description": "Federal Reserve interest rate decision and monetary policy announcement"
+    },
+    {
+      "id": 17,
+      "date": "2026-06-24",
+      "time": "08:00",
+      "title": "Bank of Japan (BoJ) Decision",
+      "importance": 3,
+      "affectedAssets": ["USDJPY"],
+      "category": "Central Bank",
+      "description": "Japanese monetary policy decision - Direct impact on JPY pairs"
+    },
+    {
+      "id": 18,
+      "date": "2026-07-03",
+      "time": "13:30",
+      "title": "Nonfarm Payrolls (NFP) - June",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "BTC USD"],
+      "category": "Employment",
+      "description": "Monthly employment report showing job creation/loss"
+    },
+    {
+      "id": 19,
+      "date": "2026-07-10",
+      "time": "13:30",
+      "title": "Consumer Price Index (CPI) - June",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "XAUUSD", "BTC USD"],
+      "category": "Inflation",
+      "description": "Monthly inflation data - Core and Headline CPI"
+    },
+    {
+      "id": 20,
+      "date": "2026-07-15",
+      "time": "13:30",
+      "title": "Producer Price Index (PPI) - June",
+      "importance": 2,
+      "affectedAssets": ["USDJPY", "EUR/USD", "XAUUSD"],
+      "category": "Inflation",
+      "description": "Producer-level inflation indicator"
+    },
+    {
+      "id": 21,
+      "date": "2026-07-22",
+      "time": "14:00",
+      "title": "ECB Decision & Lagarde Press Conference",
+      "importance": 3,
+      "affectedAssets": ["EUR/USD"],
+      "category": "Central Bank",
+      "description": "European Central Bank monetary policy decision - Direct impact on EUR pairs"
+    },
+    {
+      "id": 22,
+      "date": "2026-07-29",
+      "time": "18:00",
+      "title": "FOMC Decision & Powell Press Conference",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "XAUUSD", "BTC USD"],
+      "category": "Central Bank",
+      "description": "Federal Reserve interest rate decision and monetary policy announcement"
+    },
+    {
+      "id": 23,
+      "date": "2026-08-07",
+      "time": "13:30",
+      "title": "Nonfarm Payrolls (NFP) - July",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "BTC USD"],
+      "category": "Employment",
+      "description": "Monthly employment report showing job creation/loss"
+    },
+    {
+      "id": 24,
+      "date": "2026-08-12",
+      "time": "13:30",
+      "title": "Consumer Price Index (CPI) - July",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "XAUUSD", "BTC USD"],
+      "category": "Inflation",
+      "description": "Monthly inflation data - Core and Headline CPI"
+    },
+    {
+      "id": 25,
+      "date": "2026-08-19",
+      "time": "08:00",
+      "title": "Bank of Japan (BoJ) Decision",
+      "importance": 3,
+      "affectedAssets": ["USDJPY"],
+      "category": "Central Bank",
+      "description": "Japanese monetary policy decision - Direct impact on JPY pairs"
+    },
+    {
+      "id": 26,
+      "date": "2026-08-26",
+      "time": "14:00",
+      "title": "ECB Decision & Lagarde Press Conference",
+      "importance": 3,
+      "affectedAssets": ["EUR/USD"],
+      "category": "Central Bank",
+      "description": "European Central Bank monetary policy decision - Direct impact on EUR pairs"
+    },
+    {
+      "id": 27,
+      "date": "2026-09-04",
+      "time": "13:30",
+      "title": "Nonfarm Payrolls (NFP) - August",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "BTC USD"],
+      "category": "Employment",
+      "description": "Monthly employment report showing job creation/loss"
+    },
+    {
+      "id": 28,
+      "date": "2026-09-09",
+      "time": "13:30",
+      "title": "Consumer Price Index (CPI) - August",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "XAUUSD", "BTC USD"],
+      "category": "Inflation",
+      "description": "Monthly inflation data - Core and Headline CPI"
+    },
+    {
+      "id": 29,
+      "date": "2026-09-16",
+      "time": "18:00",
+      "title": "FOMC Decision & Powell Press Conference",
+      "importance": 3,
+      "affectedAssets": ["USDJPY", "EUR/USD", "XAUUSD", "BTC USD"],
+      "category": "Central Bank",
+      "description": "Federal Reserve interest rate decision and monetary policy announcement"
+    }
+  ],
+  "importanceLevels": {
+    "1": "Low Impact",
+    "2": "Medium Impact",
+    "3": "High Impact"
+  },
+  "assets": ["EUR/USD", "USDJPY", "XAUUSD", "NASDAQ", "BTC USD"],
+  "categories": ["Employment", "Inflation", "Central Bank", "Economic Activity"]
+}

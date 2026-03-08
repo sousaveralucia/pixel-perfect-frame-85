@@ -1,59 +1,130 @@
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bell, TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AlertCircle, Bell, X } from "lucide-react";
+import economicNews from "@/data/economicNews.json";
 
-const mockAlerts = [
-  { id: 1, type: "bullish", asset: "EUR/USD", message: "CHoCH válido identificado em H4 - Possível reversão de alta", time: "09:30", priority: "high" },
-  { id: 2, type: "bearish", asset: "XAUUSD", message: "Rompimento de suporte em H1 - Tendência de baixa", time: "10:15", priority: "medium" },
-  { id: 3, type: "news", asset: "NASDAQ", message: "NFP será divulgado às 15:30 - Alta volatilidade esperada", time: "08:00", priority: "high" },
-  { id: 4, type: "bullish", asset: "BTC USD", message: "Order Block de demanda respeitado em H4", time: "11:45", priority: "medium" },
-  { id: 5, type: "bearish", asset: "USDJPY", message: "Divergência bearish no RSI em H1", time: "12:30", priority: "low" },
-];
+/**
+ * News Alerts Component
+ * Alertas visuais para notícias econômicas de alto impacto próximas
+ */
+
+interface NewsItem {
+  id: number;
+  date: string;
+  time: string;
+  title: string;
+  importance: number;
+  affectedAssets: string[];
+  category: string;
+  description: string;
+}
+
+// Função para converter horário GMT para Brasília (GMT-3)
+const convertToBrasilia = (timeStr: string): string => {
+  if (!timeStr) return 'N/A';
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  let brasiliaHours = hours - 3; // GMT para GMT-3
+  if (brasiliaHours < 0) brasiliaHours += 24;
+  return `${String(brasiliaHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+};
 
 export default function NewsAlerts() {
+  const [dismissedAlerts, setDismissedAlerts] = useState<number[]>([]);
+
+  // Obter notícias de alto impacto dos próximos 6 meses (180 dias)
+  const upcomingHighImpactNews = useMemo(() => {
+    const today = new Date();
+    const sixMonthsLater = new Date(today.getTime() + 180 * 24 * 60 * 60 * 1000);
+    const operatedAssets = ["EUR/USD", "USDJPY", "XAUUSD", "NASDAQ", "BTC USD"];
+
+    return (economicNews.news as NewsItem[])
+      .filter((news) => {
+        const newsDate = new Date(news.date);
+        const hasOperatedAsset = news.affectedAssets.some(asset => operatedAssets.includes(asset));
+        return (
+          news.importance === 3 &&
+          newsDate >= today &&
+          newsDate <= sixMonthsLater &&
+          hasOperatedAsset &&
+          !dismissedAlerts.includes(news.id)
+        );
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, [dismissedAlerts]);
+
+  const dismissAlert = (id: number) => {
+    setDismissedAlerts([...dismissedAlerts, id]);
+  };
+
+  // Calcular dias até a notícia
+  const daysUntil = (dateStr: string): string => {
+    const today = new Date();
+    const newsDate = new Date(dateStr);
+    const diffTime = newsDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return "Hoje";
+    if (diffDays === 1) return "Amanhã";
+    return `Em ${diffDays} dias`;
+  };
+
   return (
-    <Card>
+    <Card className="border-red-200 bg-red-50">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Bell className="w-5 h-5 text-primary" />
-          Alertas de Mercado
+          <Bell className="w-5 h-5 text-red-600" />
+          Alertas de Notícias
         </CardTitle>
-        <CardDescription>Alertas e notícias relevantes para seus ativos</CardDescription>
+        <CardDescription>Notícias de alto impacto dos próximos 6 meses para seus ativos (EUR/USD, USDJPY, XAUUSD, NASDAQ, BTC USD)</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {mockAlerts.map((alert) => (
-            <Card key={alert.id} className={`border-l-4 ${
-              alert.type === "bullish" ? "border-l-success" : 
-              alert.type === "bearish" ? "border-l-destructive" : 
-              "border-l-primary"
-            }`}>
-              <CardContent className="pt-4 pb-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3">
-                    {alert.type === "bullish" ? (
-                      <TrendingUp className="w-5 h-5 text-success mt-0.5" />
-                    ) : alert.type === "bearish" ? (
-                      <TrendingDown className="w-5 h-5 text-destructive mt-0.5" />
-                    ) : (
-                      <AlertTriangle className="w-5 h-5 text-primary mt-0.5" />
-                    )}
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-foreground">{alert.asset}</span>
-                        <Badge variant={alert.priority === "high" ? "destructive" : "secondary"} className="text-xs">
-                          {alert.priority === "high" ? "Alta" : alert.priority === "medium" ? "Média" : "Baixa"}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{alert.message}</p>
-                    </div>
-                  </div>
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">{alert.time}</span>
+      <CardContent className="space-y-3">
+        {upcomingHighImpactNews.length === 0 ? (
+          <div className="text-center py-6">
+            <p className="text-sm text-foreground/70">Nenhuma notícia de alto impacto nos próximos 3 meses</p>
+          </div>
+        ) : (
+          upcomingHighImpactNews.map((news) => (
+            <div
+              key={news.id}
+              className="bg-white p-4 rounded-lg border-l-4 border-red-500 flex items-start justify-between gap-4 hover:shadow-md transition-shadow"
+            >
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <AlertCircle className="w-4 h-4 text-red-600" />
+                  <p className="font-bold text-foreground text-sm">{news.title}</p>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                <p className="text-xs text-foreground/70 mb-2">{news.time} GMT | {convertToBrasilia(news.time)} (Brasília)</p>
+                <p className="text-xs text-foreground/80 mb-2">{news.description}</p>
+                <div className="flex flex-wrap gap-1">
+                  {news.affectedAssets.map((asset) => (
+                    <Badge key={asset} variant="outline" className="text-xs bg-red-100 text-red-900 border-red-300">
+                      {asset}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+              <div className="text-right flex flex-col items-end gap-2">
+                <Badge className="bg-red-600 text-white text-xs">{daysUntil(news.date)}</Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => dismissAlert(news.id)}
+                  className="text-foreground/60 hover:text-foreground"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
+
+        {upcomingHighImpactNews.length > 0 && (
+          <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200 text-xs text-yellow-900 mt-4">
+            <strong>⚠️ Aviso:</strong> Notícias de alto impacto podem causar movimentos significativos. Considere evitar operar durante esses períodos se não tiver experiência.
+          </div>
+        )}
       </CardContent>
     </Card>
   );
