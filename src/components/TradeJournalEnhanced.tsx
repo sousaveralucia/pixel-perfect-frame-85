@@ -877,14 +877,14 @@ export default function TradeJournalEnhanced() {
                     onChange={e =>
                       setFormData({
                         ...formData,
-                        account: e.target.value as any,
+                        account: e.target.value,
                       })
                     }
                     className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    <option value="Conta 1 ($100)">Conta 1 ($100)</option>
-                    <option value="Conta 2 ($1000)">Conta 2 ($1000)</option>
-                    <option value="Conta 3 ($10000)">Conta 3 ($10000)</option>
+                    {accounts.map((acc) => (
+                      <option key={acc.id} value={acc.id}>{acc.name}</option>
+                    ))}
                   </select>
                 </div>
                 <div>
