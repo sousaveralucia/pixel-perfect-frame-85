@@ -32,10 +32,8 @@ interface Analysis {
 
 export default function AnalysisHistory() {
   const { accounts, activeAccountId } = useAccountManager();
-  const [analyses, setAnalyses] = useState<Analysis[]>(() => {
-    const saved = localStorage.getItem("analyses");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const { user } = useAuth();
+  const [analyses, setAnalyses] = useState<Analysis[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [filterAsset, setFilterAsset] = useState<string>("all");
@@ -55,9 +53,32 @@ export default function AnalysisHistory() {
 
   const assets = ["EUR/USD", "USDJPY", "XAUUSD", "NASDAQ", "BTC USD"];
 
+  // Load from Supabase
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("analyses").select("*").eq("user_id", user.id).eq("account_key", activeAccountId).order("created_at").then(({ data }) => {
+      if (data) {
+        setAnalyses(data.map((r: any) => ({
+          id: r.id,
+          accountId: r.account_key,
+          asset: r.asset || "",
+          date: r.date || "",
+          timeframe: r.timeframe || "",
+          fibonacciLevel: r.fibonacci_level || "",
+          orderBlockLevel: r.order_block_level || "",
+          liquidityZone: r.liquidity_zone || "",
+          notes: r.notes || "",
+          status: r.status || "ATIVO",
+          imageUrl1: r.image_url1 || "",
+          imageUrl2: r.image_url2 || "",
+          imageUrl3: r.image_url3 || "",
+        })));
+      }
+    });
+  }, [user, activeAccountId]);
+
   const saveAnalyses = (newAnalyses: Analysis[]) => {
     setAnalyses(newAnalyses);
-    localStorage.setItem("analyses", JSON.stringify(newAnalyses));
   };
 
   const handleAddAnalysis = () => {
