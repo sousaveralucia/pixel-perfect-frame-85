@@ -281,37 +281,8 @@ export default function Home() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="gestao" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-primary" />
-                  Gestão de Risco
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-3 gap-4">
-                  <Card className="border-l-4 border-l-primary">
-                    <CardContent className="pt-6">
-                      <p className="text-3xl font-bold text-primary">1:3</p>
-                      <p className="text-sm text-muted-foreground">R:R Mínimo</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-l-4 border-l-destructive">
-                    <CardContent className="pt-6">
-                      <p className="text-3xl font-bold text-destructive">2</p>
-                      <p className="text-sm text-muted-foreground">Stops para Parar</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-l-4 border-l-success">
-                    <CardContent className="pt-6">
-                      <p className="text-3xl font-bold text-success">5</p>
-                      <p className="text-sm text-muted-foreground">Ativos Monitorados</p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="saques" className="space-y-6">
+            <Withdrawals />
           </TabsContent>
 
           <TabsContent value="rotina" className="space-y-6">
