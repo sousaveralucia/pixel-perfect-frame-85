@@ -17,7 +17,7 @@ export function EquityCurveChart({ activeAccountId: propAccountId }: EquityCurve
   const accountId = propAccountId || hookAccountId;
 
   const activeAccount = accounts.find((a) => a.id === accountId || a.account_key === accountId);
-  const initialBalance = activeAccount?.initial_balance ?? 100;
+  const initialBalance = activeAccount?.initialBalance ?? 100;
 
   const { data: trades = [] } = useQuery({
     queryKey: ["equity-trades", user?.id, accountId],
