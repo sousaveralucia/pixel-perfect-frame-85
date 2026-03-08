@@ -96,7 +96,7 @@ export default function Home() {
             <TabsTrigger value="autoconhecimento" className="text-xs whitespace-nowrap">Pessoal</TabsTrigger>
             <TabsTrigger value="ativos" className="text-xs whitespace-nowrap">Ativos</TabsTrigger>
             <TabsTrigger value="estrategia" className="text-xs whitespace-nowrap">Estratégia</TabsTrigger>
-            <TabsTrigger value="gestao" className="text-xs whitespace-nowrap">Gestão</TabsTrigger>
+            <TabsTrigger value="validacao" className="text-xs whitespace-nowrap">Pré-Op</TabsTrigger>
             <TabsTrigger value="rotina" className="text-xs whitespace-nowrap">Rotina</TabsTrigger>
             <TabsTrigger value="alertas" className="text-xs whitespace-nowrap">Alertas</TabsTrigger>
             <TabsTrigger value="analises" className="text-xs whitespace-nowrap">Análises</TabsTrigger>
@@ -106,7 +106,7 @@ export default function Home() {
             <TabsTrigger value="insights" className="text-xs whitespace-nowrap">Insights</TabsTrigger>
             <TabsTrigger value="comparacao" className="text-xs whitespace-nowrap">Comparação</TabsTrigger>
             <TabsTrigger value="relatorio" className="text-xs whitespace-nowrap">Relatório</TabsTrigger>
-            <TabsTrigger value="validacao" className="text-xs whitespace-nowrap">Validação</TabsTrigger>
+            <TabsTrigger value="gestao" className="text-xs whitespace-nowrap">Gestão</TabsTrigger>
           </TabsList>
 
           <TabsContent value="calendario-trading" className="space-y-6">
