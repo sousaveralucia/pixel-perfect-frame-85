@@ -34,7 +34,7 @@ const CATEGORY_ICONS: Record<string, string> = {
   "Atividade Econômica": "🏭",
 };
 
-const OPERATED_ASSETS = ["EUR/USD", "USDJPY", "XAUUSD", "NASDAQ", "BTC USD"];
+const OPERATED_ASSETS = ["DXY", "EUR/USD", "USD/JPY", "XAU/USD", "NAS100", "BTC/USD"];
 
 const convertToBrasilia = (timeStr: string): string => {
   if (!timeStr) return "N/A";
