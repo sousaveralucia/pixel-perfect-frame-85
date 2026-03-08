@@ -394,10 +394,10 @@ export default function TradeJournalEnhanced() {
     }
 
     if (editingId) {
-      saveTrades(trades.map(t => (t.id === editingId ? newTrade : t)));
+      updateTradeUnified(editingId, newTrade);
       toast.success("Trade atualizado!");
     } else {
-      saveTrades([newTrade, ...trades]);
+      addTradeUnified(newTrade);
       toast.success("Trade registrado!");
     }
 
