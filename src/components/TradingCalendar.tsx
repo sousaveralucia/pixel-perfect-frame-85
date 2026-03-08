@@ -9,6 +9,7 @@ import { useAccountManager } from "@/hooks/useAccountManager";
 import { MonthlyPhotoGallery } from "./MonthlyPhotoGallery";
 import { TradingDashboard } from "./TradingDashboard";
 import { TradesSummary } from "./TradesSummary";
+import { EquityCurveChart } from "./EquityCurveChart";
 
 interface Trade {
   id: string;
