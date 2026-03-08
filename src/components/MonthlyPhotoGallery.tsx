@@ -84,8 +84,8 @@ export function MonthlyPhotoGallery({ activeAccountId: propAccountId }: MonthlyP
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="flex flex-col h-full">
+      <Card className="flex-1 flex flex-col">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
