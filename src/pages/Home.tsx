@@ -78,6 +78,10 @@ export default function Home() {
               </div>
               <ThemeToggle />
               <Badge className="bg-primary text-primary-foreground">Ativo</Badge>
+            </div>
+          </div>
+        </div>
+      </header>
 
       {/* Main Content */}
       <main className="container py-12">
