@@ -69,6 +69,7 @@ function mapRowToTrade(row: any): TradeWithChecklist {
     notes: row.notes || "",
     isFavorite: row.is_favorite || false,
     moneyResult: row.money_result ? Number(row.money_result) : undefined,
+    riskReward: row.risk_reward != null ? Number(row.risk_reward) : undefined,
     operational: row.operational || { chochValidoHTF: false, caixaGannTracada: false, regiaoDescontada50: false, orderBlockIdentificado: false, entrada50OB: false, stopRiskManagement: false, tempoGraficoOperacional: false },
     emotional: row.emotional || { hydration: false, breathing: false, mentalClarity: false },
     rational: row.rational || { analysisConfirmed: false, planRespected: false, riskManaged: false },
@@ -125,6 +126,7 @@ export const useTradeJournalUnified = (accountId: string) => {
       notes: trade.notes,
       is_favorite: trade.isFavorite,
       money_result: trade.moneyResult || null,
+      risk_reward: trade.riskReward ?? null,
       operational: trade.operational as any,
       emotional: trade.emotional as any,
       rational: trade.rational as any,
@@ -157,6 +159,7 @@ export const useTradeJournalUnified = (accountId: string) => {
     if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
     if (updates.isFavorite !== undefined) dbUpdates.is_favorite = updates.isFavorite;
     if (updates.moneyResult !== undefined) dbUpdates.money_result = updates.moneyResult;
+    if (updates.riskReward !== undefined) dbUpdates.risk_reward = updates.riskReward;
     if (updates.operational !== undefined) dbUpdates.operational = updates.operational;
     if (updates.emotional !== undefined) dbUpdates.emotional = updates.emotional;
     if (updates.rational !== undefined) dbUpdates.rational = updates.rational;
