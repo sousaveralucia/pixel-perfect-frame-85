@@ -188,7 +188,7 @@ function getMarketSessionInfo(
 
 export default function TradeJournalEnhanced() {
   const { accounts, activeAccountId } = useAccountManager();
-  const { exportToCSV } = useExportTrades();
+  
   const { trades, isLoaded, addTrade: addTradeUnified, updateTrade: updateTradeUnified, deleteTrade: deleteTradeUnified, toggleFavorite: toggleFavoriteUnified } = useTradeJournalUnified(activeAccountId);
 
   const [isOpen, setIsOpen] = useState(false);
