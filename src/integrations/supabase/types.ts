@@ -218,6 +218,7 @@ export type Database = {
           exit_price: string | null
           id: string
           is_favorite: boolean | null
+          market_session: string | null
           money_result: number | null
           notes: string | null
           operational: Json | null
@@ -247,6 +248,7 @@ export type Database = {
           exit_price?: string | null
           id?: string
           is_favorite?: boolean | null
+          market_session?: string | null
           money_result?: number | null
           notes?: string | null
           operational?: Json | null
@@ -276,6 +278,7 @@ export type Database = {
           exit_price?: string | null
           id?: string
           is_favorite?: boolean | null
+          market_session?: string | null
           money_result?: number | null
           notes?: string | null
           operational?: Json | null
