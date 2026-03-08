@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 import { subDays, subMonths, parseISO, isAfter } from "date-fns";
+import { exportInsightsPdf } from "@/lib/insightsPdfExporter";
+import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAccountManager } from "@/hooks/useAccountManager";
@@ -11,7 +13,7 @@ import {
 } from "recharts";
 import {
   TrendingUp, TrendingDown, Target, Shield, Brain, Heart, Flame, Calendar,
-  CheckCircle2, XCircle, AlertTriangle, Award, Zap, BarChart3, Filter,
+  CheckCircle2, XCircle, AlertTriangle, Award, Zap, BarChart3, Filter, Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -382,25 +384,48 @@ export default function PerformanceDashboard() {
   return (
     <div className="space-y-8">
       {/* Filtro de Período */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <Filter className="w-4 h-4 text-muted-foreground" />
-        <span className="text-sm font-medium text-muted-foreground">Período:</span>
-        {PERIOD_OPTIONS.map(opt => (
-          <Button
-            key={opt.value}
-            variant={period === opt.value ? "default" : "outline"}
-            size="sm"
-            onClick={() => setPeriod(opt.value)}
-            className="h-8"
-          >
-            {opt.label}
-          </Button>
-        ))}
-        {period !== "all" && (
-          <Badge variant="secondary" className="ml-2">
-            {trades.length} de {allTrades.length} trades
-          </Badge>
-        )}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Filter className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-muted-foreground">Período:</span>
+          {PERIOD_OPTIONS.map(opt => (
+            <Button
+              key={opt.value}
+              variant={period === opt.value ? "default" : "outline"}
+              size="sm"
+              onClick={() => setPeriod(opt.value)}
+              className="h-8"
+            >
+              {opt.label}
+            </Button>
+          ))}
+          {period !== "all" && (
+            <Badge variant="secondary" className="ml-2">
+              {trades.length} de {allTrades.length} trades
+            </Badge>
+          )}
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 gap-1.5"
+          onClick={() => {
+            const periodLabel = PERIOD_OPTIONS.find(o => o.value === period)?.label || "Tudo";
+            exportInsightsPdf({
+              overallStats,
+              disciplineStats,
+              emotionalStats,
+              streakStats,
+              dayOfWeekStats,
+              periodLabel,
+              tradesCount: trades.length,
+            });
+            toast.success("PDF de Insights exportado com sucesso!");
+          }}
+        >
+          <Download className="w-3.5 h-3.5" />
+          Exportar PDF
+        </Button>
       </div>
 
       {/* KPIs Principais */}
