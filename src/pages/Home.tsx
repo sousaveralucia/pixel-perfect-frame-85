@@ -407,7 +407,7 @@ export default function Home() {
           </TabsContent>
 
           <TabsContent value="calculadora" className="space-y-6">
-            <RiskCalculator />
+            <TradingCalculator />
           </TabsContent>
 
           <TabsContent value="diario" className="space-y-6">
