@@ -503,6 +503,7 @@ export default function TradeJournalEnhanced() {
         hydration: false,
         breathing: false,
         sleep: false,
+        meditation: false,
       },
       rational: {
         analysisConfirmed: false,
