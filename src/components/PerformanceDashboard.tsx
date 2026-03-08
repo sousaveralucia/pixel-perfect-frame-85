@@ -153,10 +153,10 @@ export default function PerformanceDashboard() {
     ];
 
     const routineItems = [
-      { key: "hydration", label: "Hidratação", icon: "💧" },
-      { key: "breathing", label: "Respiração", icon: "🌬️" },
+      { key: "nightAnalysis", label: "Análise Noturna", icon: "🌙" },
+      { key: "morningReview", label: "Revisão Manhã", icon: "🌅" },
+      { key: "regionsValidated", label: "Regiões Validadas", icon: "🎯" },
       { key: "sleep", label: "Sono", icon: "😴" },
-      { key: "meditation", label: "Meditação", icon: "🧘" },
     ];
 
     const analyzeCategory = (items: typeof emotionalItems, category: "emotional" | "rational" | "routine") => {
