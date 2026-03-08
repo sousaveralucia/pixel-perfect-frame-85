@@ -396,7 +396,7 @@ export default function Home() {
           </TabsContent>
 
           <TabsContent value="comparacao" className="space-y-6">
-            <StrategyComparisonEnhanced />
+            <StrategyComparisonEnhanced trades={trades} />
           </TabsContent>
 
           <TabsContent value="relatorio" className="space-y-6">
