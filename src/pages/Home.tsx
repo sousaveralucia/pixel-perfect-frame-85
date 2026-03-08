@@ -5,6 +5,8 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, TrendingUp, Target, Clock, Zap, Moon, Sun } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAccountManager } from "@/hooks/useAccountManager";
+import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
 import RiskCalculator from "@/components/RiskCalculator";
 import EconomicCalendar from "@/components/EconomicCalendar";
 import NewsAlerts from "@/components/NewsAlerts";
@@ -17,6 +19,8 @@ import AnalysisHistory from "@/components/AnalysisHistory";
 import DailyValidation from "@/components/DailyValidation";
 import AssetPerformanceAnalysis from "@/components/AssetPerformanceAnalysis";
 import { TradingCalendar } from "@/components/TradingCalendar";
+import CalculationHistory from "@/components/CalculationHistory";
+import { EquityAndPerformanceCharts } from "@/components/EquityAndPerformanceCharts";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
