@@ -1,10 +1,12 @@
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle2, TrendingUp, Target, Clock, Zap, Moon, Sun, LogOut } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { CheckCircle2, TrendingUp, Target, Clock, Zap, Moon, Sun, LogOut, ClipboardCheck, ArrowRight } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAccountManager } from "@/hooks/useAccountManager";
@@ -44,6 +46,7 @@ export default function Home() {
   const { signOut } = useAuth();
   const { accounts, activeAccountId, getActiveAccount, switchAccount } = useAccountManager();
   const { trades } = useTradeJournalUnified(activeAccountId);
+  const [showPlanDialog, setShowPlanDialog] = useState(false);
   const activeAccount = getActiveAccount();
   const currentBalance = activeAccount?.currentBalance ?? 0;
   const initialBalance = activeAccount?.initialBalance ?? 0;
@@ -422,10 +425,10 @@ export default function Home() {
               <p className="text-foreground/80 mb-6">
                 Para trading no mercado financeiro. Todas as suas regras, estratégias e rotinas em um único lugar.
               </p>
-              <Button onClick={() => {
-                const el = document.querySelector("[role='tablist']")?.parentElement;
-                if (el) el.scrollIntoView({ behavior: "smooth" });
-              }}>Visualizar Plano</Button>
+              <Button onClick={() => setShowPlanDialog(true)}>
+                <ClipboardCheck className="w-4 h-4 mr-2" />
+                Visualizar Plano
+              </Button>
             </div>
             <Separator className="my-6" />
             <p className="text-sm text-foreground/80">
@@ -433,6 +436,116 @@ export default function Home() {
             </p>
           </CardContent>
         </Card>
+
+        {/* Dialog do Plano Operacional */}
+        <Dialog open={showPlanDialog} onOpenChange={setShowPlanDialog}>
+          <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-xl">
+                <ClipboardCheck className="w-5 h-5 text-primary" />
+                Plano Operacional de Trade
+              </DialogTitle>
+              <DialogDescription>
+                Siga este checklist antes de cada operação
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 mt-2">
+              {/* Etapa 1 */}
+              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
+                <h3 className="font-bold text-sm text-primary flex items-center gap-2">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">1</span>
+                  Confirmação de Estrutura (HTF)
+                </h3>
+                <div className="flex items-start gap-2 ml-8">
+                  <ArrowRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                  <p className="text-sm text-foreground/80">CHoCH (Change of Character) validado em timeframe maior</p>
+                </div>
+              </div>
+
+              {/* Etapa 2 */}
+              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
+                <h3 className="font-bold text-sm text-primary flex items-center gap-2">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">2</span>
+                  Caixa de Gann Traçada
+                </h3>
+                <div className="flex items-start gap-2 ml-8">
+                  <ArrowRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                  <p className="text-sm text-foreground/80">Desenhar a Gann Box no movimento principal para identificar níveis</p>
+                </div>
+              </div>
+
+              {/* Etapa 3 */}
+              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
+                <h3 className="font-bold text-sm text-primary flex items-center gap-2">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">3</span>
+                  Região Descontada (50%)
+                </h3>
+                <div className="flex items-start gap-2 ml-8">
+                  <ArrowRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                  <p className="text-sm text-foreground/80">Preço está na região de desconto (abaixo de 50% da Gann Box)</p>
+                </div>
+              </div>
+
+              {/* Etapa 4 */}
+              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
+                <h3 className="font-bold text-sm text-primary flex items-center gap-2">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">4</span>
+                  Order Block Identificado
+                </h3>
+                <div className="flex items-start gap-2 ml-8">
+                  <ArrowRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                  <p className="text-sm text-foreground/80">Identificar o Order Block (OB) na zona de interesse</p>
+                </div>
+              </div>
+
+              {/* Etapa 5 */}
+              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
+                <h3 className="font-bold text-sm text-primary flex items-center gap-2">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">5</span>
+                  Entrada nos 50% do OB
+                </h3>
+                <div className="flex items-start gap-2 ml-8">
+                  <ArrowRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                  <p className="text-sm text-foreground/80">Posicionar entrada nos 50% do Order Block para melhor R:R</p>
+                </div>
+              </div>
+
+              {/* Etapa 6 */}
+              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
+                <h3 className="font-bold text-sm text-primary flex items-center gap-2">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">6</span>
+                  Stop & Risk Management
+                </h3>
+                <div className="flex items-start gap-2 ml-8">
+                  <ArrowRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                  <p className="text-sm text-foreground/80">Stop loss posicionado corretamente, risco controlado (máx 1-2% do capital)</p>
+                </div>
+              </div>
+
+              {/* Etapa 7 */}
+              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
+                <h3 className="font-bold text-sm text-primary flex items-center gap-2">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">7</span>
+                  Tempo Gráfico Operacional
+                </h3>
+                <div className="flex items-start gap-2 ml-8">
+                  <ArrowRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                  <p className="text-sm text-foreground/80">Confirmação no timeframe operacional antes de executar</p>
+                </div>
+              </div>
+
+              {/* Regra de ouro */}
+              <div className="rounded-lg border-2 border-primary/50 bg-primary/5 p-4 mt-4">
+                <h3 className="font-bold text-sm text-primary mb-2">⚡ Regra de Ouro</h3>
+                <p className="text-sm text-foreground/80">
+                  Somente execute se <strong>todos os 7 itens</strong> estiverem confirmados. Setup incompleto = sem entrada. 
+                  Alvo mínimo de <strong>R:R 1:3</strong>.
+                </p>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
