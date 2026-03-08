@@ -338,12 +338,15 @@ export default function ReportExportEnhanced({ trades }: ReportExportEnhancedPro
         y = 18;
 
         for (const trade of tradesWithImages) {
-          checkPage(12);
+          // New page per trade's images
+          if (y > 20) { doc.addPage(); y = 14; }
+
+          // Trade title
           doc.setTextColor(...co.accent);
-          doc.setFontSize(8);
+          doc.setFontSize(9);
           doc.setFont("helvetica", "bold");
           doc.text(`${trade.asset} - ${trade.date} (${trade.result})`, m, y);
-          y += 5;
+          y += 6;
 
           const images: [string, string | undefined][] = [
             ["Pre-Trade", trade.preTradeImage],
@@ -352,13 +355,11 @@ export default function ReportExportEnhanced({ trades }: ReportExportEnhancedPro
           ];
           const validImgs = images.filter(([, u]) => u);
 
-          // Side by side if multiple, stacked if needed
-          const imgW = validImgs.length > 1 ? (pw - 2 * m - 4 * (validImgs.length - 1)) / validImgs.length : pw - 2 * m;
-          const imgH = validImgs.length > 1 ? 50 : 70;
+          // Stack vertically, each image fills full width with equal height
+          const imgW = pw - 2 * m;
+          const availH = ph - y - 10;
+          const imgH = Math.min(82, (availH - validImgs.length * 8) / validImgs.length);
 
-          checkPage(imgH + 12);
-
-          let ix = m;
           for (const [label, url] of validImgs) {
             if (!url) continue;
             try {
@@ -369,20 +370,21 @@ export default function ReportExportEnhanced({ trades }: ReportExportEnhancedPro
                 reader.onloadend = () => resolve(reader.result as string);
                 reader.readAsDataURL(blob);
               });
-              doc.addImage(dataUrl, "JPEG", ix, y, imgW, imgH);
+
               doc.setTextColor(...co.gray);
-              doc.setFontSize(6);
-              doc.setFont("helvetica", "normal");
-              doc.text(label, ix + 1, y + imgH + 3);
-              ix += imgW + 4;
+              doc.setFontSize(7);
+              doc.setFont("helvetica", "bold");
+              doc.text(label, m, y);
+              y += 3;
+              doc.addImage(dataUrl, "JPEG", m, y, imgW, imgH);
+              y += imgH + 5;
             } catch {
               doc.setTextColor(...co.red);
               doc.setFontSize(6);
-              doc.text(`${label}: indisponivel`, ix, y + 4);
-              ix += imgW + 4;
+              doc.text(`${label}: indisponivel`, m, y);
+              y += 6;
             }
           }
-          y += imgH + 10;
         }
 
         addFooter();
