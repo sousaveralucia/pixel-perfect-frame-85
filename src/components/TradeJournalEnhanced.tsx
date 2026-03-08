@@ -456,7 +456,7 @@ export default function TradeJournalEnhanced() {
   };
 
   const handleDeleteTrade = (id: string) => {
-    saveTrades(trades.filter(t => t.id !== id));
+    deleteTradeUnified(id);
     toast.success("Trade removido!");
   };
 
