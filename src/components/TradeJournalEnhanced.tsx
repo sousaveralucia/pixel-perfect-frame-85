@@ -514,7 +514,7 @@ export default function TradeJournalEnhanced() {
       stopLoss: "",
       takeProfit: "",
       session: "",
-      account: "Conta 1 ($100)",
+      account: "",
       result: "WIN",
       riskReward: 0,
       moneyResult: 0,
