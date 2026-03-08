@@ -627,10 +627,10 @@ export default function TradeJournalEnhanced() {
     // Rotina (compact single row)
     secTitle("Rotina", c.green);
     const routItems: [string, boolean][] = [
-      ["Hidratacao", trade.routine.hydration],
-      ["Respiracao", trade.routine.breathing],
+      ["Analise Noturna", trade.routine.nightAnalysis],
+      ["Revisao Manha", trade.routine.morningReview],
+      ["Regioes Validadas", trade.routine.regionsValidated],
       ["Sono", trade.routine.sleep],
-      ["Meditacao", trade.routine.meditation],
     ];
     // Inline horizontal
     const rItemW = (pw - 2 * m) / routItems.length;
