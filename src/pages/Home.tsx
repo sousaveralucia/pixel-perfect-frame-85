@@ -38,6 +38,9 @@ function ThemeToggle() {
 }
 
 export default function Home() {
+  const { activeAccountId } = useAccountManager();
+  const { trades } = useTradeJournalUnified(activeAccountId);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
