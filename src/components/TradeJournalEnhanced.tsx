@@ -34,7 +34,7 @@ import {
   parseTimeString,
 } from "@/hooks/useMarketSession";
 import { Download } from "lucide-react";
-import { exportTradesToExcel } from "@/lib/excelExporter";
+import { exportTradesToExcel, exportToCSV as exportToCSVFile } from "@/lib/excelExporter";
 import { SimpleImageViewer } from "./SimpleImageViewer";
 import { TradeImageGallery } from "./TradeImageGallery";
 
