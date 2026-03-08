@@ -185,50 +185,9 @@ function getMarketSessionInfo(
 }
 
 export default function TradeJournalEnhanced() {
-  const { activeAccountId } = useAccountManager();
+  const { accounts, activeAccountId } = useAccountManager();
   const { exportToCSV } = useExportTrades();
-  const [trades, setTrades] = useState<TradeWithChecklist[]>([]);
-
-  // Sincronizar trades quando a conta ativa mudar
-  useEffect(() => {
-    const saved = localStorage.getItem(`trades_enhanced_${activeAccountId}`);
-    if (saved) {
-      let parsedTrades = JSON.parse(saved);
-      // Migrar trades antigos que têm chochValidoM15M5
-      parsedTrades = parsedTrades.map((trade: any) => {
-        if (
-          trade.operational &&
-          trade.operational.hasOwnProperty("chochValidoM15M5")
-        ) {
-          const { chochValidoM15M5, ...rest } = trade.operational;
-          return {
-            ...trade,
-            operational: {
-              ...rest,
-              tempoGraficoOperacional: chochValidoM15M5,
-            },
-          };
-        }
-        // Garantir que tempoGraficoOperacional existe
-        if (
-          trade.operational &&
-          !trade.operational.hasOwnProperty("tempoGraficoOperacional")
-        ) {
-          return {
-            ...trade,
-            operational: {
-              ...trade.operational,
-              tempoGraficoOperacional: false,
-            },
-          };
-        }
-        return trade;
-      });
-      setTrades(parsedTrades);
-    } else {
-      setTrades([]);
-    }
-  }, [activeAccountId]);
+  const { trades, isLoaded, addTrade: addTradeUnified, updateTrade: updateTradeUnified, deleteTrade: deleteTradeUnified, toggleFavorite: toggleFavoriteUnified } = useTradeJournalUnified(activeAccountId);
 
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
