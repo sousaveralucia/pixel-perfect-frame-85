@@ -764,12 +764,12 @@ export default function TradeJournalEnhanced() {
         breathing: false,
         mentalClarity: false,
       },
-      routine: {
-        hydration: false,
-        breathing: false,
-        sleep: false,
-        meditation: false,
-      },
+    routine: {
+      nightAnalysis: false,
+      morningReview: false,
+      regionsValidated: false,
+      sleep: false,
+    },
       rational: {
         analysisConfirmed: false,
         planRespected: false,
