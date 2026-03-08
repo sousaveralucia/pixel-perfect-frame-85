@@ -74,6 +74,7 @@ interface TradeWithChecklist {
     hydration: boolean;
     breathing: boolean;
     sleep: boolean;
+    meditation: boolean;
   };
   rational: {
     analysisConfirmed: boolean;
@@ -239,6 +240,7 @@ export default function TradeJournalEnhanced() {
       hydration: false,
       breathing: false,
       sleep: false,
+      meditation: false,
     },
     rational: {
       analysisConfirmed: false,
@@ -394,10 +396,10 @@ export default function TradeJournalEnhanced() {
     }
 
     if (editingId) {
-      saveTrades(trades.map(t => (t.id === editingId ? newTrade : t)));
+      updateTradeUnified(editingId, newTrade);
       toast.success("Trade atualizado!");
     } else {
-      saveTrades([newTrade, ...trades]);
+      addTradeUnified(newTrade);
       toast.success("Trade registrado!");
     }
 
@@ -446,6 +448,7 @@ export default function TradeJournalEnhanced() {
         hydration: false,
         breathing: false,
         sleep: false,
+        meditation: false,
       },
       rational: trade.rational,
       preTradeImage: trade.preTradeImage || "",
@@ -456,7 +459,7 @@ export default function TradeJournalEnhanced() {
   };
 
   const handleDeleteTrade = (id: string) => {
-    saveTrades(trades.filter(t => t.id !== id));
+    deleteTradeUnified(id);
     toast.success("Trade removido!");
   };
 
@@ -501,6 +504,7 @@ export default function TradeJournalEnhanced() {
         hydration: false,
         breathing: false,
         sleep: false,
+        meditation: false,
       },
       rational: {
         analysisConfirmed: false,
@@ -1882,12 +1886,7 @@ export default function TradeJournalEnhanced() {
                       size="sm"
                       variant={trade.isFavorite ? "default" : "outline"}
                       onClick={() => {
-                        const updatedTrades = trades.map(t =>
-                          t.id === trade.id
-                            ? { ...t, isFavorite: !t.isFavorite }
-                            : t
-                        );
-                        saveTrades(updatedTrades);
+                        toggleFavoriteUnified(trade.id);
                       }}
                       title={
                         trade.isFavorite
