@@ -126,6 +126,7 @@ export const useTradeJournalUnified = (accountId: string) => {
       notes: trade.notes,
       is_favorite: trade.isFavorite,
       money_result: trade.moneyResult || null,
+      risk_reward: trade.riskReward ?? null,
       operational: trade.operational as any,
       emotional: trade.emotional as any,
       rational: trade.rational as any,
