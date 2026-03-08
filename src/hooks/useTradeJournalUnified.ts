@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 export interface TradeWithChecklist {
   id: string;
   date: string;
+  entryTime?: string;
   asset: string;
   entryPrice: string;
   exitPrice: string;
@@ -13,10 +14,12 @@ export interface TradeWithChecklist {
   result: "WIN" | "LOSS" | "BREAK_EVEN" | "ONGOING";
   resultPrice: string;
   session: "Manha" | "Tarde" | "Noite" | "";
+  marketSession?: "NY" | "Londres" | "Ásia" | "Sobreposição" | "Fechado";
   account: string;
   notes: string;
   isFavorite: boolean;
   moneyResult?: number;
+  riskReward?: number;
   operational: {
     chochValidoHTF: boolean;
     caixaGannTracada: boolean;
@@ -46,6 +49,7 @@ export interface TradeWithChecklist {
   tradingImage?: string;
   postTradeImage?: string;
   createdAt: number;
+  [key: string]: any; // allow extra fields
 }
 
 function mapRowToTrade(row: any): TradeWithChecklist {
