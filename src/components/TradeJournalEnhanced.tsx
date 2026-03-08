@@ -1878,20 +1878,26 @@ export default function TradeJournalEnhanced() {
         <div className="grid md:grid-cols-2 gap-3">
           <Button
             onClick={() => {
-              const tradesForExport = trades.map(t => ({
-                id: t.id,
-                date: t.date,
-                asset: t.asset,
-                entry: parseFloat(t.entryPrice),
-                exit: parseFloat(t.exitPrice),
-                result: (t.result === "WIN"
-                  ? "Vitória"
-                  : t.result === "LOSS"
-                    ? "Derrota"
-                    : "Empate") as "Vitória" | "Derrota" | "Empate",
-                notes: t.notes,
-              }));
-              exportToCSV(tradesForExport);
+              const headers = ['Data', 'Ativo', 'Entrada', 'Saída', 'Resultado ($)', 'Sessão', 'Status', 'Notas'];
+              const data = trades.map(t => [
+                t.date, t.asset, t.entryPrice, t.exitPrice,
+                t.moneyResult || 0,
+                t.session || '',
+                t.result === "WIN" ? "Vitória" : t.result === "LOSS" ? "Derrota" : "Empate",
+                t.notes || '',
+              ]);
+              const wins = trades.filter(t => t.result === 'WIN').length;
+              const losses = trades.filter(t => t.result === 'LOSS').length;
+              const total = data.reduce((s, r) => s + (Number(r[4]) || 0), 0);
+              exportToCSVFile(
+                `trades_${new Date().toISOString().split('T')[0]}.csv`,
+                headers,
+                data,
+                [
+                  ['RESUMO'],
+                  ['Total Trades', String(trades.length), 'Vitórias', String(wins), 'Derrotas', String(losses), 'Resultado', `$${total.toFixed(2)}`],
+                ]
+              );
               toast.success("Trades exportados em CSV com sucesso!");
             }}
             variant="outline"
