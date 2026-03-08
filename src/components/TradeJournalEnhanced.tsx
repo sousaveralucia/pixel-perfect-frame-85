@@ -27,7 +27,7 @@ import { useAccountManager } from "@/hooks/useAccountManager";
 import { Plus, Trash2, Edit2, Image, FileSpreadsheet, FileDown } from "lucide-react";
 import { toast } from "sonner";
 import { useTradeAlerts } from "@/hooks/useTradeAlerts";
-import { useExportTrades } from "@/hooks/useExportTrades";
+
 import {
   useMarketSession,
   formatMarketSession,
