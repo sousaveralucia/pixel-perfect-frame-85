@@ -580,11 +580,22 @@ export default function TradeJournalEnhanced() {
       </div>
 
       {/* Add Trade Button */}
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {isDayBlocked && (
+        <div className="w-full p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm text-center font-medium">
+          🚫 {todayWins >= 2 ? "Meta de 2 WINs atingida" : "Limite de 3 LOSSes atingido"} — Trades bloqueados até o próximo dia útil
+        </div>
+      )}
+      <Dialog open={isOpen} onOpenChange={(open) => {
+        if (open && isDayBlocked && !editingId) {
+          toast.error("Trades bloqueados para hoje nesta conta!");
+          return;
+        }
+        setIsOpen(open);
+      }}>
         <DialogTrigger asChild>
-          <Button className="w-full bg-primary hover:bg-primary/90">
+          <Button className="w-full bg-primary hover:bg-primary/90" disabled={isDayBlocked}>
             <Plus className="w-4 h-4 mr-2" />
-            Registrar Novo Trade
+            {isDayBlocked ? "Trades Bloqueados Hoje" : "Registrar Novo Trade"}
           </Button>
         </DialogTrigger>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
