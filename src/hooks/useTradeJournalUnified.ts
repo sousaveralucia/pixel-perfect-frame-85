@@ -74,7 +74,7 @@ function mapRowToTrade(row: any): TradeWithChecklist {
     operational: row.operational || { chochValidoHTF: false, caixaGannTracada: false, regiaoDescontada50: false, orderBlockIdentificado: false, entrada50OB: false, stopRiskManagement: false, tempoGraficoOperacional: false },
     emotional: row.emotional || { hydration: false, breathing: false, mentalClarity: false },
     rational: row.rational || { analysisConfirmed: false, planRespected: false, riskManaged: false },
-    routine: row.routine || { hydration: false, breathing: false, sleep: false, meditation: false },
+    routine: row.routine || { nightAnalysis: false, morningReview: false, regionsValidated: false, sleep: false },
     preTradeImage: row.pre_trade_image || undefined,
     tradingImage: row.trading_image || undefined,
     postTradeImage: row.post_trade_image || undefined,
