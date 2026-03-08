@@ -165,7 +165,8 @@ export default function ReportExportEnhanced({ trades }: ReportExportEnhancedPro
       doc.setFont("" as any, "normal" as any);
       const summaryData = [
         [`Total de Trades: ${stats.total}`, `Vitórias: ${stats.wins}`, `Derrotas: ${stats.losses}`],
-        [`Taxa de Acerto: ${stats.winRate}%`, `P&L Total: $${stats.totalPnL}`, `P&L Médio: $${stats.avgPnL}`],
+        [`Taxa de Acerto: ${stats.winRate}%`, `P&L Total: $${stats.totalPnL} (${stats.pnlPercentage}%)`, `P&L Médio: $${stats.avgPnL}`],
+        [`Saldo Inicial: $${initialBalance.toFixed(2)}`, `Saldo Atual: $${(initialBalance + parseFloat(stats.totalPnL)).toFixed(2)}`, ``],
       ];
 
       summaryData.forEach((row) => {
