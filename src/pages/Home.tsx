@@ -39,7 +39,7 @@ function ThemeToggle() {
 }
 
 export default function Home() {
-  const { activeAccountId, getActiveAccount } = useAccountManager();
+  const { accounts, activeAccountId, getActiveAccount, switchAccount } = useAccountManager();
   const { trades } = useTradeJournalUnified(activeAccountId);
   const activeAccount = getActiveAccount();
   const currentBalance = activeAccount?.currentBalance ?? 0;
@@ -58,8 +58,19 @@ export default function Home() {
               <p className="text-sm text-muted-foreground mt-1">Plano Operacional - HackTrading Plan</p>
             </div>
             <div className="flex items-center gap-3">
+              <Select value={activeAccountId} onValueChange={switchAccount}>
+                <SelectTrigger className="w-[180px] h-9 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {accounts.map((account) => (
+                    <SelectItem key={account.id} value={account.id}>
+                      {account.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-secondary/50">
-                <span className="text-xs text-muted-foreground">{activeAccount?.name}</span>
                 <span className="text-sm font-bold text-foreground">${currentBalance.toFixed(2)}</span>
                 <span className={`text-xs font-semibold ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
                   {isPositive ? '+' : ''}{balancePct.toFixed(1)}%
@@ -67,10 +78,6 @@ export default function Home() {
               </div>
               <ThemeToggle />
               <Badge className="bg-primary text-primary-foreground">Ativo</Badge>
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Main Content */}
       <main className="container py-12">
