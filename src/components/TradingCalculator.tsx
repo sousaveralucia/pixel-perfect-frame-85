@@ -290,11 +290,16 @@ export default function TradingCalculator() {
               </div>
 
               {/* Key metrics */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-lg bg-secondary/60 p-3 text-center border border-border">
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Stop</p>
                   <p className="text-lg font-bold text-destructive">{result.stopDistance}</p>
                   <p className="text-[10px] text-muted-foreground">{asset.pipLabel}</p>
+                </div>
+                <div className="rounded-lg bg-secondary/60 p-3 text-center border border-border">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">$/pip</p>
+                  <p className="text-lg font-bold text-foreground">${result.valuePerPip.toFixed(4)}</p>
+                  <p className="text-[10px] text-muted-foreground">por {asset.pipLabel.slice(0, -1)}</p>
                 </div>
                 <div className="rounded-lg bg-secondary/60 p-3 text-center border border-border">
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Lot Size</p>
@@ -302,9 +307,9 @@ export default function TradingCalculator() {
                   <p className="text-[10px] text-muted-foreground">lotes</p>
                 </div>
                 <div className="rounded-lg bg-secondary/60 p-3 text-center border border-border">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">$/pip</p>
-                  <p className="text-lg font-bold text-foreground">${result.valuePerPip.toFixed(2)}</p>
-                  <p className="text-[10px] text-muted-foreground">por {asset.pipLabel.slice(0, -1)}</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Quantidade (TV)</p>
+                  <p className="text-lg font-bold text-primary">{asset.type === "forex" ? result.units.toLocaleString() : result.units}</p>
+                  <p className="text-[10px] text-muted-foreground">{asset.unitLabel}</p>
                 </div>
               </div>
 
