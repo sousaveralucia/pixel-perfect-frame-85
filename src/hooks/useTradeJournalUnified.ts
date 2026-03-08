@@ -113,6 +113,7 @@ export const useTradeJournalUnified = (accountId: string) => {
       user_id: user.id,
       account_key: accountId,
       date: trade.date,
+      entry_time: trade.entryTime || null,
       asset: trade.asset,
       entry_price: trade.entryPrice,
       exit_price: trade.exitPrice,
