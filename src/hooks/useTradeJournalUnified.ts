@@ -56,6 +56,7 @@ function mapRowToTrade(row: any): TradeWithChecklist {
   return {
     id: row.id,
     date: row.date || "",
+    entryTime: row.entry_time || undefined,
     asset: row.asset || "",
     entryPrice: row.entry_price || "",
     exitPrice: row.exit_price || "",
