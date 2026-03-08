@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTradeJournal } from "@/hooks/useTradeJournal";
+import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
 import { useAccountManager } from "@/hooks/useAccountManager";
 import { Plus, Trash2, Edit2, Image, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
