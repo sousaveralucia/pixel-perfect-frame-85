@@ -325,7 +325,7 @@ export default function TradeJournalEnhanced() {
       return;
     }
 
-    // Validar checklist operacional completo
+    // Checklist operacional - apenas aviso, não bloqueia
     const operationalItems = Object.values(formData.operational);
     const allOperationalComplete = operationalItems.every(
       item => item === true
@@ -335,10 +335,10 @@ export default function TradeJournalEnhanced() {
       const incompleteCount = operationalItems.filter(
         item => item === false
       ).length;
-      toast.error(
-        `Checklist Operacional incompleto: ${incompleteCount} item(ns) faltando`
+      toast.warning(
+        `⚠️ Checklist Operacional incompleto: ${incompleteCount} item(ns) não marcado(s)`,
+        { duration: 4000 }
       );
-      return;
     }
 
     // Validar R:R
@@ -1402,16 +1402,16 @@ export default function TradeJournalEnhanced() {
               </div>
             </div>
 
-            {/* Operational Checklist - OBRIGATORIO */}
-            <div className="space-y-3 bg-purple-50 p-4 rounded-lg border-2 border-purple-500">
+            {/* Operational Checklist */}
+            <div className="space-y-3 bg-purple-50 p-4 rounded-lg border border-purple-300">
               <div className="flex items-center gap-2">
-                <span className="text-2xl">⚠️</span>
+                <span className="text-2xl">📋</span>
                 <h3 className="font-bold text-purple-900">
-                  Checklist Operacional (OBRIGATORIO)
+                  Checklist Operacional
                 </h3>
               </div>
-              <p className="text-xs text-purple-800 font-semibold">
-                Todos os itens abaixo DEVEM estar marcados para executar o trade
+              <p className="text-xs text-purple-700">
+                Marque os itens que foram validados antes do trade
               </p>
 
               <div className="flex items-center space-x-2">
