@@ -145,6 +145,7 @@ export const useTradeJournalUnified = (accountId: string) => {
     if (!user) return;
     const dbUpdates: any = {};
     if (updates.date !== undefined) dbUpdates.date = updates.date;
+    if (updates.entryTime !== undefined) dbUpdates.entry_time = updates.entryTime;
     if (updates.asset !== undefined) dbUpdates.asset = updates.asset;
     if (updates.entryPrice !== undefined) dbUpdates.entry_price = updates.entryPrice;
     if (updates.exitPrice !== undefined) dbUpdates.exit_price = updates.exitPrice;
