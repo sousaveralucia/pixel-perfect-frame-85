@@ -656,6 +656,17 @@ export default function TradeJournalEnhanced() {
       y += 2;
     }
 
+    // === OBSERVAÇÕES (lined area for handwriting) ===
+    secTitle("Observacoes", c.accent);
+    const footerY = ph - 8;
+    const lineSpacing = 7;
+    doc.setDrawColor(200, 210, 220);
+    doc.setLineWidth(0.3);
+    while (y + lineSpacing < footerY) {
+      doc.line(m, y, pw - m, y);
+      y += lineSpacing;
+    }
+
     // === FOOTER page 1 ===
     doc.setTextColor(...c.gray); doc.setFontSize(6); doc.setFont("helvetica", "normal");
     doc.text(`Gerado em ${new Date().toLocaleString("pt-BR")}  |  Trading Dashboard`, pw / 2, ph - 6, { align: "center" });
