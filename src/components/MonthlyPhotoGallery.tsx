@@ -102,7 +102,7 @@ export function MonthlyPhotoGallery({ activeAccountId: propAccountId }: MonthlyP
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1 overflow-y-auto">
           {monthlyPhotos.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">Nenhuma foto pós-trading neste mês</p>
