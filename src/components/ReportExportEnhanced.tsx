@@ -115,308 +115,285 @@ export default function ReportExportEnhanced({ trades }: ReportExportEnhancedPro
     try {
       const { jsPDF } = await import("jspdf");
       const doc = new jsPDF();
+      const pw = doc.internal.pageSize.getWidth();
+      const ph = doc.internal.pageSize.getHeight();
+      const m = 12;
+      let y = 0;
 
-      let yPosition = 15;
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const margin = 10;
-      const maxWidth = doc.internal.pageSize.getWidth() - 2 * margin;
-
-      // Função auxiliar para adicionar nova página
-      const addNewPage = () => {
-        try {
-          doc.addPage();
-          yPosition = margin;
-        } catch (e) {
-          console.error("Erro ao adicionar página:", e);
-        }
+      const co = {
+        primary: [15, 23, 42] as [number, number, number],
+        accent: [59, 130, 246] as [number, number, number],
+        green: [34, 197, 94] as [number, number, number],
+        red: [239, 68, 68] as [number, number, number],
+        gray: [148, 163, 184] as [number, number, number],
+        lightBg: [241, 245, 249] as [number, number, number],
+        white: [255, 255, 255] as [number, number, number],
       };
 
-      // Título
-      doc.setFontSize(20);
-      doc.setFont("" as any, "bold" as any);
-      doc.text("Relatório de Trades", margin, yPosition);
-      yPosition += 10;
+      const checkPage = (need: number) => {
+        if (y + need > ph - 10) { doc.addPage(); y = 14; }
+      };
 
-      // Informações gerais
-      doc.setFontSize(10);
-      doc.setFont("" as any, "normal" as any);
-      doc.text(`Gerado em: ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR")}`, margin, yPosition as any);
-      yPosition += 5;
+      const secTitle = (title: string, color: [number, number, number]) => {
+        checkPage(14);
+        doc.setFillColor(...color);
+        doc.rect(m, y, 2.5, 6, "F");
+        doc.setTextColor(...co.primary);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text(title, m + 5, y + 4.5);
+        y += 9;
+      };
 
-      if (filterAccount !== "all") {
-        doc.text(`Conta: ${filterAccount}`, margin, yPosition as any);
-        yPosition += 5;
-      }
+      const addFooter = () => {
+        doc.setTextColor(...co.gray);
+        doc.setFontSize(6);
+        doc.setFont("helvetica", "normal");
+        doc.text("Relatorio confidencial  |  Trading Dashboard", pw / 2, ph - 5, { align: "center" });
+      };
 
-      if (filterAsset !== "all") {
-        doc.text(`Ativo: ${filterAsset}`, margin, yPosition as any);
-        yPosition += 5;
-      }
+      // ========== PAGE 1: HEADER + SUMMARY + TABLE ==========
 
-      yPosition += 5;
+      // Header bar
+      doc.setFillColor(...co.primary);
+      doc.rect(0, 0, pw, 28, "F");
+      doc.setFillColor(...co.accent);
+      doc.rect(0, 28, pw, 2, "F");
 
-      // Resumo Executivo
+      doc.setTextColor(...co.white);
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      doc.text("RELATORIO DE TRADES", m, 12);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      const subtitle = `${new Date().toLocaleDateString("pt-BR")}  |  ${filterAccount !== "all" ? filterAccount : "Todas as Contas"}  |  ${filterAsset !== "all" ? filterAsset : "Todos os Ativos"}`;
+      doc.text(subtitle, m, 22);
+
+      // Win rate badge
+      doc.setFillColor(...(parseFloat(String(stats.winRate)) >= 50 ? co.green : co.red));
+      const wrText = `${stats.winRate}%`;
+      const bw = doc.getTextWidth(wrText) * 2 + 12;
+      doc.roundedRect(pw - m - bw, 6, bw, 16, 3, 3, "F");
+      doc.setTextColor(...co.white);
       doc.setFontSize(12);
-      doc.setFont("" as any, "bold" as any);
-      doc.text("Resumo Executivo", margin, yPosition as any);
-      yPosition += 8;
+      doc.setFont("helvetica", "bold");
+      doc.text(wrText, pw - m - bw / 2, 17, { align: "center" });
 
-      doc.setFontSize(10);
-      doc.setFont("" as any, "normal" as any);
-      const summaryData = [
-        [`Total de Trades: ${stats.total}`, `Vitórias: ${stats.wins}`, `Derrotas: ${stats.losses}`],
-        [`Taxa de Acerto: ${stats.winRate}%`, `P&L Total: $${stats.totalPnL} (${stats.pnlPercentage}%)`, `P&L Médio: $${stats.avgPnL}`],
-        [`Saldo Inicial: $${initialBalance.toFixed(2)}`, `Saldo Atual: $${(initialBalance + parseFloat(stats.totalPnL)).toFixed(2)}`, ``],
+      y = 36;
+
+      // === SUMMARY CARDS (2 rows of 3) ===
+      const cardW = (pw - 2 * m - 8) / 3;
+      const cardH = 16;
+      const summaryCards = [
+        { label: "Total Trades", value: String(stats.total), color: co.accent },
+        { label: "Vitorias", value: String(stats.wins), color: co.green },
+        { label: "Derrotas", value: String(stats.losses), color: co.red },
+        { label: "P&L Total", value: `$${stats.totalPnL}`, color: parseFloat(stats.totalPnL) >= 0 ? co.green : co.red },
+        { label: "Retorno", value: `${stats.pnlPercentage}%`, color: parseFloat(stats.pnlPercentage) >= 0 ? co.green : co.red },
+        { label: "P&L Medio", value: `$${stats.avgPnL}`, color: co.accent },
       ];
 
-      summaryData.forEach((row) => {
-        row.forEach((text, index) => {
-          doc.text(text, margin + index * 60, yPosition as any);
-        });
-        yPosition += 6;
+      summaryCards.forEach((card, i) => {
+        const col = i % 3;
+        const row = Math.floor(i / 3);
+        const cx = m + col * (cardW + 4);
+        const cy = y + row * (cardH + 3);
+
+        doc.setFillColor(...co.lightBg);
+        doc.roundedRect(cx, cy, cardW, cardH, 2, 2, "F");
+        doc.setFillColor(...card.color);
+        doc.rect(cx, cy, 2.5, cardH, "F");
+
+        doc.setTextColor(...co.gray);
+        doc.setFontSize(6.5);
+        doc.setFont("helvetica", "normal");
+        doc.text(card.label, cx + 6, cy + 5.5);
+        doc.setTextColor(...card.color);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text(card.value, cx + 6, cy + 12.5);
       });
 
-      yPosition += 5;
+      y += 2 * (cardH + 3) + 6;
 
-      // Tabela de Trades
-      if (yPosition > pageHeight - 50) {
-        addNewPage();
-      }
+      // === TRADES TABLE ===
+      secTitle("Historico de Trades", co.accent);
 
-      doc.setFontSize(12);
-      doc.setFont("" as any, "bold" as any);
-      doc.text("Histórico de Trades", margin, yPosition as any);
-      yPosition += 8;
+      const colWidths = [18, 16, 12, 16, 14, 14, 16, 10, 16, 14];
+      const headers = ["Data", "Ativo", "Hora", "Entrada", "SL", "TP", "Saida", "R:R", "Resultado", "Status"];
+      const tableW = colWidths.reduce((a, b) => a + b, 0);
 
-      // Cabeçalho da tabela
-      doc.setFontSize(9);
-      doc.setFont("" as any, "bold" as any);
-      doc.setTextColor(0, 0, 0); // Texto em preto
-      doc.setFillColor(200, 220, 250); // Fundo azul claro
-      
-      const tableHeaders = ["Data", "Ativo", "Hora", "Entrada", "SL", "TP", "Saída", "Pips/Ticks", "R:R", "Resultado ($)", "Status"];
-      const colWidths = [18, 15, 12, 15, 15, 15, 15, 15, 10, 18, 15];
-      let xPos = margin;
-
-      tableHeaders.forEach((header, index) => {
-        doc.rect(xPos, yPosition, colWidths[index], 6, "F" as any);
-        doc.text(header, xPos + 1, yPosition + 4 as any);
-        xPos += colWidths[index];
+      // Table header
+      doc.setFillColor(...co.primary);
+      doc.rect(m, y - 3, tableW, 7, "F");
+      doc.setTextColor(...co.white);
+      doc.setFontSize(6.5);
+      doc.setFont("helvetica", "bold");
+      let xPos = m;
+      headers.forEach((h, i) => {
+        doc.text(h, xPos + 1.5, y + 1);
+        xPos += colWidths[i];
       });
+      y += 6;
 
-      yPosition += 8;
-      doc.setTextColor(0, 0, 0); // Garantir texto em preto
-      doc.setFont("" as any, "normal" as any);
-
-      // Dados da tabela
-      filteredTrades.forEach((trade, index) => {
-        if (yPosition > pageHeight - 20) {
-          addNewPage();
+      // Table rows
+      doc.setFontSize(6.5);
+      filteredTrades.forEach((trade, idx) => {
+        checkPage(6);
+        if (idx % 2 === 0) {
+          doc.setFillColor(...co.lightBg);
+          doc.rect(m, y - 3, tableW, 5.5, "F");
         }
 
-        // Cor de fundo alternada
-        const bgColor = index % 2 === 0 ? [245, 245, 245] : [255, 255, 255];
-        doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
-        
-        let rowXPos = margin;
-        const rowHeight = 6;
-        doc.rect(margin, yPosition, maxWidth, rowHeight, "F" as any);
-
-        // Texto sempre em preto para legibilidade
-        doc.setTextColor(0, 0, 0); // Preto
-
-        doc.setFontSize(7);
         const moneyResult = parseFloat(trade.moneyResult?.toString() || "0") || 0;
         const rowData = [
-          trade.date,
-          trade.asset,
+          trade.date || "-",
+          trade.asset || "-",
           trade.entryTime || "-",
-          trade.entryPrice,
-          trade.stopLoss,
-          trade.takeProfit,
-          trade.exitPrice,
-          "-", // Pips/Ticks (será preenchido manualmente)
+          trade.entryPrice || "-",
+          trade.stopLoss || "-",
+          trade.takeProfit || "-",
+          trade.exitPrice || "-",
           trade.riskReward ? `${trade.riskReward}:1` : "-",
           `$${moneyResult.toFixed(2)}`,
           trade.result === "WIN" ? "WIN" : trade.result === "LOSS" ? "LOSS" : "BE",
         ];
 
-        rowXPos = margin;
-        rowData.forEach((data, colIndex) => {
-          doc.text(data, rowXPos + 1, yPosition + 4 as any);
-          rowXPos += colWidths[colIndex];
+        xPos = m;
+        rowData.forEach((d, i) => {
+          // Color the status column
+          if (i === rowData.length - 1) {
+            doc.setTextColor(...(d === "WIN" ? co.green : d === "LOSS" ? co.red : co.gray));
+            doc.setFont("helvetica", "bold");
+          } else {
+            doc.setTextColor(...co.primary);
+            doc.setFont("helvetica", "normal");
+          }
+          doc.text(d, xPos + 1.5, y + 0.5);
+          xPos += colWidths[i];
         });
-
-        doc.setTextColor(0, 0, 0);
-        yPosition += rowHeight + 1;
+        y += 5.5;
       });
 
-      yPosition += 10;
+      y += 6;
 
-      // Análise de Checklists
-      if (yPosition > pageHeight - 40) {
-        addNewPage();
+      // === CHECKLIST ANALYSIS ===
+      secTitle("Analise de Checklists (Losses)", co.red);
+
+      const lossesWithMissing = filteredTrades.filter((t) => t.result === "LOSS");
+      const missing = { operational: 0, emotional: 0, routine: 0, rational: 0 };
+      lossesWithMissing.forEach((trade) => {
+        if (trade.operational && Object.values(trade.operational).some((v) => !v)) missing.operational++;
+        if (trade.emotional && Object.values(trade.emotional).some((v) => !v)) missing.emotional++;
+        if (trade.routine && Object.values(trade.routine).some((v) => !v)) missing.routine++;
+        if (trade.rational && Object.values(trade.rational).some((v) => !v)) missing.rational++;
+      });
+
+      const chkCards = [
+        { label: "Operacional", val: missing.operational, total: lossesWithMissing.length },
+        { label: "Emocional", val: missing.emotional, total: lossesWithMissing.length },
+        { label: "Rotina", val: missing.routine, total: lossesWithMissing.length },
+        { label: "Racional", val: missing.rational, total: lossesWithMissing.length },
+      ];
+      const chkW = (pw - 2 * m - 12) / 4;
+      chkCards.forEach((card, i) => {
+        const cx = m + i * (chkW + 4);
+        doc.setFillColor(...co.lightBg);
+        doc.roundedRect(cx, y, chkW, 14, 2, 2, "F");
+        doc.setTextColor(...co.gray);
+        doc.setFontSize(6);
+        doc.setFont("helvetica", "normal");
+        doc.text(card.label, cx + 3, y + 5);
+        doc.setTextColor(...co.red);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.text(`${card.val}/${card.total}`, cx + 3, y + 11.5);
+      });
+      y += 20;
+
+      // === OBSERVACOES (lined area) ===
+      secTitle("Observacoes", co.accent);
+      const footerY = ph - 8;
+      doc.setDrawColor(200, 210, 220);
+      doc.setLineWidth(0.3);
+      while (y + 7 < footerY) {
+        doc.line(m, y, pw - m, y);
+        y += 7;
       }
 
-      doc.setFontSize(12);
-      doc.setFont("" as any, "bold" as any);
-      doc.text("Análise de Checklists", margin, yPosition as any);
-      yPosition += 8;
+      addFooter();
 
-      // Contar ticks faltantes em losses
-      const lossesWithMissingTicks = filteredTrades.filter((t) => t.result === "LOSS");
-      const missingTicksBreakdown = {
-        operational: 0,
-        emotional: 0,
-        routine: 0,
-        rational: 0,
-      };
-
-      lossesWithMissingTicks.forEach((trade) => {
-        const opMissing = trade.operational ? Object.values(trade.operational).filter((v) => !v).length : 0;
-        const emMissing = trade.emotional ? Object.values(trade.emotional).filter((v) => !v).length : 0;
-        const routineMissing = trade.routine ? Object.values(trade.routine).filter((v) => !v).length : 0;
-        const raMissing = trade.rational ? Object.values(trade.rational).filter((v) => !v).length : 0;
-
-        if (opMissing > 0) missingTicksBreakdown.operational++;
-        if (emMissing > 0) missingTicksBreakdown.emotional++;
-        if (routineMissing > 0) missingTicksBreakdown.routine++;
-        if (raMissing > 0) missingTicksBreakdown.rational++;
-      });
-
-      doc.setFontSize(10);
-      doc.setFont("" as any, "normal" as any);
-      doc.text(`Total de Losses: ${lossesWithMissingTicks.length}`, margin, yPosition as any);
-      yPosition += 5;
-      doc.text(`Losses com ticks operacionais faltantes: ${missingTicksBreakdown.operational}`, margin, yPosition as any);
-      yPosition += 5;
-      doc.text(`Losses com ticks emocionais faltantes: ${missingTicksBreakdown.emotional}`, margin, yPosition as any);
-      yPosition += 5;
-      doc.text(`Losses com ticks de rotina e saúde faltantes: ${missingTicksBreakdown.routine}`, margin, yPosition as any);
-      yPosition += 5;
-      doc.text(`Losses com ticks racionais faltantes: ${missingTicksBreakdown.rational}`, margin, yPosition as any);
-      yPosition += 10;
-
-      // Galeria de Imagens dos Trades
+      // ========== PAGE 2+: IMAGES ==========
       const tradesWithImages = filteredTrades.filter((t) => t.preTradeImage || t.tradingImage || t.postTradeImage);
-      
+
       if (tradesWithImages.length > 0) {
-        if (yPosition > pageHeight - 40) {
-          addNewPage();
+        doc.addPage();
+        // Mini header
+        doc.setFillColor(...co.primary);
+        doc.rect(0, 0, pw, 12, "F");
+        doc.setTextColor(...co.white);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text("Galeria de Imagens dos Trades", m, 8);
+        y = 18;
+
+        for (const trade of tradesWithImages) {
+          checkPage(12);
+          doc.setTextColor(...co.accent);
+          doc.setFontSize(8);
+          doc.setFont("helvetica", "bold");
+          doc.text(`${trade.asset} - ${trade.date} (${trade.result})`, m, y);
+          y += 5;
+
+          const images: [string, string | undefined][] = [
+            ["Pre-Trade", trade.preTradeImage],
+            ["Trade", trade.tradingImage],
+            ["Pos-Trade", trade.postTradeImage],
+          ];
+          const validImgs = images.filter(([, u]) => u);
+
+          // Side by side if multiple, stacked if needed
+          const imgW = validImgs.length > 1 ? (pw - 2 * m - 4 * (validImgs.length - 1)) / validImgs.length : pw - 2 * m;
+          const imgH = validImgs.length > 1 ? 50 : 70;
+
+          checkPage(imgH + 12);
+
+          let ix = m;
+          for (const [label, url] of validImgs) {
+            if (!url) continue;
+            try {
+              const response = await fetch(url);
+              const blob = await response.blob();
+              const dataUrl = await new Promise<string>((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result as string);
+                reader.readAsDataURL(blob);
+              });
+              doc.addImage(dataUrl, "JPEG", ix, y, imgW, imgH);
+              doc.setTextColor(...co.gray);
+              doc.setFontSize(6);
+              doc.setFont("helvetica", "normal");
+              doc.text(label, ix + 1, y + imgH + 3);
+              ix += imgW + 4;
+            } catch {
+              doc.setTextColor(...co.red);
+              doc.setFontSize(6);
+              doc.text(`${label}: indisponivel`, ix, y + 4);
+              ix += imgW + 4;
+            }
+          }
+          y += imgH + 10;
         }
 
-        doc.setFontSize(12);
-        doc.setFont("" as any, "bold" as any);
-        doc.text("Galeria de Imagens", margin, yPosition as any);
-        yPosition += 8;
-
-        doc.setFontSize(9);
-        doc.setFont("" as any, "normal" as any);
-
-        tradesWithImages.forEach((trade, index) => {
-          if (yPosition > pageHeight - 50) {
-            addNewPage();
-          }
-
-          // Título do trade
-          doc.setFont("" as any, "bold" as any);
-          doc.text(`${trade.asset} - ${trade.date}`, margin, yPosition as any);
-          yPosition += 6;
-
-          doc.setFont("" as any, "normal" as any);
-          const imageHeight = 80;
-          const imageWidth = 150;
-          const imageSpacing = 5;
-          const pageMargin = 10;
-          let imageX = margin;
-
-          // Verificar se precisa de nova página
-          const imagesCount = (trade.preTradeImage ? 1 : 0) + (trade.tradingImage ? 1 : 0) + (trade.postTradeImage ? 1 : 0);
-          if (imagesCount > 0 && yPosition + imageHeight + 30 > pageHeight - pageMargin) {
-            doc.addPage();
-            yPosition = pageMargin;
-          }
-
-          // Pré-Trading
-          if (trade.preTradeImage) {
-            try {
-              if (imageX + imageWidth > doc.internal.pageSize.getWidth() - margin) {
-                imageX = margin;
-                yPosition += imageHeight + 15;
-                if (yPosition + imageHeight > pageHeight - pageMargin) {
-                  doc.addPage();
-                  yPosition = pageMargin;
-                }
-              }
-              doc.addImage(trade.preTradeImage, "JPEG", imageX, yPosition, imageWidth, imageHeight);
-              doc.setFontSize(9);
-              doc.text("Pré-Trading", imageX + 5, yPosition + imageHeight + 5);
-              imageX += imageWidth + imageSpacing;
-            } catch (e) {
-              // Ignorar erros de imagem
-            }
-          }
-
-          // Durante-Trading
-          if (trade.tradingImage) {
-            try {
-              if (imageX + imageWidth > doc.internal.pageSize.getWidth() - margin) {
-                imageX = margin;
-                yPosition += imageHeight + 15;
-                if (yPosition + imageHeight > pageHeight - pageMargin) {
-                  doc.addPage();
-                  yPosition = pageMargin;
-                }
-              }
-              doc.addImage(trade.tradingImage, "JPEG", imageX, yPosition, imageWidth, imageHeight);
-              doc.setFontSize(9);
-              doc.text("Durante", imageX + 10, yPosition + imageHeight + 5);
-              imageX += imageWidth + imageSpacing;
-            } catch (e) {
-              // Ignorar erros de imagem
-            }
-          }
-
-          // Pós-Trading
-          if (trade.postTradeImage) {
-            try {
-              if (imageX + imageWidth > doc.internal.pageSize.getWidth() - margin) {
-                imageX = margin;
-                yPosition += imageHeight + 15;
-                if (yPosition + imageHeight > pageHeight - pageMargin) {
-                  doc.addPage();
-                  yPosition = pageMargin;
-                }
-              }
-              doc.addImage(trade.postTradeImage, "JPEG", imageX, yPosition, imageWidth, imageHeight);
-              doc.setFontSize(9);
-              doc.text("Pós-Trading", imageX + 10, yPosition + imageHeight + 5);
-            } catch (e) {
-              // Ignorar erros de imagem
-            }
-          }
-
-          yPosition += imageHeight + 20;
-        });
+        addFooter();
       }
 
-      // Rodapé
-      doc.setFontSize(8);
-      doc.setTextColor(128, 128, 128);
-      doc.text("Relatório confidencial - Apenas para uso pessoal", margin, pageHeight - 10);
-
-      // Salvar PDF
-      try {
-        const fileName = `trading-report-${filterAccount !== "all" ? filterAccount.replace(/\s+/g, "-") : "all"}-${filterAsset !== "all" ? filterAsset : "all"}-${new Date().toISOString().split("T")[0]}.pdf`;
-        doc.save(fileName);
-        toast.success(`Relatório exportado com sucesso: ${fileName}`);
-      } catch (saveError) {
-        console.error("Erro ao salvar PDF:", saveError);
-        toast.error("Erro ao salvar relatório PDF");
-      }
+      const fileName = `trading-report-${filterAccount !== "all" ? filterAccount.replace(/\s+/g, "-") : "all"}-${filterAsset !== "all" ? filterAsset : "all"}-${new Date().toISOString().split("T")[0]}.pdf`;
+      doc.save(fileName);
+      toast.success(`Relatorio exportado: ${fileName}`);
     } catch (error) {
       console.error("Erro ao gerar PDF:", error);
-      toast.error(`Erro ao gerar relatório PDF: ${error instanceof Error ? error.message : "Erro desconhecido"}`);
+      toast.error(`Erro ao gerar relatorio PDF`);
     } finally {
       setIsGenerating(false);
     }
