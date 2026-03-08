@@ -400,7 +400,7 @@ export default function Home() {
           </TabsContent>
 
           <TabsContent value="relatorio" className="space-y-6">
-            <ReportExportEnhanced />
+            <ReportExportEnhanced trades={trades} />
           </TabsContent>
 
           <TabsContent value="validacao" className="space-y-6">
