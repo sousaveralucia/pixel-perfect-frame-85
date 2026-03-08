@@ -12,17 +12,31 @@ export interface Account {
 
 const DEFAULT_ACCOUNTS: Account[] = [
   {
-    id: "account-100",
-    name: "Conta $100",
+    id: "conta-pessoal",
+    name: "Conta Pessoal",
     initialBalance: 100,
     currentBalance: 100,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "conta-financiada",
+    name: "Conta Financiada",
+    initialBalance: 1000,
+    currentBalance: 1000,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "conta-challenger",
+    name: "Challenger",
+    initialBalance: 10000,
+    currentBalance: 10000,
     createdAt: new Date().toISOString(),
   },
 ];
 
 export function useAccountManager() {
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [activeAccountId, setActiveAccountId] = useState<string>("account-100");
+  const [activeAccountId, setActiveAccountId] = useState<string>("conta-pessoal");
 
   // Carregar contas do localStorage
   useEffect(() => {

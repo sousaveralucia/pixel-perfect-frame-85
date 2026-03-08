@@ -21,6 +21,7 @@ import AssetPerformanceAnalysis from "@/components/AssetPerformanceAnalysis";
 import { TradingCalendar } from "@/components/TradingCalendar";
 import CalculationHistory from "@/components/CalculationHistory";
 import { EquityAndPerformanceCharts } from "@/components/EquityAndPerformanceCharts";
+import { CalendarAccountSelector } from "@/components/CalendarAccountSelector";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -82,7 +83,7 @@ export default function Home() {
           </TabsList>
 
           <TabsContent value="calendario-trading" className="space-y-6">
-            <TradingCalendar />
+            <CalendarAccountSelector />
           </TabsContent>
 
           <TabsContent value="autoconhecimento" className="space-y-6">
