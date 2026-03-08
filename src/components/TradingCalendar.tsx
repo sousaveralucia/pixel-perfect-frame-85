@@ -306,7 +306,7 @@ export function TradingCalendar({ activeAccountId: propAccountId }: TradingCalen
         </div>
 
         {/* Right: Monthly Photo Gallery */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 flex flex-col">
           <MonthlyPhotoGallery activeAccountId={accountId} />
         </div>
       </div>
