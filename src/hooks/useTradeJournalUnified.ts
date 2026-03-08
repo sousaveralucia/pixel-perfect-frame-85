@@ -124,6 +124,7 @@ export const useTradeJournalUnified = (accountId: string) => {
       result: trade.result,
       result_price: trade.resultPrice,
       session: trade.session,
+      market_session: trade.marketSession || null,
       notes: trade.notes,
       is_favorite: trade.isFavorite,
       money_result: trade.moneyResult || null,
