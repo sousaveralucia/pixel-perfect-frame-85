@@ -124,13 +124,13 @@ export default function DailyValidation() {
   const isWeekdayCheck = isWeekday();
   const todayTrades = useMemo(() => {
     return trades.filter((t) => {
-      const tradeDate = new Date(t.entryDateTime).toISOString().split('T')[0];
-      return tradeDate === today && t.accountId === activeAccountId;
+      const tradeDate = t.date ? t.date.split('T')[0] : '';
+      return tradeDate === today;
     });
-  }, [trades, today, activeAccountId]);
+  }, [trades, today]);
 
-  const losses = todayTrades.filter((t) => t.status === "PERDA").length;
-  const takes = todayTrades.filter((t) => t.status === "GANHO").length;
+  const losses = todayTrades.filter((t) => t.result === "LOSS").length;
+  const takes = todayTrades.filter((t) => t.result === "WIN").length;
   const canTrade = losses < 3 && takes < 2;
 
   const getStatusColor = (value: boolean | "yes" | "caution" | null) => {
