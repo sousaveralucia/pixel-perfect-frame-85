@@ -690,9 +690,9 @@ export default function TradeJournalEnhanced() {
       doc.text(`${trade.asset}  -  Imagens do Trade`, m, 8);
       y = 18;
 
-      // Calculate image height based on count to fit in one page
+      // Calculate image height to fill page evenly
       const availH = ph - y - 10;
-      const imgH = Math.min(80, (availH - validImages.length * 8) / validImages.length);
+      const imgH = (availH - validImages.length * 7) / validImages.length;
       const imgW = pw - 2 * m;
 
       for (const [label, url] of validImages) {
