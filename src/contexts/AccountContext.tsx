@@ -102,11 +102,15 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 
   const syncAccountBalance = useCallback(async (accountKey: string) => {
     if (!user) return;
-    const { data: trades } = await supabase.from("trades").select("money_result").eq("user_id", user.id).eq("account_key", accountKey);
-    const totalMoneyResult = (trades || []).reduce((sum, t) => sum + (Number(t.money_result) || 0), 0);
+    const [tradesRes, withdrawalsRes] = await Promise.all([
+      supabase.from("trades").select("money_result").eq("user_id", user.id).eq("account_key", accountKey),
+      supabase.from("withdrawals").select("amount").eq("user_id", user.id).eq("account_key", accountKey),
+    ]);
+    const totalMoneyResult = (tradesRes.data || []).reduce((sum, t) => sum + (Number(t.money_result) || 0), 0);
+    const totalWithdrawn = (withdrawalsRes.data || []).reduce((sum, w) => sum + (Number(w.amount) || 0), 0);
     const account = accounts.find((acc) => acc.id === accountKey);
     if (account) {
-      const newBalance = account.initialBalance + totalMoneyResult;
+      const newBalance = account.initialBalance + totalMoneyResult - totalWithdrawn;
       updateAccountBalance(accountKey, newBalance);
     }
   }, [accounts, user, updateAccountBalance]);
