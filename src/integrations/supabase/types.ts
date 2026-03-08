@@ -226,6 +226,7 @@ export type Database = {
           rational: Json | null
           result: string | null
           result_price: string | null
+          risk_reward: number | null
           routine: Json | null
           session: string | null
           stop_loss: string | null
@@ -254,6 +255,7 @@ export type Database = {
           rational?: Json | null
           result?: string | null
           result_price?: string | null
+          risk_reward?: number | null
           routine?: Json | null
           session?: string | null
           stop_loss?: string | null
@@ -282,6 +284,7 @@ export type Database = {
           rational?: Json | null
           result?: string | null
           result_price?: string | null
+          risk_reward?: number | null
           routine?: Json | null
           session?: string | null
           stop_loss?: string | null
