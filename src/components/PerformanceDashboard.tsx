@@ -381,6 +381,28 @@ export default function PerformanceDashboard() {
 
   return (
     <div className="space-y-8">
+      {/* Filtro de Período */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <Filter className="w-4 h-4 text-muted-foreground" />
+        <span className="text-sm font-medium text-muted-foreground">Período:</span>
+        {PERIOD_OPTIONS.map(opt => (
+          <Button
+            key={opt.value}
+            variant={period === opt.value ? "default" : "outline"}
+            size="sm"
+            onClick={() => setPeriod(opt.value)}
+            className="h-8"
+          >
+            {opt.label}
+          </Button>
+        ))}
+        {period !== "all" && (
+          <Badge variant="secondary" className="ml-2">
+            {trades.length} de {allTrades.length} trades
+          </Badge>
+        )}
+      </div>
+
       {/* KPIs Principais */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
         <Card><CardContent className="pt-4 pb-3 text-center">
