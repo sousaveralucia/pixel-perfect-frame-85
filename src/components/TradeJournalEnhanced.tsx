@@ -2009,6 +2009,14 @@ export default function TradeJournalEnhanced() {
                     <Button
                       size="sm"
                       variant="outline"
+                      onClick={() => handleExportTradePDF(trade)}
+                      title="Exportar trade em PDF"
+                    >
+                      <FileDown className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => handleEditTrade(trade)}
                     >
                       <Edit2 className="w-4 h-4" />
