@@ -527,20 +527,23 @@ export default function ReportExportEnhanced({ trades }: ReportExportEnhancedPro
                 </Button>
                 <Button
                   onClick={() => {
+                    const analyses = JSON.parse(localStorage.getItem("analyses") || "[]");
+                    const totalGain = filteredTrades.filter(t => t.result === "WIN").reduce((s, t) => s + (parseFloat(t.moneyResult?.toString() || "0") || 0), 0);
+                    const totalLoss = filteredTrades.filter(t => t.result === "LOSS").reduce((s, t) => s + Math.abs(parseFloat(t.moneyResult?.toString() || "0") || 0), 0);
                     const summary = {
                       period: 'Período Selecionado',
                       totalTrades: stats.total,
                       winningTrades: stats.wins,
                       losingTrades: stats.losses,
                       winRate: stats.winRate,
-                      totalGain: 0,
-                      totalLoss: 0,
-                      netProfit: 0,
-                      riskReward: 0,
+                      totalGain: totalGain.toFixed(2),
+                      totalLoss: totalLoss.toFixed(2),
+                      netProfit: (totalGain - totalLoss).toFixed(2),
+                      riskReward: totalLoss > 0 ? (totalGain / totalLoss).toFixed(2) : 0,
                       maxGain: 0,
                       maxLoss: 0,
                     };
-                    exportCompleteReportToExcel(summary, filteredTrades, []);
+                    exportCompleteReportToExcel(summary, filteredTrades, analyses);
                     toast.success('Relatório exportado em Excel com sucesso!');
                   }}
                   className="w-full bg-green-600 hover:bg-green-700 gap-2"
