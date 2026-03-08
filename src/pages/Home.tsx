@@ -9,7 +9,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAccountManager } from "@/hooks/useAccountManager";
 import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
-import RiskCalculator from "@/components/RiskCalculator";
+import TradingCalculator from "@/components/TradingCalculator";
 import EconomicCalendar from "@/components/EconomicCalendar";
 import NewsAlerts from "@/components/NewsAlerts";
 import TradeJournalEnhanced from "@/components/TradeJournalEnhanced";
@@ -407,7 +407,7 @@ export default function Home() {
           </TabsContent>
 
           <TabsContent value="calculadora" className="space-y-6">
-            <RiskCalculator />
+            <TradingCalculator />
           </TabsContent>
 
           <TabsContent value="diario" className="space-y-6">
