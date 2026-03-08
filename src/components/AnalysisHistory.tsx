@@ -574,82 +574,30 @@ export default function AnalysisHistory() {
               <p className="text-center text-muted-foreground py-8">Nenhuma análise registrada</p>
             ) : (
               filteredAnalyses.map((analysis) => (
-                <div key={analysis.id} className="bg-secondary/50 p-4 rounded-lg border border-border space-y-2">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <p className="font-bold text-foreground">{analysis.asset}</p>
-                        <span className="text-xs bg-secondary px-2 py-1 rounded">{analysis.timeframe}</span>
-                        <span
-                          className={`text-xs px-2 py-1 rounded font-semibold ${
-                            analysis.status === "ATIVO"
-                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
-                              : analysis.status === "TESTADO"
-                              ? "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
-                              : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
-                          }`}
-                        >
-                          {analysis.status}
-                        </span>
-                        <span className="text-xs text-muted-foreground ml-auto">{analysis.date}</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        <strong>Fibonacci:</strong> {analysis.fibonacciLevel}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        <strong>Order Block:</strong> {analysis.orderBlockLevel}
-                      </p>
-                      {analysis.liquidityZone && (
-                        <p className="text-sm text-muted-foreground">
-                          <strong>Liquidez:</strong> {analysis.liquidityZone}
-                        </p>
-                      )}
-                      {analysis.notes && <p className="text-sm text-muted-foreground mt-2">{analysis.notes}</p>}
-                      
-                      {(analysis.imageUrl1 || analysis.imageUrl2 || analysis.imageUrl3) && (
-                        <div className="flex gap-2 mt-3 flex-wrap">
-                          {[analysis.imageUrl1, analysis.imageUrl2, analysis.imageUrl3].map((img, idx) => (
-                            img && (
-                              <div key={idx} className="flex gap-1 items-end">
-                                <div
-                                  className="w-16 h-16 rounded-full overflow-hidden cursor-pointer hover:opacity-80 transition-opacity border-2 border-primary/30"
-                                  onClick={() => {
-                                    const div = document.createElement('div');
-                                    div.innerHTML = `<div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999;" onclick="this.remove()"><img src="${img}" style="max-width: 90vw; max-height: 90vh; object-fit: contain;" /></div>`;
-                                    document.body.appendChild(div.firstChild as Node);
-                                  }}
-                                >
-                                  <img src={img} alt={`Imagem ${idx + 1}`} className="w-full h-full object-cover" />
-                                </div>
-                                <Button
-                                  type="button"
-                                  variant="destructive"
-                                  size="sm"
-                                  onClick={() => {
-                                    const updatedAnalysis = {
-                                      ...analysis,
-                                      [`imageUrl${idx + 1}`]: ""
-                                    } as Analysis;
-                                    saveAnalyses(analyses.map(a => a.id === analysis.id ? updatedAnalysis : a));
-                                    toast.success(`Imagem ${idx + 1} removida`);
-                                  }}
-                                  className="h-8 w-8 p-0"
-                                  title="Remover imagem"
-                                >
-                                  ✕
-                                </Button>
-                              </div>
-                            )
-                          ))}
-                        </div>
-                      )}
+                <div key={analysis.id} className="bg-secondary/50 p-4 rounded-lg border border-border space-y-2 overflow-hidden">
+                  <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-bold text-foreground">{analysis.asset}</p>
+                      <span className="text-xs bg-secondary px-2 py-1 rounded">{analysis.timeframe}</span>
+                      <span
+                        className={`text-xs px-2 py-1 rounded font-semibold ${
+                          analysis.status === "ATIVO"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+                            : analysis.status === "TESTADO"
+                            ? "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
+                            : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
+                        }`}
+                      >
+                        {analysis.status}
+                      </span>
+                      <span className="text-xs text-muted-foreground">{analysis.date}</span>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1 flex-shrink-0">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEditAnalysis(analysis)}
-                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950"
+                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 h-8 w-8 p-0"
                       >
                         <Edit2 className="w-4 h-4" />
                       </Button>
@@ -657,8 +605,8 @@ export default function AnalysisHistory() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleExportPDF(analysis)}
-                        className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950"
-                        title="Exportar análise como PDF"
+                        className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950 h-8 w-8 p-0"
+                        title="Exportar PDF"
                       >
                         <Download className="w-4 h-4" />
                       </Button>
@@ -666,11 +614,63 @@ export default function AnalysisHistory() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDeleteAnalysis(analysis.id)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 h-8 w-8 p-0"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
+                  </div>
+                  <div className="min-w-0 space-y-1">
+                    <p className="text-sm text-muted-foreground break-words">
+                      <strong>Fibonacci:</strong> {analysis.fibonacciLevel}
+                    </p>
+                    <p className="text-sm text-muted-foreground break-words">
+                      <strong>Order Block:</strong> {analysis.orderBlockLevel}
+                    </p>
+                    {analysis.liquidityZone && (
+                      <p className="text-sm text-muted-foreground break-words">
+                        <strong>Liquidez:</strong> {analysis.liquidityZone}
+                      </p>
+                    )}
+                    {analysis.notes && <p className="text-sm text-muted-foreground mt-2 break-words">{analysis.notes}</p>}
+                    
+                    {(analysis.imageUrl1 || analysis.imageUrl2 || analysis.imageUrl3) && (
+                      <div className="flex gap-2 mt-3 flex-wrap">
+                        {[analysis.imageUrl1, analysis.imageUrl2, analysis.imageUrl3].map((img, idx) => (
+                          img && (
+                            <div key={idx} className="flex gap-1 items-end">
+                              <div
+                                className="w-16 h-16 rounded-full overflow-hidden cursor-pointer hover:opacity-80 transition-opacity border-2 border-primary/30 flex-shrink-0"
+                                onClick={() => {
+                                  const div = document.createElement('div');
+                                  div.innerHTML = `<div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999;" onclick="this.remove()"><img src="${img}" style="max-width: 90vw; max-height: 90vh; object-fit: contain;" /></div>`;
+                                  document.body.appendChild(div.firstChild as Node);
+                                }}
+                              >
+                                <img src={img} alt={`Imagem ${idx + 1}`} className="w-full h-full object-cover" />
+                              </div>
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => {
+                                  const updatedAnalysis = {
+                                    ...analysis,
+                                    [`imageUrl${idx + 1}`]: ""
+                                  } as Analysis;
+                                  saveAnalyses(analyses.map(a => a.id === analysis.id ? updatedAnalysis : a));
+                                  toast.success(`Imagem ${idx + 1} removida`);
+                                }}
+                                className="h-8 w-8 p-0"
+                                title="Remover imagem"
+                              >
+                                ✕
+                              </Button>
+                            </div>
+                          )
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))
