@@ -169,9 +169,9 @@ export function TradingCalendar({ activeAccountId: propAccountId }: TradingCalen
       )}
 
       {/* 3-Column Layout: Summary | Calendar | Gallery */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-stretch">
         {/* Left: Trades Summary */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 flex flex-col">
           <TradesSummary activeAccountId={accountId} />
         </div>
 
@@ -306,7 +306,7 @@ export function TradingCalendar({ activeAccountId: propAccountId }: TradingCalen
         </div>
 
         {/* Right: Monthly Photo Gallery */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 flex flex-col">
           <MonthlyPhotoGallery activeAccountId={accountId} />
         </div>
       </div>
