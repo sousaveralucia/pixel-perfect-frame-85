@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart } from 'recharts';
 import { useAccountManager } from '@/hooks/useAccountManager';
+import { useTradeJournalUnified } from '@/hooks/useTradeJournalUnified';
 
 interface TradeWithChecklist {
   id: string;
