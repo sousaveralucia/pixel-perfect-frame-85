@@ -177,92 +177,108 @@ export default function AnalysisHistory() {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    let yPosition = 20;
+    const margin = 20;
+    const contentWidth = pageWidth - margin * 2;
+    let y = 20;
 
-    // Título
-    doc.setFontSize(16);
-    doc.text(`Análise - ${analysis.asset}`, pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 10;
-
-    // Informações básicas
-    doc.setFontSize(11);
-    doc.text(`Data: ${analysis.date}`, 20, yPosition);
-    yPosition += 7;
-    doc.text(`Timeframe: ${analysis.timeframe}`, 20, yPosition);
-    yPosition += 7;
-    doc.text(`Status: ${analysis.status}`, 20, yPosition);
-    yPosition += 12;
-
-    // Detalhes da análise
-    doc.setFontSize(12);
+    // === Header bar ===
+    doc.setFillColor(16, 185, 129); // emerald-500
+    doc.rect(0, 0, pageWidth, 40, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
     doc.setFont(undefined as any, "bold");
-    doc.text("Detalhes da Análise", 20, yPosition);
-    yPosition += 8;
-
+    doc.text(`Análise — ${analysis.asset}`, margin, 26);
     doc.setFontSize(10);
     doc.setFont(undefined as any, "normal");
-    
-    // Fibonacci com quebra de linha
-    doc.text("Nível Fibonacci:", 20, yPosition);
-    yPosition += 6;
-    const fibonacciLines = doc.splitTextToSize(analysis.fibonacciLevel || "N/A", pageWidth - 40);
-    doc.text(fibonacciLines as string[], 30, yPosition);
-    yPosition += fibonacciLines.length * 5 + 5;
-    
-    // Order Block com quebra de linha
-    doc.text("Nível Order Block:", 20, yPosition);
-    yPosition += 6;
-    const orderBlockLines = doc.splitTextToSize(analysis.orderBlockLevel || "N/A", pageWidth - 40);
-    doc.text(orderBlockLines as string[], 30, yPosition);
-    yPosition += orderBlockLines.length * 5 + 5;
-    
-    // Zona de Liquidez com quebra de linha
-    doc.text("Zona de Liquidez:", 20, yPosition);
-    yPosition += 6;
-    const liquidityLines = doc.splitTextToSize(analysis.liquidityZone || "N/A", pageWidth - 40);
-    doc.text(liquidityLines as string[], 30, yPosition);
-    yPosition += liquidityLines.length * 5 + 10;
+    doc.text(`${analysis.date}  •  ${analysis.timeframe}  •  ${analysis.status}`, margin, 35);
 
-    // Notas
-    if (analysis.notes) {
+    y = 52;
+    doc.setTextColor(30, 41, 59); // slate-800
+
+    // === Helper: section block ===
+    const drawSection = (title: string, content: string) => {
+      if (!content) return;
+      // Check page break
+      const lines = doc.splitTextToSize(content, contentWidth - 16);
+      const blockHeight = 10 + lines.length * 5 + 8;
+      if (y + blockHeight > pageHeight - 20) {
+        doc.addPage();
+        y = 20;
+      }
+      // Section title
+      doc.setFillColor(241, 245, 249); // slate-100
+      doc.roundedRect(margin, y, contentWidth, blockHeight, 3, 3, "F");
+      doc.setFontSize(10);
       doc.setFont(undefined as any, "bold");
-      doc.text("Notas:", 20, yPosition);
-      yPosition += 6;
+      doc.setTextColor(16, 185, 129);
+      doc.text(title, margin + 8, y + 7);
+      // Section content
       doc.setFont(undefined as any, "normal");
-      const noteLines = doc.splitTextToSize(analysis.notes, pageWidth - 40);
-      doc.text(noteLines as string[], 20, yPosition);
-      yPosition += noteLines.length * 5 + 10;
-    }
+      doc.setTextColor(51, 65, 85); // slate-600
+      doc.setFontSize(9);
+      doc.text(lines as string[], margin + 8, y + 14);
+      y += blockHeight + 6;
+    };
 
-    // Imagens se existirem
+    drawSection("Nível de Fibonacci", analysis.fibonacciLevel || "N/A");
+    drawSection("Nível de Order Block", analysis.orderBlockLevel || "N/A");
+    drawSection("Zona de Liquidez", analysis.liquidityZone || "N/A");
+    drawSection("Notas e Observações", analysis.notes || "");
+
+    // === Images ===
     const images = [analysis.imageUrl1, analysis.imageUrl2, analysis.imageUrl3].filter(Boolean);
     if (images.length > 0) {
-      doc.setFont(undefined as any, "bold");
-      doc.text("Imagens da Análise:", 20, yPosition);
-      yPosition += 10;
-      doc.setFont(undefined as any, "normal");
-      
       let imagesLoaded = 0;
+      
+      if (y + 10 > pageHeight - 20) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFontSize(11);
+      doc.setFont(undefined as any, "bold");
+      doc.setTextColor(16, 185, 129);
+      doc.text("Imagens da Análise", margin, y + 5);
+      y += 12;
+
       images.forEach((imgUrl, idx) => {
         const img = new Image();
+        img.crossOrigin = "anonymous";
         img.src = imgUrl!;
         img.onload = () => {
-          if (yPosition + 80 > pageHeight) {
+          if (y + 100 > pageHeight - 20) {
             doc.addPage();
-            yPosition = 20;
+            y = 20;
           }
-          doc.text(`Imagem ${idx + 1}:`, 20, yPosition);
-          yPosition += 5;
-          doc.addImage(imgUrl!, "JPEG", 20, yPosition, 170, 100);
-          yPosition += 110;
+          doc.setFontSize(9);
+          doc.setTextColor(100, 116, 139);
+          doc.setFont(undefined as any, "normal");
+          doc.text(`Imagem ${idx + 1}`, margin, y + 4);
+          y += 7;
+          // Border around image
+          doc.setDrawColor(203, 213, 225);
+          doc.roundedRect(margin, y, contentWidth, 95, 2, 2, "S");
+          doc.addImage(imgUrl!, "JPEG", margin + 2, y + 2, contentWidth - 4, 91);
+          y += 102;
           imagesLoaded++;
-          
+
           if (imagesLoaded === images.length) {
+            // Footer
+            const totalPages = doc.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+              doc.setPage(i);
+              doc.setFontSize(8);
+              doc.setTextColor(148, 163, 184);
+              doc.text(`Página ${i} de ${totalPages}`, pageWidth / 2, pageHeight - 8, { align: "center" });
+            }
             doc.save(`analise_${analysis.asset}_${analysis.date}.pdf`);
           }
         };
       });
     } else {
+      // Footer
+      doc.setFontSize(8);
+      doc.setTextColor(148, 163, 184);
+      doc.text("Página 1 de 1", pageWidth / 2, pageHeight - 8, { align: "center" });
       doc.save(`analise_${analysis.asset}_${analysis.date}.pdf`);
     }
   };
