@@ -22,6 +22,10 @@ interface AssetConfig {
   pipValuePerLot: number;   // valor em $ de 1 pip/ponto por 1 lote padrão
   stopRange: string;        // referência de stop médio
   decimals: number;         // casas decimais do preço
+  multiplier: number;       // multiplicador de precisão para evitar floating point (1/pipSize)
+  lotToUnits: number;       // conversão de lote para unidades (TradingView)
+  stepSize: number;         // step de quantidade do símbolo no broker
+  unitLabel: string;        // label para unidades no TradingView
 }
 
 const ASSETS: Record<string, AssetConfig> = {
