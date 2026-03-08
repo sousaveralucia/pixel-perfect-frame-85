@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { CheckCircle2, TrendingUp, Target, Clock, Zap, Moon, Sun, LogOut, ClipboardCheck, ArrowRight } from "lucide-react";
+import { CheckCircle2, TrendingUp, Target, Clock, Zap, Moon, Sun, LogOut, ClipboardCheck, ArrowRight, Eye, ListChecks, ChevronDown, BarChart2, Layers, Grid3X3, Droplets, Shield, Brain } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAccountManager } from "@/hooks/useAccountManager";
@@ -244,41 +244,239 @@ export default function Home() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="estrategia" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-primary" />
-                  Checklist Operacional
-                </CardTitle>
-                <CardDescription>8 Regras Essenciais para Operação Disciplinada</CardDescription>
+          <TabsContent value="estrategia" className="space-y-4">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-foreground">Minha Estratégia</h2>
+                <p className="text-sm text-muted-foreground">Smart Money Concepts — Modelo Operacional Completo</p>
+              </div>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+                <TrendingUp className="w-3.5 h-3.5 text-primary" />
+                <span className="text-xs font-semibold text-primary">ICT / SMC</span>
+              </div>
+            </div>
+
+            {/* Visão Geral da Estratégia */}
+            <Card className="border overflow-hidden">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Eye className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-foreground mb-1">Visão Geral</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Opero com base em <strong className="text-foreground">Smart Money Concepts</strong>: identifico a estrutura 
+                      de mercado em timeframes maiores (HTF), busco confirmação de mudança de caráter (CHoCH/BOS), 
+                      e entro em <strong className="text-foreground">Order Blocks descontados</strong> dentro da Caixa de Gann 
+                      com RR mínimo de 1:3. Ativos: EUR/USD, USD/JPY, XAU/USD, NAS100, BTC/USD e DXY como referência.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Fluxo Operacional - Passo a Passo */}
+            <Card className="border">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded bg-primary/10 flex items-center justify-center">
+                    <ListChecks className="w-3.5 h-3.5 text-primary" />
+                  </div>
+                  <CardTitle className="text-sm font-semibold">Checklist Operacional — 8 Passos</CardTitle>
+                </div>
+                <CardDescription className="text-xs">Seguir na ordem. Não pular etapas.</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="pt-0">
+                <div className="space-y-2">
                   {[
-                    { number: "1", title: "CHoCH Válido em HTF (H4, H2 ou H1)", desc: "Um CHoCH válido é quando um LOW ou HIGH protegido é rompido.", color: "border-l-primary" },
-                    { number: "2", title: "Caixa de Gann em M30", desc: "Traçada do início do movimento até o fim do CHoCH válido. Utilizar apenas as regiões 0%, 50% e 100%.", color: "border-l-chart-3" },
-                    { number: "3", title: "Orderblocks Descontados (50% da Gann)", desc: "Apenas orderblocks abaixo da linha de 50% da Gann para compra, ou acima do 50% para venda.", color: "border-l-success" },
-                    { number: "4", title: "Order Blocks Válidos (H4, H2, H1 ou M30)", desc: "Se o candle tiver muito pavil e pouco corpo, traçar o candle todo.", color: "border-l-warning" },
-                    { number: "5", title: "Entrada Sempre no 50% do Order Block", desc: "Identificar ineficiências de HTF e entrar sempre no 50% da região.", color: "border-l-destructive" },
-                    { number: "6", title: "Stop Loss com Folga", desc: "Stop abaixo ou acima do Order Block no mínimo M30 com um pouco de folga.", color: "border-l-chart-2" },
-                    { number: "7", title: "Take Profit Mínimo 1:3", desc: "Take profit sempre em 1:3 no mínimo. Relação risco-retorno obrigatória.", color: "border-l-chart-4" },
-                    { number: "8", title: "Tempo Gráfico Operacional em M15 ou M5", desc: "Confirmar o tempo gráfico operacional antes de executar a operação.", color: "border-l-ring" },
+                    {
+                      step: 1,
+                      title: "CHoCH Válido em HTF",
+                      timeframe: "H4 / H2 / H1",
+                      desc: "Identificar mudança de caráter: um LOW ou HIGH protegido rompido com corpo de candle.",
+                      detail: "CHoCH = Change of Character. É a primeira confirmação de que o mercado pode estar mudando de direção. Sem CHoCH válido, não há setup.",
+                      tag: "Estrutura",
+                      tagColor: "bg-primary/10 text-primary border-primary/20",
+                    },
+                    {
+                      step: 2,
+                      title: "Caixa de Gann em M30",
+                      timeframe: "M30",
+                      desc: "Traçar do início do movimento até o fim do CHoCH. Usar regiões 0%, 50% e 100%.",
+                      detail: "A Caixa de Gann define a zona premium (acima de 50%) e discount (abaixo de 50%). Só opero em zonas de desconto para compra e premium para venda.",
+                      tag: "Gann",
+                      tagColor: "bg-chart-3/10 text-chart-3 border-chart-3/20",
+                    },
+                    {
+                      step: 3,
+                      title: "Order Blocks Descontados",
+                      timeframe: "50% da Gann",
+                      desc: "Apenas OBs abaixo de 50% (compra) ou acima de 50% (venda).",
+                      detail: "Order Blocks fora da zona de desconto têm menor probabilidade. A confluência com a Gann aumenta a taxa de acerto significativamente.",
+                      tag: "Desconto",
+                      tagColor: "bg-success/10 text-success border-success/20",
+                    },
+                    {
+                      step: 4,
+                      title: "Order Blocks Válidos",
+                      timeframe: "H4 / H2 / H1 / M30",
+                      desc: "Se candle com muito pavio e pouco corpo → traçar o candle inteiro.",
+                      detail: "Um OB válido é o último candle de baixa antes de um impulso de alta (ou vice-versa). Deve ter causado deslocamento significativo no preço.",
+                      tag: "OB",
+                      tagColor: "bg-warning/10 text-warning border-warning/20",
+                    },
+                    {
+                      step: 5,
+                      title: "Entrada no 50% do Order Block",
+                      timeframe: "M15 / M5",
+                      desc: "Identificar ineficiências de HTF e entrar sempre no 50% da região.",
+                      detail: "O 50% do OB é o ponto ótimo de entrada (OTE — Optimal Trade Entry). Garante melhor RR e stop mais curto. Usar limit order.",
+                      tag: "Entrada",
+                      tagColor: "bg-destructive/10 text-destructive border-destructive/20",
+                    },
+                    {
+                      step: 6,
+                      title: "Stop Loss com Folga",
+                      timeframe: "M30+",
+                      desc: "Stop abaixo/acima do OB com folga. Nunca stop no extremo exato.",
+                      detail: "Adicionar 5-10 pips de folga além do OB. Stops apertados demais são varridos por liquidez institucional antes do movimento real.",
+                      tag: "Proteção",
+                      tagColor: "bg-chart-2/10 text-chart-2 border-chart-2/20",
+                    },
+                    {
+                      step: 7,
+                      title: "Take Profit Mínimo 1:3",
+                      timeframe: "Obrigatório",
+                      desc: "RR mínimo de 1:3. Abaixo disso, não entrar.",
+                      detail: "Com 1:3, você pode errar 2 de cada 3 trades e ainda ficar positivo. É a base matemática que torna a estratégia sustentável no longo prazo.",
+                      tag: "RR",
+                      tagColor: "bg-chart-4/10 text-chart-4 border-chart-4/20",
+                    },
+                    {
+                      step: 8,
+                      title: "Confirmação em LTF",
+                      timeframe: "M15 / M5",
+                      desc: "Confirmar o setup no tempo gráfico operacional antes de executar.",
+                      detail: "Buscar CHoCH ou BOS em M15/M5 dentro do Order Block de HTF. É a confirmação final antes de posicionar a ordem.",
+                      tag: "Execução",
+                      tagColor: "bg-ring/10 text-ring border-ring/20",
+                    },
                   ].map((item, idx) => (
-                    <Card key={idx} className={`border-l-4 ${item.color}`}>
-                      <CardContent className="pt-6">
-                        <div className="flex items-start gap-4">
-                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
-                            {item.number}
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-bold text-foreground">{item.title}</p>
-                            <p className="text-sm text-foreground/80 mt-2">{item.desc}</p>
-                          </div>
+                    <details key={idx} className="group">
+                      <summary className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-muted-foreground/30 cursor-pointer transition-colors bg-card">
+                        <div className="w-7 h-7 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs flex-shrink-0">
+                          {item.step}
                         </div>
-                      </CardContent>
-                    </Card>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-sm text-foreground">{item.title}</span>
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${item.tagColor}`}>{item.tag}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground truncate">{item.desc}</p>
+                        </div>
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-muted text-muted-foreground font-mono flex-shrink-0">{item.timeframe}</span>
+                        <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180 flex-shrink-0" />
+                      </summary>
+                      <div className="mt-1 ml-10 mr-3 mb-2 p-3 rounded-lg bg-muted/50 border border-border">
+                        <p className="text-xs text-foreground/80 leading-relaxed">{item.detail}</p>
+                      </div>
+                    </details>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Conceitos Chave */}
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { icon: <TrendingUp className="w-4 h-4" />, title: "CHoCH", desc: "Mudança de caráter — primeiro sinal de reversão" },
+                { icon: <BarChart2 className="w-4 h-4" />, title: "BOS", desc: "Break of Structure — continuação de tendência" },
+                { icon: <Layers className="w-4 h-4" />, title: "Order Block", desc: "Última vela contrária antes do impulso" },
+                { icon: <Grid3X3 className="w-4 h-4" />, title: "Gann Box", desc: "Ferramenta de desconto — 0%, 50%, 100%" },
+                { icon: <Droplets className="w-4 h-4" />, title: "Liquidez", desc: "Pools de ordens acima/abaixo de highs/lows" },
+                { icon: <Zap className="w-4 h-4" />, title: "FVG / Imbalance", desc: "Gap de valor justo — região de ineficiência" },
+              ].map((concept, idx) => (
+                <Card key={idx} className="border hover:border-primary/30 transition-colors">
+                  <CardContent className="p-3">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <div className="w-7 h-7 rounded bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                        {concept.icon}
+                      </div>
+                      <span className="font-semibold text-xs text-foreground">{concept.title}</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">{concept.desc}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Gestão de Risco */}
+            <Card className="border">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-destructive" />
+                  <CardTitle className="text-sm font-semibold">Gestão de Risco</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="text-center p-3 rounded-lg bg-destructive/5 border border-destructive/20">
+                    <p className="text-2xl font-bold text-destructive">3</p>
+                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mt-1">Max Losses/Dia</p>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/20">
+                    <p className="text-2xl font-bold text-primary">2</p>
+                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mt-1">Meta Wins/Dia</p>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-chart-4/5 border border-chart-4/20">
+                    <p className="text-2xl font-bold text-chart-4">1:3</p>
+                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mt-1">RR Mínimo</p>
+                  </div>
+                </div>
+
+                <div className="mt-3 space-y-2">
+                  {[
+                    { rule: "Nunca arriscar mais de 1-2% do capital por trade", icon: "🛡️" },
+                    { rule: "Se bater 3 losses, parar imediatamente — sem exceções", icon: "🛑" },
+                    { rule: "Após 2 wins, considerar encerrar o dia positivo", icon: "✅" },
+                    { rule: "Não operar por vingança ou FOMO — respeitar o plano", icon: "🧠" },
+                    { rule: "DXY é referência — se o dólar diverge, cautela redobrada", icon: "💵" },
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-muted/50">
+                      <span className="text-sm">{item.icon}</span>
+                      <span className="text-xs text-foreground/80">{item.rule}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Psicologia e Disciplina */}
+            <Card className="border border-warning/30 bg-warning/5">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-warning/15 flex items-center justify-center flex-shrink-0">
+                    <Brain className="w-5 h-5 text-warning" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-foreground mb-2">Mentalidade de Trader Profissional</p>
+                    <div className="space-y-1.5">
+                      {[
+                        "O resultado de um trade individual é irrelevante — foco no processo",
+                        "Perdas fazem parte. Um trader lucrativo perde regularmente",
+                        "A disciplina de NÃO operar é tão valiosa quanto a de operar",
+                        "Consistência > resultados excepcionais esporádicos",
+                        "Analisar à noite, operar de dia — separar emoção de execução",
+                      ].map((tip, idx) => (
+                        <p key={idx} className="text-xs text-foreground/70 flex items-start gap-1.5">
+                          <span className="text-warning mt-0.5">▸</span>
+                          {tip}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
