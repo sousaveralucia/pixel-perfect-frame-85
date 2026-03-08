@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from "recharts";
 import { useAccountManager } from "@/hooks/useAccountManager";
+import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
 
 interface Trade {
   id: string;
