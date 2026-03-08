@@ -159,6 +159,7 @@ export const useTradeJournalUnified = (accountId: string) => {
     if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
     if (updates.isFavorite !== undefined) dbUpdates.is_favorite = updates.isFavorite;
     if (updates.moneyResult !== undefined) dbUpdates.money_result = updates.moneyResult;
+    if (updates.riskReward !== undefined) dbUpdates.risk_reward = updates.riskReward;
     if (updates.operational !== undefined) dbUpdates.operational = updates.operational;
     if (updates.emotional !== undefined) dbUpdates.emotional = updates.emotional;
     if (updates.rational !== undefined) dbUpdates.rational = updates.rational;
