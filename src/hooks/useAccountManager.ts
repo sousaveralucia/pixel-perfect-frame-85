@@ -21,18 +21,20 @@ const DEFAULT_ACCOUNTS: Account[] = [
   {
     id: "conta-financiada",
     name: "Conta Financiada",
-    initialBalance: 1000,
-    currentBalance: 1000,
+    initialBalance: 50000,
+    currentBalance: 50000,
     createdAt: new Date().toISOString(),
   },
   {
     id: "conta-challenger",
     name: "Challenger",
-    initialBalance: 10000,
-    currentBalance: 10000,
+    initialBalance: 100000,
+    currentBalance: 100000,
     createdAt: new Date().toISOString(),
   },
 ];
+
+const ACCOUNTS_VERSION = "v2";
 
 export function useAccountManager() {
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -40,6 +42,17 @@ export function useAccountManager() {
 
   // Carregar contas do localStorage
   useEffect(() => {
+    const version = localStorage.getItem("trading_accounts_version");
+    if (version !== ACCOUNTS_VERSION) {
+      // Migrar para novas contas padrão
+      setAccounts(DEFAULT_ACCOUNTS);
+      localStorage.setItem("trading_accounts", JSON.stringify(DEFAULT_ACCOUNTS));
+      localStorage.setItem("trading_accounts_version", ACCOUNTS_VERSION);
+      setActiveAccountId("conta-pessoal");
+      localStorage.setItem("trading_active_account", "conta-pessoal");
+      return;
+    }
+
     const stored = localStorage.getItem("trading_accounts");
     if (stored) {
       try {
