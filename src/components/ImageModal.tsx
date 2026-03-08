@@ -18,7 +18,8 @@ export function ImageModal({ imageUrl, onClose }: ImageModalProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  return (
+  if (!imageUrl) return null;
+
     <div 
       className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-4"
       onClick={onClose}
