@@ -49,45 +49,45 @@
   }
 
   .dark {
-    --background: 0 0% 10%;
-    --foreground: 220 13% 91%;
-    --card: 0 0% 16%;
-    --card-foreground: 220 13% 91%;
-    --popover: 0 0% 16%;
-    --popover-foreground: 220 13% 91%;
-    --primary: 36 90% 44%;
+    --background: 220 16% 8%;
+    --foreground: 210 20% 92%;
+    --card: 220 14% 11%;
+    --card-foreground: 210 20% 92%;
+    --popover: 220 14% 11%;
+    --popover-foreground: 210 20% 92%;
+    --primary: 160 84% 39%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 25%;
-    --secondary-foreground: 220 13% 91%;
-    --muted: 0 0% 25%;
-    --muted-foreground: 0 0% 63%;
-    --accent: 36 90% 44%;
+    --secondary: 215 16% 16%;
+    --secondary-foreground: 210 20% 88%;
+    --muted: 215 14% 18%;
+    --muted-foreground: 215 12% 55%;
+    --accent: 160 84% 39%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 13% 26%;
-    --input: 215 28% 15%;
-    --ring: 36 90% 44%;
+    --border: 215 14% 18%;
+    --input: 215 16% 14%;
+    --ring: 160 84% 39%;
 
-    --chart-1: 36 90% 44%;
-    --chart-2: 28 92% 37%;
-    --chart-3: 22 90% 31%;
-    --chart-4: 142 71% 45%;
+    --chart-1: 160 84% 39%;
+    --chart-2: 160 70% 30%;
+    --chart-3: 160 60% 24%;
+    --chart-4: 45 93% 58%;
     --chart-5: 0 84% 60%;
 
-    --sidebar-background: 215 28% 15%;
-    --sidebar-foreground: 220 13% 91%;
-    --sidebar-primary: 28 92% 37%;
+    --sidebar-background: 220 16% 6%;
+    --sidebar-foreground: 210 20% 92%;
+    --sidebar-primary: 160 84% 39%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 36 90% 44%;
+    --sidebar-accent: 160 84% 39%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 220 13% 26%;
-    --sidebar-ring: 36 90% 44%;
+    --sidebar-border: 215 14% 16%;
+    --sidebar-ring: 160 84% 39%;
 
     --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
-    --warning: 36 90% 44%;
-    --warning-foreground: 0 0% 100%;
+    --warning: 45 93% 58%;
+    --warning-foreground: 0 0% 10%;
   }
 }
 
