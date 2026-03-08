@@ -214,6 +214,7 @@ export type Database = {
           date: string | null
           emotional: Json | null
           entry_price: string | null
+          entry_time: string | null
           exit_price: string | null
           id: string
           is_favorite: boolean | null
@@ -241,6 +242,7 @@ export type Database = {
           date?: string | null
           emotional?: Json | null
           entry_price?: string | null
+          entry_time?: string | null
           exit_price?: string | null
           id?: string
           is_favorite?: boolean | null
@@ -268,6 +270,7 @@ export type Database = {
           date?: string | null
           emotional?: Json | null
           entry_price?: string | null
+          entry_time?: string | null
           exit_price?: string | null
           id?: string
           is_favorite?: boolean | null

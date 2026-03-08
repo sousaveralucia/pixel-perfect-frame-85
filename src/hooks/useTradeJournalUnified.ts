@@ -56,6 +56,7 @@ function mapRowToTrade(row: any): TradeWithChecklist {
   return {
     id: row.id,
     date: row.date || "",
+    entryTime: row.entry_time || undefined,
     asset: row.asset || "",
     entryPrice: row.entry_price || "",
     exitPrice: row.exit_price || "",
@@ -112,6 +113,7 @@ export const useTradeJournalUnified = (accountId: string) => {
       user_id: user.id,
       account_key: accountId,
       date: trade.date,
+      entry_time: trade.entryTime || null,
       asset: trade.asset,
       entry_price: trade.entryPrice,
       exit_price: trade.exitPrice,
@@ -143,6 +145,7 @@ export const useTradeJournalUnified = (accountId: string) => {
     if (!user) return;
     const dbUpdates: any = {};
     if (updates.date !== undefined) dbUpdates.date = updates.date;
+    if (updates.entryTime !== undefined) dbUpdates.entry_time = updates.entryTime;
     if (updates.asset !== undefined) dbUpdates.asset = updates.asset;
     if (updates.entryPrice !== undefined) dbUpdates.entry_price = updates.entryPrice;
     if (updates.exitPrice !== undefined) dbUpdates.exit_price = updates.exitPrice;
