@@ -46,6 +46,7 @@ export default function Home() {
   const { signOut } = useAuth();
   const { accounts, activeAccountId, getActiveAccount, switchAccount } = useAccountManager();
   const { trades } = useTradeJournalUnified(activeAccountId);
+  const [showPlanDialog, setShowPlanDialog] = useState(false);
   const activeAccount = getActiveAccount();
   const currentBalance = activeAccount?.currentBalance ?? 0;
   const initialBalance = activeAccount?.initialBalance ?? 0;
