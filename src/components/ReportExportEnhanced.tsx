@@ -461,7 +461,7 @@ export default function ReportExportEnhanced({ trades }: ReportExportEnhancedPro
       </div>
 
       {/* Resumo */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total de Trades</CardTitle>
@@ -492,6 +492,27 @@ export default function ReportExportEnhanced({ trades }: ReportExportEnhancedPro
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.winRate}%</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">P&L Total</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className={`text-2xl font-bold ${parseFloat(stats.totalPnL) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              ${stats.totalPnL}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Retorno s/ Saldo</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className={`text-2xl font-bold ${parseFloat(stats.pnlPercentage) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {parseFloat(stats.pnlPercentage) >= 0 ? '+' : ''}{stats.pnlPercentage}%
+            </div>
+            <p className="text-xs text-muted-foreground">Base: ${initialBalance.toFixed(0)}</p>
           </CardContent>
         </Card>
       </div>
