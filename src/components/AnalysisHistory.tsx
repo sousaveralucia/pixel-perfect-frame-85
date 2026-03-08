@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BarChart3, Plus, Trash2, Download, Edit2, FileText, FileSpreadsheet } from "lucide-react";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
-import { exportAnalysesToExcel } from "@/lib/excelExporter";
+import { exportAnalysesToExcel, exportToCSV } from "@/lib/excelExporter";
 
 interface Analysis {
   id: string;
