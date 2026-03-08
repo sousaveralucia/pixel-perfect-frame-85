@@ -30,40 +30,72 @@ interface SavedCalculation {
 const STORAGE_KEY = "calculation_history";
 
 export default function CalculationHistory() {
+  const { user } = useAuth();
   const [calculations, setCalculations] = useState<SavedCalculation[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Carregar histórico do localStorage
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        setCalculations(JSON.parse(stored));
-      } catch (error) {
-        console.error("Erro ao carregar histórico:", error);
+    if (!user) return;
+    supabase.from("calculation_history").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).then(({ data }) => {
+      if (data) {
+        setCalculations(data.map((r: any) => ({
+          id: r.id,
+          timestamp: r.timestamp || r.created_at,
+          capital: Number(r.capital),
+          asset: r.asset || "",
+          riskType: r.risk_type || "optimal",
+          stopLoss: Number(r.stop_loss),
+          rrRatio: Number(r.rr_ratio),
+          currentPrice: Number(r.current_price),
+          positionSize: Number(r.position_size),
+          takeProfitValue: Number(r.take_profit_value),
+          pipsAtRisk: Number(r.pips_at_risk),
+          pipsPotentialProfit: Number(r.pips_potential_profit),
+        })));
       }
-    }
-    setIsLoaded(true);
-  }, []);
+      setIsLoaded(true);
+    });
+  }, [user]);
 
-  // Adicionar novo cálculo ao histórico
-  const addCalculation = (calc: Omit<SavedCalculation, "id" | "timestamp">) => {
-    const newCalc: SavedCalculation = {
-      ...calc,
-      id: `calc_${Date.now()}`,
+  const addCalculation = async (calc: Omit<SavedCalculation, "id" | "timestamp">) => {
+    if (!user) return;
+    const { data } = await supabase.from("calculation_history").insert({
+      user_id: user.id,
       timestamp: new Date().toISOString(),
-    };
-    const updated = [newCalc, ...calculations];
-    setCalculations(updated);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      capital: calc.capital,
+      asset: calc.asset,
+      risk_type: calc.riskType,
+      stop_loss: calc.stopLoss,
+      rr_ratio: calc.rrRatio,
+      current_price: calc.currentPrice,
+      position_size: calc.positionSize,
+      take_profit_value: calc.takeProfitValue,
+      pips_at_risk: calc.pipsAtRisk,
+      pips_potential_profit: calc.pipsPotentialProfit,
+    }).select().single();
+    if (data) {
+      setCalculations(prev => [{
+        id: data.id,
+        timestamp: data.timestamp || data.created_at,
+        capital: Number(data.capital),
+        asset: data.asset || "",
+        riskType: (data.risk_type || "optimal") as any,
+        stopLoss: Number(data.stop_loss),
+        rrRatio: Number(data.rr_ratio),
+        currentPrice: Number(data.current_price),
+        positionSize: Number(data.position_size),
+        takeProfitValue: Number(data.take_profit_value),
+        pipsAtRisk: Number(data.pips_at_risk),
+        pipsPotentialProfit: Number(data.pips_potential_profit),
+      }, ...prev]);
+    }
     toast.success("Cálculo salvo no histórico!");
   };
 
-  // Deletar cálculo
-  const deleteCalculation = (id: string) => {
-    const updated = calculations.filter((c) => c.id !== id);
-    setCalculations(updated);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  const deleteCalculation = async (id: string) => {
+    if (!user) return;
+    await supabase.from("calculation_history").delete().eq("id", id).eq("user_id", user.id);
+    setCalculations(calculations.filter((c) => c.id !== id));
     toast.success("Cálculo removido!");
   };
 
