@@ -22,11 +22,7 @@ export function TradesSummary({ activeAccountId }: TradesSummaryProps = {}) {
   const [viewMode, setViewMode] = useState<"week" | "month">("week");
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  // Carregar trades do localStorage
-  const trades = useMemo(() => {
-    const saved = localStorage.getItem(`trades_enhanced_${activeAccountId}`);
-    return saved ? JSON.parse(saved) : [];
-  }, [activeAccountId]);
+  const { trades } = useTradeJournalUnified(activeAccountId || "");
 
   // Calcular resumo por dia
   const dailySummary = useMemo(() => {

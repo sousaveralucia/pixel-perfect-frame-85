@@ -45,11 +45,8 @@ export function TradingCalendar({ activeAccountId: propAccountId }: TradingCalen
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [filterResult, setFilterResult] = useState<"ALL" | "WIN" | "LOSS" | "BREAK_EVEN" | "FAVORITES">("ALL");
 
-  // Carregar trades do localStorage
-  const trades = useMemo(() => {
-    const saved = localStorage.getItem(`trades_enhanced_${accountId}`);
-    return saved ? JSON.parse(saved) : [];
-  }, [accountId]);
+  // Carregar trades do Supabase
+  const { trades } = useTradeJournalUnified(accountId);
 
   // Sincronizar saldo quando trades mudam
   useMemo(() => {

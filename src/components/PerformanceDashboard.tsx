@@ -28,10 +28,7 @@ interface TradeWithChecklist {
 export default function PerformanceDashboard() {
   const { activeAccountId } = useAccountManager();
 
-  const trades = useMemo(() => {
-    const saved = localStorage.getItem(`trades_enhanced_${activeAccountId}`);
-    return saved ? JSON.parse(saved) : [];
-  }, [activeAccountId]);
+  const { trades } = useTradeJournalUnified(activeAccountId);
 
   // Agrupar trades por data
   const dailyStats = useMemo(() => {
