@@ -1,10 +1,35 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { TrendingUp, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Login() {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      toast.error("Preencha todos os campos");
+      return;
+    }
+    setIsLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setIsLoading(false);
+    if (error) {
+      toast.error("E-mail ou senha incorretos");
+      return;
+    }
+    toast.success("Login realizado com sucesso!");
+    navigate("/");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 flex items-center justify-center p-4">
@@ -16,42 +41,24 @@ export default function Login() {
             </div>
           </div>
           <CardTitle className="text-3xl font-bold">Trading Dashboard</CardTitle>
-          <CardDescription>Plano Operacional - HackTrading Plan</CardDescription>
+          <CardDescription>Faça login para acessar seu dashboard</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <p className="text-sm text-muted-foreground text-center">
-            Faça login para acessar seu dashboard de trading e gerenciar seus trades com disciplina e estratégia.
-          </p>
-
-          <div className="space-y-3 pt-4">
-            <Button onClick={() => navigate("/")} size="lg" className="w-full">
-              Entrar no Dashboard
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">E-mail</Label>
+              <Input id="email" type="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading} />
+            </div>
+            <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
+              {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Entrando...</> : "Entrar"}
             </Button>
-          </div>
+          </form>
 
-          <div className="space-y-4 pt-4 border-t">
-            <h3 className="font-semibold text-sm">Funcionalidades:</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-0.5">✓</span>
-                <span>Diário de trades com checklist operacional</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-0.5">✓</span>
-                <span>Análise de desempenho e relatórios PDF</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-0.5">✓</span>
-                <span>Gerenciamento de múltiplas contas</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-0.5">✓</span>
-                <span>Calendário econômico e alertas</span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="text-center text-sm pt-2">
+          <div className="text-center text-sm">
             <span className="text-muted-foreground">Novo por aqui? </span>
             <button onClick={() => navigate("/register")} className="text-primary hover:underline font-semibold">
               Criar conta
