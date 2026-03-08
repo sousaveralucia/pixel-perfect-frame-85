@@ -27,14 +27,14 @@ import { useAccountManager } from "@/hooks/useAccountManager";
 import { Plus, Trash2, Edit2, Image, FileSpreadsheet, FileDown } from "lucide-react";
 import { toast } from "sonner";
 import { useTradeAlerts } from "@/hooks/useTradeAlerts";
-import { useExportTrades } from "@/hooks/useExportTrades";
+
 import {
   useMarketSession,
   formatMarketSession,
   parseTimeString,
 } from "@/hooks/useMarketSession";
 import { Download } from "lucide-react";
-import { exportTradesToExcel } from "@/lib/excelExporter";
+import { exportTradesToExcel, exportToCSV as exportToCSVFile } from "@/lib/excelExporter";
 import { SimpleImageViewer } from "./SimpleImageViewer";
 import { TradeImageGallery } from "./TradeImageGallery";
 
@@ -188,7 +188,7 @@ function getMarketSessionInfo(
 
 export default function TradeJournalEnhanced() {
   const { accounts, activeAccountId } = useAccountManager();
-  const { exportToCSV } = useExportTrades();
+  
   const { trades, isLoaded, addTrade: addTradeUnified, updateTrade: updateTradeUnified, deleteTrade: deleteTradeUnified, toggleFavorite: toggleFavoriteUnified } = useTradeJournalUnified(activeAccountId);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -1878,20 +1878,26 @@ export default function TradeJournalEnhanced() {
         <div className="grid md:grid-cols-2 gap-3">
           <Button
             onClick={() => {
-              const tradesForExport = trades.map(t => ({
-                id: t.id,
-                date: t.date,
-                asset: t.asset,
-                entry: parseFloat(t.entryPrice),
-                exit: parseFloat(t.exitPrice),
-                result: (t.result === "WIN"
-                  ? "Vitória"
-                  : t.result === "LOSS"
-                    ? "Derrota"
-                    : "Empate") as "Vitória" | "Derrota" | "Empate",
-                notes: t.notes,
-              }));
-              exportToCSV(tradesForExport);
+              const headers = ['Data', 'Ativo', 'Entrada', 'Saída', 'Resultado ($)', 'Sessão', 'Status', 'Notas'];
+              const data = trades.map(t => [
+                t.date, t.asset, t.entryPrice, t.exitPrice,
+                t.moneyResult || 0,
+                t.session || '',
+                t.result === "WIN" ? "Vitória" : t.result === "LOSS" ? "Derrota" : "Empate",
+                t.notes || '',
+              ]);
+              const wins = trades.filter(t => t.result === 'WIN').length;
+              const losses = trades.filter(t => t.result === 'LOSS').length;
+              const total = data.reduce((s, r) => s + (Number(r[4]) || 0), 0);
+              exportToCSVFile(
+                `trades_${new Date().toISOString().split('T')[0]}.csv`,
+                headers,
+                data,
+                [
+                  ['RESUMO'],
+                  ['Total Trades', String(trades.length), 'Vitórias', String(wins), 'Derrotas', String(losses), 'Resultado', `$${total.toFixed(2)}`],
+                ]
+              );
               toast.success("Trades exportados em CSV com sucesso!");
             }}
             variant="outline"

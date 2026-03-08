@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BarChart3, Plus, Trash2, Download, Edit2, FileText, FileSpreadsheet } from "lucide-react";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
-import { exportAnalysesToExcel } from "@/lib/excelExporter";
+import { exportAnalysesToExcel, exportToCSV } from "@/lib/excelExporter";
 
 interface Analysis {
   id: string;
@@ -291,31 +291,23 @@ export default function AnalysisHistory() {
 
   const handleExportAnalyses = () => {
     const accountAnalyses = analyses.filter((a) => a.accountId === activeAccountId);
-    const csv = [
-      ['Data', 'Ativo', 'Timeframe', 'Nível Fibonacci', 'Nível Order Block', 'Zona Liquidez', 'Status', 'Notas'].join(','),
-      ...accountAnalyses.map((a) =>
-        [
-          a.date,
-          a.asset,
-          a.timeframe,
-          `"${a.fibonacciLevel}"`,
-          `"${a.orderBlockLevel}"`,
-          `"${a.liquidityZone}"`,
-          a.status,
-          `"${a.notes}"`
-        ].join(',')
-      )
-    ].join('\n');
-
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `analises_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const headers = ['Data', 'Ativo', 'Timeframe', 'Nível Fibonacci', 'Nível Order Block', 'Zona Liquidez', 'Status', 'Notas'];
+    const data = accountAnalyses.map((a) => [
+      a.date, a.asset, a.timeframe, a.fibonacciLevel, a.orderBlockLevel, a.liquidityZone, a.status, a.notes
+    ]);
+    const active = accountAnalyses.filter(a => a.status === 'ATIVO').length;
+    const tested = accountAnalyses.filter(a => a.status === 'TESTADO').length;
+    const discarded = accountAnalyses.filter(a => a.status === 'DESCARTADO').length;
+    exportToCSV(
+      `analises_${new Date().toISOString().split('T')[0]}.csv`,
+      headers,
+      data,
+      [
+        ['RESUMO'],
+        ['Total', String(accountAnalyses.length), 'Ativas', String(active), 'Testadas', String(tested), 'Descartadas', String(discarded)],
+      ]
+    );
+    toast.success('Análises exportadas em CSV com sucesso!');
   };
 
   const filteredAnalyses = useMemo(() => {
