@@ -130,7 +130,11 @@ export default function TradingCalculator() {
 
     const direction: "long" | "short" = entry > sl ? "long" : "short";
     const priceDiff = Math.abs(entry - sl);
-    const stopDistance = Math.round(priceDiff / asset.pipSize);
+
+    // Use multiplier to avoid floating point precision issues
+    const entryInt = Math.round(entry * asset.multiplier);
+    const slInt = Math.round(sl * asset.multiplier);
+    const stopDistance = Math.abs(entryInt - slInt);
 
     if (stopDistance <= 0) return null;
 
@@ -138,9 +142,16 @@ export default function TradingCalculator() {
     const valuePerPip = riskAmt / stopDistance;
 
     // Lot size = valor por pip / valor por pip por lote
-    const lotSize = valuePerPip / asset.pipValuePerLot;
+    const rawLotSize = valuePerPip / asset.pipValuePerLot;
 
-    // TPs baseados na distância do stop
+    // Quantidade em unidades (para TradingView)
+    const rawUnits = rawLotSize * asset.lotToUnits;
+    // Arredondar para o step do símbolo
+    const units = Math.floor(rawUnits / asset.stepSize) * asset.stepSize;
+    // Lot size arredondado baseado nas unidades
+    const lotSize = units / asset.lotToUnits;
+
+    // TPs baseados na distância do stop (em preço)
     const tpOffset2 = priceDiff * 2;
     const tpOffset3 = priceDiff * 3;
     const tpOffset4 = priceDiff * 4;
@@ -154,6 +165,7 @@ export default function TradingCalculator() {
       direction,
       stopDistance,
       lotSize,
+      units,
       valuePerPip,
       tp2,
       tp3,
@@ -161,7 +173,7 @@ export default function TradingCalculator() {
       profit2: riskAmt * 2,
       profit3: riskAmt * 3,
       profit4: riskAmt * 4,
-      rr: 3, // mínimo do plano
+      rr: 3,
     };
   }, [entryPrice, stopLossPrice, risk, asset]);
 
