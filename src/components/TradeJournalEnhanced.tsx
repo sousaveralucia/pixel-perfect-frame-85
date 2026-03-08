@@ -477,195 +477,190 @@ export default function TradeJournalEnhanced() {
     const pw = doc.internal.pageSize.getWidth();
     const ph = doc.internal.pageSize.getHeight();
     let y = 0;
+    const m = 12; // margin
 
-    const colors = {
-      primary: [15, 23, 42] as [number, number, number],      // slate-900
-      accent: [59, 130, 246] as [number, number, number],      // blue-500
-      green: [34, 197, 94] as [number, number, number],        // green-500
-      red: [239, 68, 68] as [number, number, number],          // red-500
-      yellow: [234, 179, 8] as [number, number, number],       // yellow-500
-      gray: [148, 163, 184] as [number, number, number],       // slate-400
-      lightBg: [241, 245, 249] as [number, number, number],    // slate-100
+    const c = {
+      primary: [15, 23, 42] as [number, number, number],
+      accent: [59, 130, 246] as [number, number, number],
+      green: [34, 197, 94] as [number, number, number],
+      red: [239, 68, 68] as [number, number, number],
+      yellow: [234, 179, 8] as [number, number, number],
+      gray: [148, 163, 184] as [number, number, number],
+      lightBg: [241, 245, 249] as [number, number, number],
       white: [255, 255, 255] as [number, number, number],
     };
+    const resultColor = trade.result === "WIN" ? c.green : trade.result === "LOSS" ? c.red : trade.result === "BREAK_EVEN" ? c.yellow : c.gray;
+    const resultText = trade.result === "WIN" ? "WIN" : trade.result === "LOSS" ? "LOSS" : trade.result === "BREAK_EVEN" ? "BE" : "ONGOING";
 
-    const resultColor = trade.result === "WIN" ? colors.green : trade.result === "LOSS" ? colors.red : trade.result === "BREAK_EVEN" ? colors.yellow : colors.gray;
+    // === PAGE 1: HEADER + DATA + ALL CHECKLISTS ===
 
-    // === HEADER BAR ===
-    doc.setFillColor(...colors.primary);
-    doc.rect(0, 0, pw, 36, "F");
-    doc.setFillColor(...colors.accent);
-    doc.rect(0, 36, pw, 3, "F");
+    // Header bar (compact)
+    doc.setFillColor(...c.primary);
+    doc.rect(0, 0, pw, 28, "F");
+    doc.setFillColor(...c.accent);
+    doc.rect(0, 28, pw, 2, "F");
 
-    doc.setTextColor(...colors.white);
-    doc.setFontSize(20);
+    doc.setTextColor(...c.white);
+    doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
-    doc.text("TRADE REPORT", 14, 16);
-    doc.setFontSize(24);
-    doc.text(trade.asset, 14, 30);
+    doc.text(`TRADE REPORT  -  ${trade.asset}`, m, 12);
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${trade.date || "N/A"}  |  ${trade.session || "N/A"}  |  ${trade.entryTime || ""}  |  R:R ${trade.riskReward ?? "N/A"}  |  ${trade.moneyResult != null ? "$" + trade.moneyResult.toFixed(2) : ""}`, m, 22);
 
     // Result badge
     doc.setFillColor(...resultColor);
-    const resultText = trade.result === "WIN" ? "WIN" : trade.result === "LOSS" ? "LOSS" : trade.result === "BREAK_EVEN" ? "BE" : "ONGOING";
-    const badgeW = doc.getTextWidth(resultText) + 16;
-    doc.roundedRect(pw - 14 - badgeW, 10, badgeW, 22, 4, 4, "F");
-    doc.setTextColor(...colors.white);
-    doc.setFontSize(16);
+    const bw = doc.getTextWidth(resultText) * 1.8 + 10;
+    doc.roundedRect(pw - m - bw, 6, bw, 16, 3, 3, "F");
+    doc.setTextColor(...c.white);
+    doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
-    doc.text(resultText, pw - 14 - badgeW / 2, 24, { align: "center" });
+    doc.text(resultText, pw - m - bw / 2, 17, { align: "center" });
 
-    y = 48;
+    y = 36;
 
-    // === INFO ROW ===
-    doc.setFillColor(...colors.lightBg);
-    doc.rect(0, y - 4, pw, 14, "F");
-    doc.setTextColor(...colors.gray);
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    const infoText = `Data: ${trade.date || "N/A"}   |   Sessao: ${trade.session || "N/A"}   |   Horario: ${trade.entryTime || "N/A"}   |   R:R: ${trade.riskReward ?? "N/A"}   |   Resultado: ${trade.moneyResult != null ? "$" + trade.moneyResult.toFixed(2) : "N/A"}`;
-    doc.text(infoText, pw / 2, y + 3, { align: "center" });
-    y += 18;
-
-    // Helper: section title with colored left bar
-    const sectionTitle = (title: string, color: [number, number, number]) => {
-      if (y > ph - 30) { doc.addPage(); y = 20; }
+    // Helper: compact section title
+    const secTitle = (title: string, color: [number, number, number]) => {
       doc.setFillColor(...color);
-      doc.rect(14, y - 4, 3, 8, "F");
-      doc.setTextColor(...colors.primary);
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.text(title, 20, y + 2);
-      y += 10;
-    };
-
-    // Helper: key-value in two columns
-    const dataRow = (label: string, value: string, isAlt: boolean) => {
-      if (y > ph - 15) { doc.addPage(); y = 20; }
-      if (isAlt) {
-        doc.setFillColor(...colors.lightBg);
-        doc.rect(14, y - 4, pw - 28, 8, "F");
-      }
-      doc.setTextColor(...colors.gray);
+      doc.rect(m, y, 2.5, 6, "F");
+      doc.setTextColor(...c.primary);
       doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
-      doc.text(label, 18, y + 1);
-      doc.setTextColor(...colors.primary);
       doc.setFont("helvetica", "bold");
-      doc.text(value, pw / 2, y + 1);
+      doc.text(title, m + 5, y + 4.5);
       y += 8;
     };
 
-    // Helper: checklist item with visual indicator
-    const checkItem = (label: string, checked: boolean, isAlt: boolean) => {
-      if (y > ph - 15) { doc.addPage(); y = 20; }
-      if (isAlt) {
-        doc.setFillColor(...colors.lightBg);
-        doc.rect(14, y - 4, pw - 28, 8, "F");
-      }
-      // Circle indicator
-      if (checked) {
-        doc.setFillColor(...colors.green);
-        doc.circle(22, y - 0.5, 2.5, "F");
-        doc.setTextColor(...colors.white);
-        doc.setFontSize(7);
-        doc.setFont("helvetica", "bold");
-        doc.text("v", 20.7, y + 1);
-      } else {
-        doc.setDrawColor(...colors.red);
-        doc.setLineWidth(0.5);
-        doc.circle(22, y - 0.5, 2.5, "S");
-        doc.setTextColor(...colors.red);
-        doc.setFontSize(7);
-        doc.setFont("helvetica", "bold");
-        doc.text("x", 20.8, y + 1);
-      }
-      doc.setTextColor(...colors.primary);
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
-      doc.text(label, 28, y + 1);
-      // Status text
-      doc.setTextColor(...(checked ? colors.green : colors.red));
-      doc.setFont("helvetica", "bold");
-      doc.text(checked ? "Sim" : "Nao", pw - 30, y + 1);
-      y += 8;
+    // Helper: compact data row
+    const dRow = (label: string, value: string, x: number, w: number, alt: boolean) => {
+      if (alt) { doc.setFillColor(...c.lightBg); doc.rect(x, y - 3, w, 6, "F"); }
+      doc.setTextColor(...c.gray); doc.setFontSize(7.5); doc.setFont("helvetica", "normal");
+      doc.text(label, x + 2, y + 0.5);
+      doc.setTextColor(...c.primary); doc.setFont("helvetica", "bold");
+      doc.text(value, x + w / 2, y + 0.5);
+      y += 6;
     };
 
-    // === TRADE DATA ===
-    sectionTitle("Dados do Trade", colors.accent);
-    const tradeData: [string, string][] = [
-      ["Ativo", trade.asset],
-      ["Preco de Entrada", trade.entryPrice || "N/A"],
-      ["Preco de Saida", trade.exitPrice || "N/A"],
+    // Helper: compact check item
+    const chk = (label: string, checked: boolean, x: number, w: number) => {
+      doc.setFillColor(...(checked ? c.green : c.red));
+      doc.circle(x + 4, y + 0.5, 1.8, "F");
+      doc.setTextColor(...c.primary); doc.setFontSize(7.5); doc.setFont("helvetica", "normal");
+      doc.text(label, x + 8, y + 1.5);
+      doc.setTextColor(...(checked ? c.green : c.red)); doc.setFont("helvetica", "bold");
+      doc.text(checked ? "Sim" : "Nao", x + w - 12, y + 1.5);
+      y += 5.5;
+    };
+
+    // === TRADE DATA (two columns) ===
+    secTitle("Dados do Trade", c.accent);
+    const halfW = (pw - 2 * m) / 2;
+    const dataLeft: [string, string][] = [
+      ["Entrada", trade.entryPrice || "N/A"],
+      ["Saida", trade.exitPrice || "N/A"],
       ["Stop Loss", trade.stopLoss || "N/A"],
       ["Take Profit", trade.takeProfit || "N/A"],
-      ["Resultado", trade.result],
-      ["Risk:Reward", String(trade.riskReward ?? "N/A")],
-      ["Resultado ($)", trade.moneyResult != null ? `$${trade.moneyResult.toFixed(2)}` : "N/A"],
     ];
-    tradeData.forEach(([l, v], i) => dataRow(l, v, i % 2 === 0));
-    y += 4;
+    const dataRight: [string, string][] = [
+      ["Resultado", trade.result],
+      ["R:R", String(trade.riskReward ?? "N/A")],
+      ["Resultado $", trade.moneyResult != null ? `$${trade.moneyResult.toFixed(2)}` : "N/A"],
+      ["Ativo", trade.asset],
+    ];
+    const savedY = y;
+    dataLeft.forEach(([l, v], i) => dRow(l, v, m, halfW, i % 2 === 0));
+    const leftEnd = y;
+    y = savedY;
+    dataRight.forEach(([l, v], i) => dRow(l, v, m + halfW, halfW, i % 2 === 0));
+    y = Math.max(leftEnd, y) + 3;
 
-    // === CHECKLIST OPERACIONAL ===
-    sectionTitle("Checklist Operacional", colors.accent);
+    // === CHECKLISTS in 2-column grid ===
+    const colW = (pw - 2 * m - 4) / 2;
+
+    // Left: Operacional
+    secTitle("Checklist Operacional", c.accent);
     const opItems: [string, boolean][] = [
       ["CHOCH Valido HTF", trade.operational.chochValidoHTF],
       ["Caixa Gann Tracada", trade.operational.caixaGannTracada],
       ["Regiao Descontada 50%", trade.operational.regiaoDescontada50],
-      ["Order Block Identificado", trade.operational.orderBlockIdentificado],
+      ["Order Block ID", trade.operational.orderBlockIdentificado],
       ["Entrada 50% OB", trade.operational.entrada50OB],
-      ["Stop Risk Management", trade.operational.stopRiskManagement],
-      ["Tempo Grafico Operacional", trade.operational.tempoGraficoOperacional],
+      ["Stop Risk Mgmt", trade.operational.stopRiskManagement],
+      ["Tempo Graf. Op.", trade.operational.tempoGraficoOperacional],
     ];
-    opItems.forEach(([l, c], i) => checkItem(l, c, i % 2 === 0));
-    y += 4;
+    opItems.forEach(([l, v]) => chk(l, v, m, colW));
+    y += 3;
 
-    // === EMOCIONAL ===
-    sectionTitle("Emocional", [139, 92, 246]);
+    // Side-by-side: Emocional + Racional
+    const twoColY = y;
+    secTitle("Emocional", [139, 92, 246]);
     const emoItems: [string, boolean][] = [
       ["Hidratacao", trade.emotional.hydration],
       ["Respiracao", trade.emotional.breathing],
       ["Clareza Mental", trade.emotional.mentalClarity],
     ];
-    emoItems.forEach(([l, c], i) => checkItem(l, c, i % 2 === 0));
-    y += 4;
+    emoItems.forEach(([l, v]) => chk(l, v, m, colW));
+    const emoEnd = y;
 
-    // === RACIONAL ===
-    sectionTitle("Racional", [14, 165, 233]);
+    y = twoColY;
+    // Racional on right side
+    doc.setFillColor(14, 165, 233);
+    doc.rect(m + colW + 4, y, 2.5, 6, "F");
+    doc.setTextColor(...c.primary); doc.setFontSize(9); doc.setFont("helvetica", "bold");
+    doc.text("Racional", m + colW + 9, y + 4.5);
+    y += 8;
     const ratItems: [string, boolean][] = [
       ["Analise Confirmada", trade.rational.analysisConfirmed],
       ["Plano Respeitado", trade.rational.planRespected],
       ["Risco Gerenciado", trade.rational.riskManaged],
     ];
-    ratItems.forEach(([l, c], i) => checkItem(l, c, i % 2 === 0));
-    y += 4;
+    ratItems.forEach(([l, v]) => {
+      doc.setFillColor(...(v ? c.green : c.red));
+      doc.circle(m + colW + 8, y + 0.5, 1.8, "F");
+      doc.setTextColor(...c.primary); doc.setFontSize(7.5); doc.setFont("helvetica", "normal");
+      doc.text(l, m + colW + 12, y + 1.5);
+      doc.setTextColor(...(v ? c.green : c.red)); doc.setFont("helvetica", "bold");
+      doc.text(v ? "Sim" : "Nao", m + colW + colW - 8, y + 1.5);
+      y += 5.5;
+    });
+    y = Math.max(emoEnd, y) + 3;
 
-    // === ROTINA ===
-    sectionTitle("Rotina", colors.green);
+    // Rotina (compact single row)
+    secTitle("Rotina", c.green);
     const routItems: [string, boolean][] = [
       ["Hidratacao", trade.routine.hydration],
       ["Respiracao", trade.routine.breathing],
       ["Sono", trade.routine.sleep],
       ["Meditacao", trade.routine.meditation],
     ];
-    routItems.forEach(([l, c], i) => checkItem(l, c, i % 2 === 0));
-    y += 4;
+    // Inline horizontal
+    const rItemW = (pw - 2 * m) / routItems.length;
+    routItems.forEach(([l, v], i) => {
+      const rx = m + i * rItemW;
+      doc.setFillColor(...(v ? c.green : c.red));
+      doc.circle(rx + 4, y + 0.5, 1.8, "F");
+      doc.setTextColor(...c.primary); doc.setFontSize(7); doc.setFont("helvetica", "normal");
+      doc.text(l, rx + 8, y + 1.5);
+    });
+    y += 8;
 
-    // === NOTAS ===
+    // === NOTAS (compact) ===
     if (trade.notes) {
-      sectionTitle("Notas", colors.gray);
-      doc.setTextColor(...colors.primary);
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
-      const lines = doc.splitTextToSize(trade.notes, pw - 36);
-      lines.forEach((line: string) => {
-        if (y > ph - 15) { doc.addPage(); y = 20; }
-        doc.text(line, 18, y);
-        y += 5;
+      secTitle("Notas", c.gray);
+      doc.setTextColor(...c.primary); doc.setFontSize(7.5); doc.setFont("helvetica", "normal");
+      const noteLines = doc.splitTextToSize(trade.notes, pw - 2 * m - 8);
+      noteLines.forEach((line: string) => {
+        if (y > ph - 12) { doc.addPage(); y = 14; }
+        doc.text(line, m + 4, y);
+        y += 4.5;
       });
-      y += 4;
+      y += 2;
     }
 
-    // === IMAGES ===
+    // === FOOTER page 1 ===
+    doc.setTextColor(...c.gray); doc.setFontSize(6); doc.setFont("helvetica", "normal");
+    doc.text(`Gerado em ${new Date().toLocaleString("pt-BR")}  |  Trading Dashboard`, pw / 2, ph - 6, { align: "center" });
+
+    // === PAGE 2: IMAGES (only if there are images) ===
     const imageEntries: [string, string | undefined][] = [
       ["Pre-Trade", trade.preTradeImage],
       ["Trade", trade.tradingImage],
@@ -675,8 +670,19 @@ export default function TradeJournalEnhanced() {
 
     if (validImages.length > 0) {
       doc.addPage();
-      y = 20;
-      sectionTitle("Imagens do Trade", colors.accent);
+      y = 14;
+
+      // Mini header
+      doc.setFillColor(...c.primary);
+      doc.rect(0, 0, pw, 12, "F");
+      doc.setTextColor(...c.white); doc.setFontSize(10); doc.setFont("helvetica", "bold");
+      doc.text(`${trade.asset}  -  Imagens do Trade`, m, 8);
+      y = 18;
+
+      // Calculate image height based on count to fit in one page
+      const availH = ph - y - 10;
+      const imgH = Math.min(80, (availH - validImages.length * 8) / validImages.length);
+      const imgW = pw - 2 * m;
 
       for (const [label, url] of validImages) {
         if (!url) continue;
@@ -689,32 +695,24 @@ export default function TradeJournalEnhanced() {
             reader.readAsDataURL(blob);
           });
 
-          if (y > ph - 80) { doc.addPage(); y = 20; }
+          if (y + imgH + 8 > ph - 8) { doc.addPage(); y = 14; }
 
-          doc.setTextColor(...colors.gray);
-          doc.setFontSize(9);
-          doc.setFont("helvetica", "bold");
-          doc.text(label, 14, y);
+          doc.setTextColor(...c.accent); doc.setFontSize(8); doc.setFont("helvetica", "bold");
+          doc.text(label, m, y);
           y += 4;
-
-          const imgW = pw - 28;
-          const imgH = 70;
-          doc.addImage(dataUrl, "JPEG", 14, y, imgW, imgH);
-          y += imgH + 10;
+          doc.addImage(dataUrl, "JPEG", m, y, imgW, imgH);
+          y += imgH + 6;
         } catch {
-          doc.setTextColor(...colors.red);
-          doc.setFontSize(8);
-          doc.text(`Imagem ${label} indisponivel`, 14, y);
-          y += 8;
+          doc.setTextColor(...c.red); doc.setFontSize(7);
+          doc.text(`Imagem ${label} indisponivel`, m, y);
+          y += 6;
         }
       }
-    }
 
-    // === FOOTER on last page ===
-    doc.setTextColor(...colors.gray);
-    doc.setFontSize(7);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Gerado em ${new Date().toLocaleString("pt-BR")}  |  Trading Dashboard`, pw / 2, ph - 8, { align: "center" });
+      // Footer page 2
+      doc.setTextColor(...c.gray); doc.setFontSize(6); doc.setFont("helvetica", "normal");
+      doc.text(`Trading Dashboard`, pw / 2, ph - 6, { align: "center" });
+    }
 
     doc.save(`Trade_${trade.asset}_${trade.date || "sem-data"}.pdf`);
     toast.success("PDF exportado com sucesso!");
