@@ -60,11 +60,14 @@ interface ReportExportEnhancedProps {
 }
 
 export default function ReportExportEnhanced({ trades }: ReportExportEnhancedProps) {
+  const { getActiveAccount, accounts } = useAccountManager();
   const [filterAccount, setFilterAccount] = useState<string>("all");
   const [filterAsset, setFilterAsset] = useState<string>("all");
   const [isGenerating, setIsGenerating] = useState(false);
   const allAssets = ["EUR/USD", "USDJPY", "XAUUSD", "NASDAQ", "BTC USD"];
-  const allAccounts = ["Conta 1 ($100)", "Conta 2 ($1000)", "Conta 3 ($10000)"];
+  const allAccounts = accounts.map(a => a.name);
+  const activeAccount = getActiveAccount();
+  const initialBalance = activeAccount?.initialBalance ?? 0;
 
   // Filtrar trades
   const filteredTrades = useMemo(() => {
