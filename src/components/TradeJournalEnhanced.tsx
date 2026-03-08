@@ -49,7 +49,7 @@ interface TradeWithChecklist {
   resultPrice: string;
   session: "Manha" | "Tarde" | "Noite" | "";
   marketSession?: "NY" | "Londres" | "Ásia" | "Sobreposição" | "Fechado";
-  account: "Conta 1 ($100)" | "Conta 2 ($1000)" | "Conta 3 ($10000)";
+  account: string;
   result: "WIN" | "LOSS" | "BREAK_EVEN" | "ONGOING";
   riskReward?: number;
   moneyResult?: number;
