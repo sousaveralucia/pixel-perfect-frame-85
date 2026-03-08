@@ -26,9 +26,31 @@ const COLORS = {
 
 const DAY_NAMES = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 
+type PeriodFilter = "all" | "7d" | "30d" | "90d";
+
+const PERIOD_OPTIONS: { value: PeriodFilter; label: string }[] = [
+  { value: "all", label: "Tudo" },
+  { value: "7d", label: "7 dias" },
+  { value: "30d", label: "30 dias" },
+  { value: "90d", label: "3 meses" },
+];
+
 export default function PerformanceDashboard() {
   const { activeAccountId } = useAccountManager();
-  const { trades } = useTradeJournalUnified(activeAccountId);
+  const { trades: allTrades } = useTradeJournalUnified(activeAccountId);
+  const [period, setPeriod] = useState<PeriodFilter>("all");
+
+  const trades = useMemo(() => {
+    if (period === "all") return allTrades;
+    const now = new Date();
+    const cutoff = period === "7d" ? subDays(now, 7) : period === "30d" ? subMonths(now, 1) : subMonths(now, 3);
+    return allTrades.filter(t => {
+      if (!t.date) return false;
+      try {
+        return isAfter(parseISO(t.date), cutoff);
+      } catch { return false; }
+    });
+  }, [allTrades, period]);
 
   // ============ BASIC STATS ============
   const overallStats = useMemo(() => {
