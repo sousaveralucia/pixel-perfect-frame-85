@@ -295,7 +295,26 @@ export default function TradeJournalEnhanced() {
     }, 15000);
   };
 
+  // Verificar se o dia está bloqueado para trades (3 losses ou 2 wins)
+  const today = new Date().toISOString().split("T")[0];
+  const todayTradesForAccount = trades.filter(
+    t => t.date === today
+  );
+  const todayWins = todayTradesForAccount.filter(t => t.result === "WIN").length;
+  const todayLosses = todayTradesForAccount.filter(t => t.result === "LOSS").length;
+  const isDayBlocked = todayWins >= 2 || todayLosses >= 3;
+
   const handleAddTrade = () => {
+    // Bloqueio diário: não permitir novos trades se meta de loss ou win foi batida
+    if (!editingId && isDayBlocked) {
+      toast.error(
+        todayWins >= 2
+          ? "🚫 Meta diária de 2 WINs atingida! Trades bloqueados até o próximo dia útil."
+          : "🚫 Limite de 3 LOSSes atingido! Trades bloqueados até o próximo dia útil.",
+        { duration: 5000 }
+      );
+      return;
+    }
     // Validar entrada e saída (saída é opcional para trades em andamento)
     if (!formData.entryPrice) {
       toast.error("Preencha o preço de entrada!");
@@ -403,17 +422,6 @@ export default function TradeJournalEnhanced() {
       toast.success("Trade registrado!");
     }
 
-    // Verificar limite diario POR CONTA: 2 vitorias ou 3 perdas na conta especifica
-    const today = new Date().toISOString().split("T")[0];
-    const todaysTrades = [...trades, newTrade].filter(
-      t => t.date === today && t.account === formData.account
-    );
-    const wins = todaysTrades.filter(t => t.result === "WIN").length;
-    const losses = todaysTrades.filter(t => t.result === "LOSS").length;
-
-    if (wins >= 2 || losses >= 3) {
-      showDailyLimitAlert(wins, losses);
-    }
 
     setIsOpen(false);
     resetForm();
@@ -561,11 +569,22 @@ export default function TradeJournalEnhanced() {
       </div>
 
       {/* Add Trade Button */}
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {isDayBlocked && (
+        <div className="w-full p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm text-center font-medium">
+          🚫 {todayWins >= 2 ? "Meta de 2 WINs atingida" : "Limite de 3 LOSSes atingido"} — Trades bloqueados até o próximo dia útil
+        </div>
+      )}
+      <Dialog open={isOpen} onOpenChange={(open) => {
+        if (open && isDayBlocked && !editingId) {
+          toast.error("Trades bloqueados para hoje nesta conta!");
+          return;
+        }
+        setIsOpen(open);
+      }}>
         <DialogTrigger asChild>
-          <Button className="w-full bg-primary hover:bg-primary/90">
+          <Button className="w-full bg-primary hover:bg-primary/90" disabled={isDayBlocked}>
             <Plus className="w-4 h-4 mr-2" />
-            Registrar Novo Trade
+            {isDayBlocked ? "Trades Bloqueados Hoje" : "Registrar Novo Trade"}
           </Button>
         </DialogTrigger>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
