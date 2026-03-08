@@ -1,0 +1,1 @@
+ALTER TABLE public.trades ADD COLUMN entry_time text NULL;
