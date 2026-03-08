@@ -40,6 +40,7 @@ function ThemeToggle() {
 }
 
 export default function Home() {
+  const { signOut } = useAuth();
   const { accounts, activeAccountId, getActiveAccount, switchAccount } = useAccountManager();
   const { trades } = useTradeJournalUnified(activeAccountId);
   const activeAccount = getActiveAccount();
