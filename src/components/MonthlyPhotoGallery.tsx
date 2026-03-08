@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -32,11 +33,7 @@ export function MonthlyPhotoGallery({ activeAccountId: propAccountId }: MonthlyP
   } | null>(null);
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
 
-  // Carregar trades do localStorage
-  const trades = useMemo(() => {
-    const saved = localStorage.getItem(`trades_enhanced_${activeAccountId}`);
-    return saved ? JSON.parse(saved) : [];
-  }, [activeAccountId]);
+  const { trades } = useTradeJournalUnified(activeAccountId);
 
   // Filtrar trades do mês atual com imagens pós-trading
   const monthlyPhotos = useMemo(() => {

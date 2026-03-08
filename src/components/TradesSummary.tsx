@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,11 +22,7 @@ export function TradesSummary({ activeAccountId }: TradesSummaryProps = {}) {
   const [viewMode, setViewMode] = useState<"week" | "month">("week");
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  // Carregar trades do localStorage
-  const trades = useMemo(() => {
-    const saved = localStorage.getItem(`trades_enhanced_${activeAccountId}`);
-    return saved ? JSON.parse(saved) : [];
-  }, [activeAccountId]);
+  const { trades } = useTradeJournalUnified(activeAccountId || "");
 
   // Calcular resumo por dia
   const dailySummary = useMemo(() => {

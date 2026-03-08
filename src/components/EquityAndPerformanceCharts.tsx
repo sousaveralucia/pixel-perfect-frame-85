@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from "recharts";
 import { useAccountManager } from "@/hooks/useAccountManager";
+import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
 
 interface Trade {
   id: string;
@@ -17,11 +18,7 @@ interface Trade {
 export function EquityAndPerformanceCharts() {
   const { activeAccountId } = useAccountManager();
 
-  // Carregar trades do localStorage
-  const trades = useMemo(() => {
-    const saved = localStorage.getItem(`trades_enhanced_${activeAccountId}`);
-    return saved ? JSON.parse(saved) : [];
-  }, [activeAccountId]);
+  const { trades } = useTradeJournalUnified(activeAccountId);
 
   // Calcular dados de patrimônio (equity curve)
   const equityData = useMemo(() => {

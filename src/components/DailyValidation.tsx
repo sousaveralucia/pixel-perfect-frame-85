@@ -2,7 +2,9 @@ import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAccountManager } from "@/hooks/useAccountManager";
-import { useTradeJournal } from "@/hooks/useTradeJournal";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
 import { CheckCircle2, AlertCircle, Clock } from "lucide-react";
 
 interface DailyValidationState {
@@ -14,22 +16,40 @@ interface DailyValidationState {
   timerStartedAt: string | null;
 }
 
+const defaultValidation: DailyValidationState = {
+  environment: null,
+  mentalReady: null,
+  emotionalReady: null,
+  objective: null,
+  validatedAt: null,
+  timerStartedAt: null,
+};
+
 export default function DailyValidation() {
   const { activeAccountId } = useAccountManager();
-  const { trades } = useTradeJournal();
+  const { user } = useAuth();
+  const { trades } = useTradeJournalUnified(activeAccountId);
   const today = new Date().toISOString().split('T')[0];
 
-  const [validation, setValidation] = useState<DailyValidationState>(() => {
-    const saved = localStorage.getItem(`validation_${activeAccountId}_${today}`);
-    return saved ? JSON.parse(saved) : {
-      environment: null,
-      mentalReady: null,
-      emotionalReady: null,
-      objective: null,
-      validatedAt: null,
-      timerStartedAt: null,
-    };
-  });
+  const [validation, setValidation] = useState<DailyValidationState>(defaultValidation);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("daily_validations").select("*").eq("user_id", user.id).eq("account_key", activeAccountId).eq("date", today).maybeSingle().then(({ data }) => {
+      if (data) {
+        setValidation({
+          environment: data.environment,
+          mentalReady: data.mental_ready as any,
+          emotionalReady: data.emotional_ready as any,
+          objective: data.objective,
+          validatedAt: data.validated_at,
+          timerStartedAt: data.timer_started_at,
+        });
+      } else {
+        setValidation(defaultValidation);
+      }
+    });
+  }, [user, activeAccountId, today]);
 
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
 
@@ -39,9 +59,20 @@ export default function DailyValidation() {
     validation.emotionalReady !== null &&
     validation.objective !== null;
 
-  const saveValidation = (newValidation: DailyValidationState) => {
+  const saveValidation = async (newValidation: DailyValidationState) => {
     setValidation(newValidation);
-    localStorage.setItem(`validation_${activeAccountId}_${today}`, JSON.stringify(newValidation));
+    if (!user) return;
+    await supabase.from("daily_validations").upsert({
+      user_id: user.id,
+      account_key: activeAccountId,
+      date: today,
+      environment: newValidation.environment,
+      mental_ready: newValidation.mentalReady,
+      emotional_ready: newValidation.emotionalReady,
+      objective: newValidation.objective,
+      validated_at: newValidation.validatedAt,
+      timer_started_at: newValidation.timerStartedAt,
+    }, { onConflict: "user_id,account_key,date" });
   };
 
   // Timer de 24 horas

@@ -2,6 +2,8 @@ import { useEffect, useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useAccountManager } from '@/hooks/useAccountManager';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DailyValidation {
   date: string;
@@ -15,17 +17,25 @@ interface DailyValidation {
 
 export default function DailyValidationHistory() {
   const { activeAccountId } = useAccountManager();
+  const { user } = useAuth();
   const [validations, setValidations] = useState<DailyValidation[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem(`daily_validations_${activeAccountId}`);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      // Converter para array se for objeto
-      const validationArray = Array.isArray(parsed) ? parsed : Object.values(parsed);
-      setValidations(validationArray as DailyValidation[]);
-    }
-  }, [activeAccountId]);
+    if (!user) return;
+    supabase.from("daily_validations").select("*").eq("user_id", user.id).eq("account_key", activeAccountId).order("date").then(({ data }) => {
+      if (data) {
+        setValidations(data.map((v: any) => ({
+          date: v.date,
+          environment: v.environment || false,
+          mental: v.mental_ready === "yes",
+          emotional: v.emotional_ready === "yes",
+          objective: v.objective || false,
+          completed: v.validated_at !== null,
+          completedAt: v.validated_at || "",
+        })));
+      }
+    });
+  }, [user, activeAccountId]);
 
   const stats = useMemo(() => {
     const last30Days = validations.slice(-30);

@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, Target, Zap } from "lucide-react";
 import { useAccountManager } from "@/hooks/useAccountManager";
+import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
 
 
 interface Trade {
@@ -24,11 +25,7 @@ export function TradingDashboard({ activeAccountId: propAccountId }: TradingDash
   const { activeAccountId: hookAccountId } = useAccountManager();
   const activeAccountId = propAccountId || hookAccountId;
 
-  // Carregar trades do localStorage
-  const trades = useMemo(() => {
-    const saved = localStorage.getItem(`trades_enhanced_${activeAccountId}`);
-    return saved ? JSON.parse(saved) : [];
-  }, [activeAccountId]);
+  const { trades } = useTradeJournalUnified(activeAccountId);
 
   // Calcular KPIs
   const kpis = useMemo(() => {

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useAccountManager } from "@/hooks/useAccountManager";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { BarChart3, Plus, Trash2, Download, Edit2, FileText, FileSpreadsheet } from "lucide-react";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
@@ -30,10 +32,8 @@ interface Analysis {
 
 export default function AnalysisHistory() {
   const { accounts, activeAccountId } = useAccountManager();
-  const [analyses, setAnalyses] = useState<Analysis[]>(() => {
-    const saved = localStorage.getItem("analyses");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const { user } = useAuth();
+  const [analyses, setAnalyses] = useState<Analysis[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [filterAsset, setFilterAsset] = useState<string>("all");
@@ -53,52 +53,91 @@ export default function AnalysisHistory() {
 
   const assets = ["EUR/USD", "USDJPY", "XAUUSD", "NASDAQ", "BTC USD"];
 
+  // Load from Supabase
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("analyses").select("*").eq("user_id", user.id).eq("account_key", activeAccountId).order("created_at").then(({ data }) => {
+      if (data) {
+        setAnalyses(data.map((r: any) => ({
+          id: r.id,
+          accountId: r.account_key,
+          asset: r.asset || "",
+          date: r.date || "",
+          timeframe: r.timeframe || "",
+          fibonacciLevel: r.fibonacci_level || "",
+          orderBlockLevel: r.order_block_level || "",
+          liquidityZone: r.liquidity_zone || "",
+          notes: r.notes || "",
+          status: r.status || "ATIVO",
+          imageUrl1: r.image_url1 || "",
+          imageUrl2: r.image_url2 || "",
+          imageUrl3: r.image_url3 || "",
+        })));
+      }
+    });
+  }, [user, activeAccountId]);
+
   const saveAnalyses = (newAnalyses: Analysis[]) => {
     setAnalyses(newAnalyses);
-    localStorage.setItem("analyses", JSON.stringify(newAnalyses));
   };
 
-  const handleAddAnalysis = () => {
-    if (!formData.fibonacciLevel || !formData.orderBlockLevel) {
+  const handleAddAnalysis = async () => {
+    if (!user || !formData.fibonacciLevel || !formData.orderBlockLevel) {
       toast.error("Preencha os níveis de Fibonacci e Order Block");
       return;
     }
 
     if (editingId) {
-      // Editar análise existente
-      saveAnalyses(analyses.map(a => a.id === editingId ? {
-        ...a,
+      await supabase.from("analyses").update({
         asset: formData.asset,
         timeframe: formData.timeframe,
-        fibonacciLevel: formData.fibonacciLevel,
-        orderBlockLevel: formData.orderBlockLevel,
-        liquidityZone: formData.liquidityZone,
+        fibonacci_level: formData.fibonacciLevel,
+        order_block_level: formData.orderBlockLevel,
+        liquidity_zone: formData.liquidityZone,
         notes: formData.notes,
         status: formData.status,
-        imageUrl1: formData.imageUrl1,
-        imageUrl2: formData.imageUrl2,
-        imageUrl3: formData.imageUrl3,
+        image_url1: formData.imageUrl1,
+        image_url2: formData.imageUrl2,
+        image_url3: formData.imageUrl3,
+      }).eq("id", editingId).eq("user_id", user.id);
+      setAnalyses(analyses.map(a => a.id === editingId ? {
+        ...a, ...formData, fibonacciLevel: formData.fibonacciLevel, orderBlockLevel: formData.orderBlockLevel, liquidityZone: formData.liquidityZone,
       } : a));
       toast.success("Análise atualizada!");
       setEditingId(null);
     } else {
-      // Criar nova análise
-      const newAnalysis: Analysis = {
-        id: Date.now().toString(),
-        accountId: activeAccountId,
+      const { data } = await supabase.from("analyses").insert({
+        user_id: user.id,
+        account_key: activeAccountId,
         asset: formData.asset,
         date: new Date().toISOString().split("T")[0],
         timeframe: formData.timeframe,
-        fibonacciLevel: formData.fibonacciLevel,
-        orderBlockLevel: formData.orderBlockLevel,
-        liquidityZone: formData.liquidityZone,
+        fibonacci_level: formData.fibonacciLevel,
+        order_block_level: formData.orderBlockLevel,
+        liquidity_zone: formData.liquidityZone,
         notes: formData.notes,
         status: formData.status,
-        imageUrl1: formData.imageUrl1,
-        imageUrl2: formData.imageUrl2,
-        imageUrl3: formData.imageUrl3,
-      };
-      saveAnalyses([...analyses, newAnalysis]);
+        image_url1: formData.imageUrl1,
+        image_url2: formData.imageUrl2,
+        image_url3: formData.imageUrl3,
+      }).select().single();
+      if (data) {
+        setAnalyses([...analyses, {
+          id: data.id,
+          accountId: data.account_key,
+          asset: data.asset || "",
+          date: data.date || "",
+          timeframe: data.timeframe || "",
+          fibonacciLevel: data.fibonacci_level || "",
+          orderBlockLevel: data.order_block_level || "",
+          liquidityZone: data.liquidity_zone || "",
+          notes: data.notes || "",
+          status: (data.status || "ATIVO") as any,
+          imageUrl1: data.image_url1 || "",
+          imageUrl2: data.image_url2 || "",
+          imageUrl3: data.image_url3 || "",
+        }]);
+      }
       toast.success("Análise registrada!");
     }
 
@@ -228,8 +267,10 @@ export default function AnalysisHistory() {
     }
   };
 
-  const handleDeleteAnalysis = (id: string) => {
-    saveAnalyses(analyses.filter((a) => a.id !== id));
+  const handleDeleteAnalysis = async (id: string) => {
+    if (!user) return;
+    await supabase.from("analyses").delete().eq("id", id).eq("user_id", user.id);
+    setAnalyses(analyses.filter((a) => a.id !== id));
   };
 
   const handleExportAnalyses = () => {

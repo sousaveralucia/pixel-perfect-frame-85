@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAccountManager } from "@/hooks/useAccountManager";
+import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 interface TradeWithChecklist {
@@ -27,10 +28,7 @@ interface TradeWithChecklist {
 export default function PerformanceDashboard() {
   const { activeAccountId } = useAccountManager();
 
-  const trades = useMemo(() => {
-    const saved = localStorage.getItem(`trades_enhanced_${activeAccountId}`);
-    return saved ? JSON.parse(saved) : [];
-  }, [activeAccountId]);
+  const { trades } = useTradeJournalUnified(activeAccountId);
 
   // Agrupar trades por data
   const dailyStats = useMemo(() => {

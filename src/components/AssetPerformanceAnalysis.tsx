@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart } from 'recharts';
 import { useAccountManager } from '@/hooks/useAccountManager';
+import { useTradeJournalUnified } from '@/hooks/useTradeJournalUnified';
 
 interface TradeWithChecklist {
   id: string;
@@ -26,14 +27,7 @@ interface AssetStats {
 
 export default function AssetPerformanceAnalysis() {
   const { activeAccountId } = useAccountManager();
-  const [trades, setTrades] = useState<TradeWithChecklist[]>([]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(`trades_enhanced_${activeAccountId}`);
-    if (saved) {
-      setTrades(JSON.parse(saved));
-    }
-  }, [activeAccountId]);
+  const { trades } = useTradeJournalUnified(activeAccountId);
 
   const assetStats = useMemo(() => {
     const stats: Record<string, AssetStats> = {};

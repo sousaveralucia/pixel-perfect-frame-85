@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTradeJournal } from "@/hooks/useTradeJournal";
+import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
 import { useAccountManager } from "@/hooks/useAccountManager";
 import { Plus, Trash2, Edit2, Image, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
@@ -49,7 +50,7 @@ interface TradeWithChecklist {
   resultPrice: string;
   session: "Manha" | "Tarde" | "Noite" | "";
   marketSession?: "NY" | "Londres" | "Ásia" | "Sobreposição" | "Fechado";
-  account: "Conta 1 ($100)" | "Conta 2 ($1000)" | "Conta 3 ($10000)";
+  account: string;
   result: "WIN" | "LOSS" | "BREAK_EVEN" | "ONGOING";
   riskReward?: number;
   moneyResult?: number;
@@ -185,50 +186,9 @@ function getMarketSessionInfo(
 }
 
 export default function TradeJournalEnhanced() {
-  const { activeAccountId } = useAccountManager();
+  const { accounts, activeAccountId } = useAccountManager();
   const { exportToCSV } = useExportTrades();
-  const [trades, setTrades] = useState<TradeWithChecklist[]>([]);
-
-  // Sincronizar trades quando a conta ativa mudar
-  useEffect(() => {
-    const saved = localStorage.getItem(`trades_enhanced_${activeAccountId}`);
-    if (saved) {
-      let parsedTrades = JSON.parse(saved);
-      // Migrar trades antigos que têm chochValidoM15M5
-      parsedTrades = parsedTrades.map((trade: any) => {
-        if (
-          trade.operational &&
-          trade.operational.hasOwnProperty("chochValidoM15M5")
-        ) {
-          const { chochValidoM15M5, ...rest } = trade.operational;
-          return {
-            ...trade,
-            operational: {
-              ...rest,
-              tempoGraficoOperacional: chochValidoM15M5,
-            },
-          };
-        }
-        // Garantir que tempoGraficoOperacional existe
-        if (
-          trade.operational &&
-          !trade.operational.hasOwnProperty("tempoGraficoOperacional")
-        ) {
-          return {
-            ...trade,
-            operational: {
-              ...trade.operational,
-              tempoGraficoOperacional: false,
-            },
-          };
-        }
-        return trade;
-      });
-      setTrades(parsedTrades);
-    } else {
-      setTrades([]);
-    }
-  }, [activeAccountId]);
+  const { trades, isLoaded, addTrade: addTradeUnified, updateTrade: updateTradeUnified, deleteTrade: deleteTradeUnified, toggleFavorite: toggleFavoriteUnified } = useTradeJournalUnified(activeAccountId);
 
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -255,10 +215,7 @@ export default function TradeJournalEnhanced() {
     stopLossDollars: "",
     takeProfitDollars: "",
     session: "" as "Manha" | "Tarde" | "Noite" | "",
-    account: "Conta 1 ($100)" as
-      | "Conta 1 ($100)"
-      | "Conta 2 ($1000)"
-      | "Conta 3 ($10000)",
+    account: "",
     result: "WIN" as "WIN" | "LOSS" | "BREAK_EVEN" | "ONGOING",
     riskReward: 0,
     moneyResult: 0,
@@ -296,12 +253,9 @@ export default function TradeJournalEnhanced() {
   // Usar hook de alertas
   useTradeAlerts(trades, activeAccountId);
 
-  const saveTrades = (newTrades: TradeWithChecklist[]) => {
-    setTrades(newTrades);
-    localStorage.setItem(
-      `trades_enhanced_${activeAccountId}`,
-      JSON.stringify(newTrades)
-    );
+  // saveTrades is now handled by useTradeJournalUnified
+  const saveTrades = (_newTrades: TradeWithChecklist[]) => {
+    // no-op: trades are managed by Supabase hook
   };
 
   const showDailyLimitAlert = (wins: number, losses: number) => {
@@ -517,7 +471,7 @@ export default function TradeJournalEnhanced() {
       stopLoss: "",
       takeProfit: "",
       session: "",
-      account: "Conta 1 ($100)",
+      account: "",
       result: "WIN",
       riskReward: 0,
       moneyResult: 0,
@@ -880,14 +834,14 @@ export default function TradeJournalEnhanced() {
                     onChange={e =>
                       setFormData({
                         ...formData,
-                        account: e.target.value as any,
+                        account: e.target.value,
                       })
                     }
                     className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    <option value="Conta 1 ($100)">Conta 1 ($100)</option>
-                    <option value="Conta 2 ($1000)">Conta 2 ($1000)</option>
-                    <option value="Conta 3 ($10000)">Conta 3 ($10000)</option>
+                    {accounts.map((acc) => (
+                      <option key={acc.id} value={acc.id}>{acc.name}</option>
+                    ))}
                   </select>
                 </div>
                 <div>

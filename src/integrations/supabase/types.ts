@@ -14,7 +14,282 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      accounts: {
+        Row: {
+          account_key: string
+          created_at: string
+          current_balance: number
+          daily_loss_limit: number | null
+          id: string
+          initial_balance: number
+          last_reset_date: string | null
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_key: string
+          created_at?: string
+          current_balance?: number
+          daily_loss_limit?: number | null
+          id?: string
+          initial_balance?: number
+          last_reset_date?: string | null
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_key?: string
+          created_at?: string
+          current_balance?: number
+          daily_loss_limit?: number | null
+          id?: string
+          initial_balance?: number
+          last_reset_date?: string | null
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      analyses: {
+        Row: {
+          account_key: string
+          asset: string | null
+          created_at: string
+          date: string | null
+          fibonacci_level: string | null
+          id: string
+          image_url1: string | null
+          image_url2: string | null
+          image_url3: string | null
+          liquidity_zone: string | null
+          notes: string | null
+          order_block_level: string | null
+          status: string | null
+          timeframe: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_key: string
+          asset?: string | null
+          created_at?: string
+          date?: string | null
+          fibonacci_level?: string | null
+          id?: string
+          image_url1?: string | null
+          image_url2?: string | null
+          image_url3?: string | null
+          liquidity_zone?: string | null
+          notes?: string | null
+          order_block_level?: string | null
+          status?: string | null
+          timeframe?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_key?: string
+          asset?: string | null
+          created_at?: string
+          date?: string | null
+          fibonacci_level?: string | null
+          id?: string
+          image_url1?: string | null
+          image_url2?: string | null
+          image_url3?: string | null
+          liquidity_zone?: string | null
+          notes?: string | null
+          order_block_level?: string | null
+          status?: string | null
+          timeframe?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      calculation_history: {
+        Row: {
+          asset: string | null
+          capital: number | null
+          created_at: string
+          current_price: number | null
+          id: string
+          pips_at_risk: number | null
+          pips_potential_profit: number | null
+          position_size: number | null
+          risk_type: string | null
+          rr_ratio: number | null
+          stop_loss: number | null
+          take_profit_value: number | null
+          timestamp: string | null
+          user_id: string
+        }
+        Insert: {
+          asset?: string | null
+          capital?: number | null
+          created_at?: string
+          current_price?: number | null
+          id?: string
+          pips_at_risk?: number | null
+          pips_potential_profit?: number | null
+          position_size?: number | null
+          risk_type?: string | null
+          rr_ratio?: number | null
+          stop_loss?: number | null
+          take_profit_value?: number | null
+          timestamp?: string | null
+          user_id: string
+        }
+        Update: {
+          asset?: string | null
+          capital?: number | null
+          created_at?: string
+          current_price?: number | null
+          id?: string
+          pips_at_risk?: number | null
+          pips_potential_profit?: number | null
+          position_size?: number | null
+          risk_type?: string | null
+          rr_ratio?: number | null
+          stop_loss?: number | null
+          take_profit_value?: number | null
+          timestamp?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      daily_validations: {
+        Row: {
+          account_key: string
+          created_at: string
+          date: string
+          emotional_ready: string | null
+          environment: boolean | null
+          id: string
+          mental_ready: string | null
+          objective: boolean | null
+          timer_started_at: string | null
+          updated_at: string
+          user_id: string
+          validated_at: string | null
+        }
+        Insert: {
+          account_key: string
+          created_at?: string
+          date: string
+          emotional_ready?: string | null
+          environment?: boolean | null
+          id?: string
+          mental_ready?: string | null
+          objective?: boolean | null
+          timer_started_at?: string | null
+          updated_at?: string
+          user_id: string
+          validated_at?: string | null
+        }
+        Update: {
+          account_key?: string
+          created_at?: string
+          date?: string
+          emotional_ready?: string | null
+          environment?: boolean | null
+          id?: string
+          mental_ready?: string | null
+          objective?: boolean | null
+          timer_started_at?: string | null
+          updated_at?: string
+          user_id?: string
+          validated_at?: string | null
+        }
+        Relationships: []
+      }
+      trades: {
+        Row: {
+          account_key: string
+          asset: string | null
+          created_at: string
+          date: string | null
+          emotional: Json | null
+          entry_price: string | null
+          exit_price: string | null
+          id: string
+          is_favorite: boolean | null
+          money_result: number | null
+          notes: string | null
+          operational: Json | null
+          post_trade_image: string | null
+          pre_trade_image: string | null
+          rational: Json | null
+          result: string | null
+          result_price: string | null
+          routine: Json | null
+          session: string | null
+          stop_loss: string | null
+          take_profit: string | null
+          trade_data: Json | null
+          trading_image: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_key: string
+          asset?: string | null
+          created_at?: string
+          date?: string | null
+          emotional?: Json | null
+          entry_price?: string | null
+          exit_price?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          money_result?: number | null
+          notes?: string | null
+          operational?: Json | null
+          post_trade_image?: string | null
+          pre_trade_image?: string | null
+          rational?: Json | null
+          result?: string | null
+          result_price?: string | null
+          routine?: Json | null
+          session?: string | null
+          stop_loss?: string | null
+          take_profit?: string | null
+          trade_data?: Json | null
+          trading_image?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_key?: string
+          asset?: string | null
+          created_at?: string
+          date?: string | null
+          emotional?: Json | null
+          entry_price?: string | null
+          exit_price?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          money_result?: number | null
+          notes?: string | null
+          operational?: Json | null
+          post_trade_image?: string | null
+          pre_trade_image?: string | null
+          rational?: Json | null
+          result?: string | null
+          result_price?: string | null
+          routine?: Json | null
+          session?: string | null
+          stop_loss?: string | null
+          take_profit?: string | null
+          trade_data?: Json | null
+          trading_image?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

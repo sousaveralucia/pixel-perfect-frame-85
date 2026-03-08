@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -45,11 +46,8 @@ export function TradingCalendar({ activeAccountId: propAccountId }: TradingCalen
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [filterResult, setFilterResult] = useState<"ALL" | "WIN" | "LOSS" | "BREAK_EVEN" | "FAVORITES">("ALL");
 
-  // Carregar trades do localStorage
-  const trades = useMemo(() => {
-    const saved = localStorage.getItem(`trades_enhanced_${accountId}`);
-    return saved ? JSON.parse(saved) : [];
-  }, [accountId]);
+  // Carregar trades do Supabase
+  const { trades } = useTradeJournalUnified(accountId);
 
   // Sincronizar saldo quando trades mudam
   useMemo(() => {
