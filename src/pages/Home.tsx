@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle2, TrendingUp, Target, Clock, Zap, Moon, Sun } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAccountManager } from "@/hooks/useAccountManager";
@@ -21,7 +22,6 @@ import AssetPerformanceAnalysis from "@/components/AssetPerformanceAnalysis";
 import { TradingCalendar } from "@/components/TradingCalendar";
 import CalculationHistory from "@/components/CalculationHistory";
 import { EquityAndPerformanceCharts } from "@/components/EquityAndPerformanceCharts";
-import { CalendarAccountSelector } from "@/components/CalendarAccountSelector";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
