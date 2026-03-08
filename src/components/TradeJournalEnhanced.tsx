@@ -237,10 +237,10 @@ export default function TradeJournalEnhanced() {
       mentalClarity: false,
     },
     routine: {
-      hydration: false,
-      breathing: false,
+      nightAnalysis: false,
+      morningReview: false,
+      regionsValidated: false,
       sleep: false,
-      meditation: false,
     },
     rational: {
       analysisConfirmed: false,
