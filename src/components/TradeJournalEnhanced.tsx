@@ -325,7 +325,7 @@ export default function TradeJournalEnhanced() {
       return;
     }
 
-    // Validar checklist operacional completo
+    // Checklist operacional - apenas aviso, não bloqueia
     const operationalItems = Object.values(formData.operational);
     const allOperationalComplete = operationalItems.every(
       item => item === true
@@ -335,10 +335,10 @@ export default function TradeJournalEnhanced() {
       const incompleteCount = operationalItems.filter(
         item => item === false
       ).length;
-      toast.error(
-        `Checklist Operacional incompleto: ${incompleteCount} item(ns) faltando`
+      toast.warning(
+        `⚠️ Checklist Operacional incompleto: ${incompleteCount} item(ns) não marcado(s)`,
+        { duration: 4000 }
       );
-      return;
     }
 
     // Validar R:R
