@@ -395,137 +395,140 @@ export default function AnalysisHistory() {
                   Nova Análise
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Registrar Nova Análise</DialogTitle>
+              <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+                <DialogHeader className="flex-shrink-0">
+                  <DialogTitle>{editingId ? 'Editar Análise' : 'Registrar Nova Análise'}</DialogTitle>
                   <DialogDescription>Registre sua análise de Fibonacci e Order Blocks</DialogDescription>
                 </DialogHeader>
 
-                <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="flex-1 overflow-y-auto pr-2 space-y-4 min-h-0">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Ativo</Label>
+                      <Select value={formData.asset} onValueChange={(value) => setFormData({ ...formData, asset: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {assets.map((asset) => (
+                            <SelectItem key={asset} value={asset}>
+                              {asset}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Timeframe</Label>
+                      <Select value={formData.timeframe} onValueChange={(value) => setFormData({ ...formData, timeframe: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="H4">H4</SelectItem>
+                          <SelectItem value="Diário">Diário</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
                   <div>
-                    <Label>Ativo</Label>
-                    <Select value={formData.asset} onValueChange={(value) => setFormData({ ...formData, asset: value })}>
+                    <Label>Nível de Fibonacci (ex: 75%-85%)</Label>
+                    <Input
+                      value={formData.fibonacciLevel}
+                      onChange={(e) => setFormData({ ...formData, fibonacciLevel: e.target.value })}
+                      placeholder="1.2500 - 1.2600"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Nível de Order Block (ex: H4, H2, H1)</Label>
+                    <Input
+                      value={formData.orderBlockLevel}
+                      onChange={(e) => setFormData({ ...formData, orderBlockLevel: e.target.value })}
+                      placeholder="1.2550 (H4) → 1.2545 (H2) → 1.2548 (H1)"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Zona de Liquidez</Label>
+                    <Input
+                      value={formData.liquidityZone}
+                      onChange={(e) => setFormData({ ...formData, liquidityZone: e.target.value })}
+                      placeholder="Descreva a zona de liquidez"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Notas e Observações</Label>
+                    <Textarea
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      placeholder="Detalhes da análise, confluências observadas..."
+                      rows={3}
+                      className="resize-none"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Status</Label>
+                    <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value as any })}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {assets.map((asset) => (
-                          <SelectItem key={asset} value={asset}>
-                            {asset}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="ATIVO">Ativa (Aguardando Preco)</SelectItem>
+                        <SelectItem value="TESTADO">Testada (Trade Executado)</SelectItem>
+                        <SelectItem value="DESCARTADO">Descartada (Nao Validada)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+
                   <div>
-                    <Label>Timeframe</Label>
-                    <Select value={formData.timeframe} onValueChange={(value) => setFormData({ ...formData, timeframe: value })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="H4">H4</SelectItem>
-                        <SelectItem value="Diário">Diário</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div>
-                  <Label>Nível de Fibonacci (ex: 75%-85%)</Label>
-                  <Input
-                    value={formData.fibonacciLevel}
-                    onChange={(e) => setFormData({ ...formData, fibonacciLevel: e.target.value })}
-                    placeholder="1.2500 - 1.2600"
-                  />
-                </div>
-
-                <div>
-                  <Label>Nível de Order Block (ex: H4, H2, H1)</Label>
-                  <Input
-                    value={formData.orderBlockLevel}
-                    onChange={(e) => setFormData({ ...formData, orderBlockLevel: e.target.value })}
-                    placeholder="1.2550 (H4) → 1.2545 (H2) → 1.2548 (H1)"
-                  />
-                </div>
-
-                <div>
-                  <Label>Zona de Liquidez</Label>
-                  <Input
-                    value={formData.liquidityZone}
-                    onChange={(e) => setFormData({ ...formData, liquidityZone: e.target.value })}
-                    placeholder="Descreva a zona de liquidez"
-                  />
-                </div>
-
-                <div>
-                  <Label>Notas e Observações</Label>
-                  <Textarea
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    placeholder="Detalhes da análise, confluências observadas..."
-                    rows={3}
-                  />
-                </div>
-
-                <div>
-                  <Label>Status</Label>
-                  <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value as any })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ATIVO">Ativa (Aguardando Preco)</SelectItem>
-                      <SelectItem value="TESTADO">Testada (Trade Executado)</SelectItem>
-                      <SelectItem value="DESCARTADO">Descartada (Nao Validada)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label>Upload de Imagens (Máximo 3)</Label>
-                  <div className="space-y-3">
-                    {[1, 2, 3].map((num) => {
-                      const key = `imageUrl${num}` as keyof typeof formData;
-                      return (
-                        <div key={num}>
-                          <Label className="text-sm">Imagem {num}</Label>
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                const reader = new FileReader();
-                                reader.onload = (event) => {
-                                  setFormData({ ...formData, [key]: event.target?.result as string });
-                                };
-                                reader.readAsDataURL(file);
-                              }
-                            }}
-                          />
-                          {formData[key] && (
-                            <div className="mt-2 relative w-full h-32 bg-muted rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity" onClick={() => {
-                              const img = document.createElement('div');
-                              img.innerHTML = `<div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999;" onclick="this.remove()"><img src="${formData[key]}" style="max-width: 90vw; max-height: 90vh; object-fit: contain;" /></div>`;
-                              document.body.appendChild(img.firstChild as Node);
-                            }}>
-                              <img src={formData[key]} alt={`Preview ${num}`} className="w-full h-full object-cover" />
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity">
-                                <span className="text-white text-sm">Clique para ampliar</span>
+                    <Label>Upload de Imagens (Máximo 3)</Label>
+                    <div className="space-y-3">
+                      {[1, 2, 3].map((num) => {
+                        const key = `imageUrl${num}` as keyof typeof formData;
+                        return (
+                          <div key={num}>
+                            <Label className="text-sm">Imagem {num}</Label>
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onload = (event) => {
+                                    setFormData({ ...formData, [key]: event.target?.result as string });
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                            />
+                            {formData[key] && (
+                              <div className="mt-2 relative w-full h-28 bg-muted rounded-lg overflow-hidden">
+                                <img src={formData[key]} alt={`Preview ${num}`} className="w-full h-full object-cover" />
+                                <button
+                                  type="button"
+                                  onClick={() => setFormData({ ...formData, [key]: "" })}
+                                  className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs hover:opacity-80"
+                                >
+                                  ✕
+                                </button>
                               </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
 
-                <Button onClick={handleAddAnalysis} className="w-full bg-primary hover:bg-primary/90">
-                  Registrar Análise
-                </Button>
+                <div className="flex-shrink-0 pt-4 border-t border-border">
+                  <Button onClick={handleAddAnalysis} className="w-full bg-primary hover:bg-primary/90">
+                    {editingId ? 'Salvar Alterações' : 'Registrar Análise'}
+                  </Button>
                 </div>
               </DialogContent>
             </Dialog>
