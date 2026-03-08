@@ -13,7 +13,7 @@ import {
 } from "recharts";
 import {
   TrendingUp, TrendingDown, Target, Shield, Brain, Heart, Flame, Calendar,
-  CheckCircle2, XCircle, AlertTriangle, Award, Zap, BarChart3, Filter,
+  CheckCircle2, XCircle, AlertTriangle, Award, Zap, BarChart3, Filter, Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
