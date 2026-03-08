@@ -23,6 +23,7 @@ import AssetPerformanceAnalysis from "@/components/AssetPerformanceAnalysis";
 import { TradingCalendar } from "@/components/TradingCalendar";
 import CalculationHistory from "@/components/CalculationHistory";
 import { EquityAndPerformanceCharts } from "@/components/EquityAndPerformanceCharts";
+import Withdrawals from "@/components/Withdrawals";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
