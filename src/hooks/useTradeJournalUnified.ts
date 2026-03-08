@@ -158,6 +158,7 @@ export const useTradeJournalUnified = (accountId: string) => {
     if (updates.result !== undefined) dbUpdates.result = updates.result;
     if (updates.resultPrice !== undefined) dbUpdates.result_price = updates.resultPrice;
     if (updates.session !== undefined) dbUpdates.session = updates.session;
+    if (updates.marketSession !== undefined) dbUpdates.market_session = updates.marketSession;
     if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
     if (updates.isFavorite !== undefined) dbUpdates.is_favorite = updates.isFavorite;
     if (updates.moneyResult !== undefined) dbUpdates.money_result = updates.moneyResult;
