@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle2, TrendingUp, Target, Clock, Zap, Moon, Sun } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAccountManager } from "@/hooks/useAccountManager";
@@ -21,7 +22,6 @@ import AssetPerformanceAnalysis from "@/components/AssetPerformanceAnalysis";
 import { TradingCalendar } from "@/components/TradingCalendar";
 import CalculationHistory from "@/components/CalculationHistory";
 import { EquityAndPerformanceCharts } from "@/components/EquityAndPerformanceCharts";
-import { CalendarAccountSelector } from "@/components/CalendarAccountSelector";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -39,7 +39,7 @@ function ThemeToggle() {
 }
 
 export default function Home() {
-  const { activeAccountId, getActiveAccount } = useAccountManager();
+  const { accounts, activeAccountId, getActiveAccount, switchAccount } = useAccountManager();
   const { trades } = useTradeJournalUnified(activeAccountId);
   const activeAccount = getActiveAccount();
   const currentBalance = activeAccount?.currentBalance ?? 0;
@@ -58,8 +58,19 @@ export default function Home() {
               <p className="text-sm text-muted-foreground mt-1">Plano Operacional - HackTrading Plan</p>
             </div>
             <div className="flex items-center gap-3">
+              <Select value={activeAccountId} onValueChange={switchAccount}>
+                <SelectTrigger className="w-[180px] h-9 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {accounts.map((account) => (
+                    <SelectItem key={account.id} value={account.id}>
+                      {account.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-secondary/50">
-                <span className="text-xs text-muted-foreground">{activeAccount?.name}</span>
                 <span className="text-sm font-bold text-foreground">${currentBalance.toFixed(2)}</span>
                 <span className={`text-xs font-semibold ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
                   {isPositive ? '+' : ''}{balancePct.toFixed(1)}%
@@ -95,7 +106,7 @@ export default function Home() {
           </TabsList>
 
           <TabsContent value="calendario-trading" className="space-y-6">
-            <CalendarAccountSelector />
+            <TradingCalendar activeAccountId={activeAccountId} />
           </TabsContent>
 
           <TabsContent value="autoconhecimento" className="space-y-6">
