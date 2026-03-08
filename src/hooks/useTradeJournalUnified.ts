@@ -65,6 +65,7 @@ function mapRowToTrade(row: any): TradeWithChecklist {
     result: row.result || "ONGOING",
     resultPrice: row.result_price || "",
     session: row.session || "",
+    marketSession: row.market_session || undefined,
     account: row.account_key || "",
     notes: row.notes || "",
     isFavorite: row.is_favorite || false,
