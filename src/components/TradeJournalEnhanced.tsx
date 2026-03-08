@@ -253,12 +253,9 @@ export default function TradeJournalEnhanced() {
   // Usar hook de alertas
   useTradeAlerts(trades, activeAccountId);
 
-  const saveTrades = (newTrades: TradeWithChecklist[]) => {
-    setTrades(newTrades);
-    localStorage.setItem(
-      `trades_enhanced_${activeAccountId}`,
-      JSON.stringify(newTrades)
-    );
+  // saveTrades is now handled by useTradeJournalUnified
+  const saveTrades = (_newTrades: TradeWithChecklist[]) => {
+    // no-op: trades are managed by Supabase hook
   };
 
   const showDailyLimitAlert = (wins: number, losses: number) => {
