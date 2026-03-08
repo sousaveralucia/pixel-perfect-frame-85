@@ -36,7 +36,7 @@ const DEFAULT_ACCOUNTS: Account[] = [
 
 export function useAccountManager() {
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [activeAccountId, setActiveAccountId] = useState<string>("account-100");
+  const [activeAccountId, setActiveAccountId] = useState<string>("conta-pessoal");
 
   // Carregar contas do localStorage
   useEffect(() => {

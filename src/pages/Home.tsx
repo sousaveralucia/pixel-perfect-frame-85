@@ -82,7 +82,7 @@ export default function Home() {
           </TabsList>
 
           <TabsContent value="calendario-trading" className="space-y-6">
-            <TradingCalendar />
+            <CalendarAccountSelector />
           </TabsContent>
 
           <TabsContent value="autoconhecimento" className="space-y-6">
