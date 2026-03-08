@@ -295,7 +295,26 @@ export default function TradeJournalEnhanced() {
     }, 15000);
   };
 
+  // Verificar se o dia está bloqueado para trades (3 losses ou 2 wins)
+  const today = new Date().toISOString().split("T")[0];
+  const todayTradesForAccount = trades.filter(
+    t => t.date === today
+  );
+  const todayWins = todayTradesForAccount.filter(t => t.result === "WIN").length;
+  const todayLosses = todayTradesForAccount.filter(t => t.result === "LOSS").length;
+  const isDayBlocked = todayWins >= 2 || todayLosses >= 3;
+
   const handleAddTrade = () => {
+    // Bloqueio diário: não permitir novos trades se meta de loss ou win foi batida
+    if (!editingId && isDayBlocked) {
+      toast.error(
+        todayWins >= 2
+          ? "🚫 Meta diária de 2 WINs atingida! Trades bloqueados até o próximo dia útil."
+          : "🚫 Limite de 3 LOSSes atingido! Trades bloqueados até o próximo dia útil.",
+        { duration: 5000 }
+      );
+      return;
+    }
     // Validar entrada e saída (saída é opcional para trades em andamento)
     if (!formData.entryPrice) {
       toast.error("Preencha o preço de entrada!");
