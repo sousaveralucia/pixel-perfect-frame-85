@@ -74,6 +74,7 @@ interface TradeWithChecklist {
     hydration: boolean;
     breathing: boolean;
     sleep: boolean;
+    meditation: boolean;
   };
   rational: {
     analysisConfirmed: boolean;
