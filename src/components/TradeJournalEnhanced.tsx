@@ -255,10 +255,7 @@ export default function TradeJournalEnhanced() {
     stopLossDollars: "",
     takeProfitDollars: "",
     session: "" as "Manha" | "Tarde" | "Noite" | "",
-    account: "Conta 1 ($100)" as
-      | "Conta 1 ($100)"
-      | "Conta 2 ($1000)"
-      | "Conta 3 ($10000)",
+    account: "",
     result: "WIN" as "WIN" | "LOSS" | "BREAK_EVEN" | "ONGOING",
     riskReward: 0,
     moneyResult: 0,
