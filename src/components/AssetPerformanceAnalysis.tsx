@@ -27,14 +27,7 @@ interface AssetStats {
 
 export default function AssetPerformanceAnalysis() {
   const { activeAccountId } = useAccountManager();
-  const [trades, setTrades] = useState<TradeWithChecklist[]>([]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(`trades_enhanced_${activeAccountId}`);
-    if (saved) {
-      setTrades(JSON.parse(saved));
-    }
-  }, [activeAccountId]);
+  const { trades } = useTradeJournalUnified(activeAccountId);
 
   const assetStats = useMemo(() => {
     const stats: Record<string, AssetStats> = {};

@@ -18,11 +18,7 @@ interface Trade {
 export function EquityAndPerformanceCharts() {
   const { activeAccountId } = useAccountManager();
 
-  // Carregar trades do localStorage
-  const trades = useMemo(() => {
-    const saved = localStorage.getItem(`trades_enhanced_${activeAccountId}`);
-    return saved ? JSON.parse(saved) : [];
-  }, [activeAccountId]);
+  const { trades } = useTradeJournalUnified(activeAccountId);
 
   // Calcular dados de patrimônio (equity curve)
   const equityData = useMemo(() => {

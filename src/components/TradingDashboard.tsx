@@ -25,11 +25,7 @@ export function TradingDashboard({ activeAccountId: propAccountId }: TradingDash
   const { activeAccountId: hookAccountId } = useAccountManager();
   const activeAccountId = propAccountId || hookAccountId;
 
-  // Carregar trades do localStorage
-  const trades = useMemo(() => {
-    const saved = localStorage.getItem(`trades_enhanced_${activeAccountId}`);
-    return saved ? JSON.parse(saved) : [];
-  }, [activeAccountId]);
+  const { trades } = useTradeJournalUnified(activeAccountId);
 
   // Calcular KPIs
   const kpis = useMemo(() => {
