@@ -132,3 +132,39 @@
     }
   }
 }
+
+/* Dark mode overrides for hardcoded light colors */
+.dark .bg-white { background-color: hsl(220 14% 13%) !important; }
+.dark .bg-blue-50 { background-color: hsl(215 30% 14%) !important; }
+.dark .bg-green-50 { background-color: hsl(160 30% 12%) !important; }
+.dark .bg-red-50 { background-color: hsl(0 30% 14%) !important; }
+.dark .bg-yellow-50 { background-color: hsl(45 30% 13%) !important; }
+.dark .bg-orange-50 { background-color: hsl(25 30% 13%) !important; }
+.dark .bg-gray-50 { background-color: hsl(220 14% 13%) !important; }
+.dark .bg-gray-100 { background-color: hsl(220 14% 15%) !important; }
+.dark .bg-slate-100 { background-color: hsl(215 14% 15%) !important; }
+
+.dark .border-blue-200 { border-color: hsl(215 30% 25%) !important; }
+.dark .border-green-200 { border-color: hsl(160 30% 22%) !important; }
+.dark .border-red-200 { border-color: hsl(0 30% 25%) !important; }
+.dark .border-red-300 { border-color: hsl(0 35% 30%) !important; }
+.dark .border-yellow-200 { border-color: hsl(45 30% 25%) !important; }
+.dark .border-orange-200 { border-color: hsl(25 30% 25%) !important; }
+.dark .border-gray-200 { border-color: hsl(220 14% 20%) !important; }
+.dark .border-gray-300 { border-color: hsl(220 14% 22%) !important; }
+.dark .border-purple-200 { border-color: hsl(270 30% 25%) !important; }
+
+.dark .text-blue-900 { color: hsl(215 60% 72%) !important; }
+.dark .text-green-900 { color: hsl(160 60% 65%) !important; }
+.dark .text-red-900 { color: hsl(0 60% 68%) !important; }
+.dark .text-yellow-900 { color: hsl(45 70% 65%) !important; }
+.dark .text-orange-900 { color: hsl(25 70% 65%) !important; }
+.dark .text-purple-900 { color: hsl(270 60% 72%) !important; }
+.dark .text-gray-600 { color: hsl(215 12% 55%) !important; }
+.dark .text-gray-700 { color: hsl(215 12% 60%) !important; }
+.dark .text-gray-900 { color: hsl(210 20% 88%) !important; }
+.dark .text-slate-600 { color: hsl(215 12% 55%) !important; }
+.dark .text-slate-900 { color: hsl(210 20% 88%) !important; }
+
+.dark .text-green-600 { color: hsl(160 70% 50%) !important; }
+.dark .text-red-600 { color: hsl(0 70% 58%) !important; }
