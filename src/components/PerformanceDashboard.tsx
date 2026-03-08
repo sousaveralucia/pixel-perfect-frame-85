@@ -11,8 +11,9 @@ import {
 } from "recharts";
 import {
   TrendingUp, TrendingDown, Target, Shield, Brain, Heart, Flame, Calendar,
-  CheckCircle2, XCircle, AlertTriangle, Award, Zap, BarChart3,
+  CheckCircle2, XCircle, AlertTriangle, Award, Zap, BarChart3, Filter,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const COLORS = {
   win: "#22c55e",
