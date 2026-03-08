@@ -65,6 +65,7 @@ function mapRowToTrade(row: any): TradeWithChecklist {
     result: row.result || "ONGOING",
     resultPrice: row.result_price || "",
     session: row.session || "",
+    marketSession: row.market_session || undefined,
     account: row.account_key || "",
     notes: row.notes || "",
     isFavorite: row.is_favorite || false,
@@ -123,6 +124,7 @@ export const useTradeJournalUnified = (accountId: string) => {
       result: trade.result,
       result_price: trade.resultPrice,
       session: trade.session,
+      market_session: trade.marketSession || null,
       notes: trade.notes,
       is_favorite: trade.isFavorite,
       money_result: trade.moneyResult || null,
@@ -156,6 +158,7 @@ export const useTradeJournalUnified = (accountId: string) => {
     if (updates.result !== undefined) dbUpdates.result = updates.result;
     if (updates.resultPrice !== undefined) dbUpdates.result_price = updates.resultPrice;
     if (updates.session !== undefined) dbUpdates.session = updates.session;
+    if (updates.marketSession !== undefined) dbUpdates.market_session = updates.marketSession;
     if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
     if (updates.isFavorite !== undefined) dbUpdates.is_favorite = updates.isFavorite;
     if (updates.moneyResult !== undefined) dbUpdates.money_result = updates.moneyResult;
