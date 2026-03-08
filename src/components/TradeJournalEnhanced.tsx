@@ -690,9 +690,9 @@ export default function TradeJournalEnhanced() {
       doc.text(`${trade.asset}  -  Imagens do Trade`, m, 8);
       y = 18;
 
-      // Calculate image height to fill page evenly
-      const availH = ph - y - 10;
-      const imgH = (availH - validImages.length * 7) / validImages.length;
+      // Force all images to fit on this single page
+      const availH = ph - y - 8;
+      const imgH = (availH - validImages.length * 6) / validImages.length;
       const imgW = pw - 2 * m;
 
       for (const [label, url] of validImages) {
@@ -706,17 +706,15 @@ export default function TradeJournalEnhanced() {
             reader.readAsDataURL(blob);
           });
 
-          if (y + imgH + 8 > ph - 8) { doc.addPage(); y = 14; }
-
-          doc.setTextColor(...c.accent); doc.setFontSize(8); doc.setFont("helvetica", "bold");
+          doc.setTextColor(...c.accent); doc.setFontSize(7); doc.setFont("helvetica", "bold");
           doc.text(label, m, y);
-          y += 4;
+          y += 3;
           doc.addImage(dataUrl, "JPEG", m, y, imgW, imgH);
-          y += imgH + 6;
+          y += imgH + 3;
         } catch {
           doc.setTextColor(...c.red); doc.setFontSize(7);
           doc.text(`Imagem ${label} indisponivel`, m, y);
-          y += 6;
+          y += 5;
         }
       }
 
