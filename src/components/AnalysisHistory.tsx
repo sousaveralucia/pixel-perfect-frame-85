@@ -81,47 +81,63 @@ export default function AnalysisHistory() {
     setAnalyses(newAnalyses);
   };
 
-  const handleAddAnalysis = () => {
-    if (!formData.fibonacciLevel || !formData.orderBlockLevel) {
+  const handleAddAnalysis = async () => {
+    if (!user || !formData.fibonacciLevel || !formData.orderBlockLevel) {
       toast.error("Preencha os níveis de Fibonacci e Order Block");
       return;
     }
 
     if (editingId) {
-      // Editar análise existente
-      saveAnalyses(analyses.map(a => a.id === editingId ? {
-        ...a,
+      await supabase.from("analyses").update({
         asset: formData.asset,
         timeframe: formData.timeframe,
-        fibonacciLevel: formData.fibonacciLevel,
-        orderBlockLevel: formData.orderBlockLevel,
-        liquidityZone: formData.liquidityZone,
+        fibonacci_level: formData.fibonacciLevel,
+        order_block_level: formData.orderBlockLevel,
+        liquidity_zone: formData.liquidityZone,
         notes: formData.notes,
         status: formData.status,
-        imageUrl1: formData.imageUrl1,
-        imageUrl2: formData.imageUrl2,
-        imageUrl3: formData.imageUrl3,
+        image_url1: formData.imageUrl1,
+        image_url2: formData.imageUrl2,
+        image_url3: formData.imageUrl3,
+      }).eq("id", editingId).eq("user_id", user.id);
+      setAnalyses(analyses.map(a => a.id === editingId ? {
+        ...a, ...formData, fibonacciLevel: formData.fibonacciLevel, orderBlockLevel: formData.orderBlockLevel, liquidityZone: formData.liquidityZone,
       } : a));
       toast.success("Análise atualizada!");
       setEditingId(null);
     } else {
-      // Criar nova análise
-      const newAnalysis: Analysis = {
-        id: Date.now().toString(),
-        accountId: activeAccountId,
+      const { data } = await supabase.from("analyses").insert({
+        user_id: user.id,
+        account_key: activeAccountId,
         asset: formData.asset,
         date: new Date().toISOString().split("T")[0],
         timeframe: formData.timeframe,
-        fibonacciLevel: formData.fibonacciLevel,
-        orderBlockLevel: formData.orderBlockLevel,
-        liquidityZone: formData.liquidityZone,
+        fibonacci_level: formData.fibonacciLevel,
+        order_block_level: formData.orderBlockLevel,
+        liquidity_zone: formData.liquidityZone,
         notes: formData.notes,
         status: formData.status,
-        imageUrl1: formData.imageUrl1,
-        imageUrl2: formData.imageUrl2,
-        imageUrl3: formData.imageUrl3,
-      };
-      saveAnalyses([...analyses, newAnalysis]);
+        image_url1: formData.imageUrl1,
+        image_url2: formData.imageUrl2,
+        image_url3: formData.imageUrl3,
+      }).select().single();
+      if (data) {
+        setAnalyses([...analyses, {
+          id: data.id,
+          accountId: data.account_key,
+          asset: data.asset || "",
+          date: data.date || "",
+          timeframe: data.timeframe || "",
+          fibonacciLevel: data.fibonacci_level || "",
+          orderBlockLevel: data.order_block_level || "",
+          liquidityZone: data.liquidity_zone || "",
+          notes: data.notes || "",
+          status: (data.status || "ATIVO") as any,
+          imageUrl1: data.image_url1 || "",
+          imageUrl2: data.image_url2 || "",
+          imageUrl3: data.image_url3 || "",
+        }]);
+      }
       toast.success("Análise registrada!");
     }
 
