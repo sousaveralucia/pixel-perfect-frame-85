@@ -293,24 +293,93 @@ export default function Home() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Clock className="w-5 h-5 text-primary" />
-                  Rotina Diária de Operação
+                  Minha Rotina de Trading
                 </CardTitle>
-                <CardDescription>Segunda a Sexta-feira - Regime de Meio Período</CardDescription>
+                <CardDescription>Rotina pessoal baseada no meu operacional — Análise noturna + Operação diurna</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
+                  {/* Weekly Calendar */}
+                  <Card className="border-2 border-primary/30 bg-primary/5">
+                    <CardContent className="pt-6">
+                      <p className="font-bold text-primary mb-4">📅 Calendário Semanal</p>
+                      <div className="grid grid-cols-7 gap-2">
+                        {[
+                          { day: "DOM", analysis: true, operation: false, color: "bg-chart-3/20 border-chart-3" },
+                          { day: "SEG", analysis: true, operation: true, color: "bg-primary/20 border-primary" },
+                          { day: "TER", analysis: true, operation: true, color: "bg-primary/20 border-primary" },
+                          { day: "QUA", analysis: true, operation: true, color: "bg-primary/20 border-primary" },
+                          { day: "QUI", analysis: true, operation: true, color: "bg-primary/20 border-primary" },
+                          { day: "SEX", analysis: false, operation: true, color: "bg-warning/20 border-warning" },
+                          { day: "SÁB", analysis: false, operation: false, color: "bg-muted border-border" },
+                        ].map((item) => (
+                          <Card key={item.day} className={`border ${item.color} text-center`}>
+                            <CardContent className="pt-3 pb-3 px-1">
+                              <p className="font-bold text-foreground text-sm">{item.day}</p>
+                              <div className="mt-2 space-y-1">
+                                {item.analysis && (
+                                  <Badge variant="outline" className="text-[10px] px-1 py-0 block bg-chart-3/10 text-chart-3 border-chart-3/30">
+                                    🌙 Análise
+                                  </Badge>
+                                )}
+                                {item.operation && (
+                                  <Badge variant="outline" className="text-[10px] px-1 py-0 block bg-primary/10 text-primary border-primary/30">
+                                    📈 Operar
+                                  </Badge>
+                                )}
+                                {!item.analysis && !item.operation && (
+                                  <Badge variant="outline" className="text-[10px] px-1 py-0 block text-muted-foreground">
+                                    😴 Folga
+                                  </Badge>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                      <div className="flex flex-wrap gap-3 mt-4 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-chart-3/30 inline-block"></span> Noite de Análise</span>
+                        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-primary/30 inline-block"></span> Dia de Operação + Análise</span>
+                        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-warning/30 inline-block"></span> Só Operação (sem análise à noite)</span>
+                        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-muted inline-block"></span> Folga</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Routine Flow */}
                   {[
                     {
-                      period: "Manhã (6h-12h)", icon: "🌅",
-                      tasks: ["Verificar configuração do ambiente", "Avaliar prontidão mental e emocional", "Análise HTF (H4, H2, H1) dos 5 ativos", "Identificar CHoCH válidos em HTF", "Traçar Caixas de Gann em M30", "Planejamento do dia"]
+                      period: "Noite (20h-20h30) — Análise", icon: "🌙",
+                      description: "Dom, Seg, Ter, Qua, Qui",
+                      tasks: [
+                        "Análise de mercado dos ativos que opero",
+                        "Traçar regiões de interesse (Order Blocks, Gann, etc.)",
+                        "Marcar zonas de liquidez e pontos de entrada",
+                        "Definir cenários para o dia seguinte",
+                        "Registrar análises na aba Análises"
+                      ]
                     },
                     {
-                      period: "Tarde (12h-18h)", icon: "☀️",
-                      tasks: ["Operações principais conforme setups", "Monitoramento contínuo dos 5 ativos", "Identificação de Order Blocks descontados", "Execução de entradas no 50% do OB", "Gerenciamento de posições abertas", "Respeito rígido ao checklist"]
+                      period: "Manhã (ao acordar) — Revisão", icon: "🌅",
+                      description: "Seg a Sex",
+                      tasks: [
+                        "Revisar as marcações feitas na noite anterior",
+                        "Observar como o mercado se moveu durante a madrugada",
+                        "Verificar se as regiões traçadas estão sendo buscadas ou respeitadas",
+                        "Entender melhor o contexto sem a pressão de traçar e operar na hora",
+                        "Ajustar cenários se necessário"
+                      ]
                     },
                     {
-                      period: "Noite (18h-22h)", icon: "🌙",
-                      tasks: ["Fechamento de posições abertas", "Revisão detalhada de todos os trades", "Análise de erros e regras violadas", "Registrar trades no Diário", "Cálculo de P&L do dia", "Planejamento para o próximo dia"]
+                      period: "Dia — Operação", icon: "📈",
+                      description: "Seg a Sex",
+                      tasks: [
+                        "Operar baseado nas marcações da noite anterior",
+                        "Aguardar o preço chegar nas regiões marcadas",
+                        "Executar conforme o checklist operacional",
+                        "Registrar trades no Diário com todos os checklists",
+                        "Respeitar limites de perdas e ganhos diários"
+                      ]
                     },
                   ].map((item, idx) => (
                     <Card key={idx} className="border-l-4 border-l-primary">
@@ -319,7 +388,8 @@ export default function Home() {
                           <div className="text-3xl">{item.icon}</div>
                           <div className="flex-1">
                             <p className="font-bold text-foreground text-lg">{item.period}</p>
-                            <ul className="mt-4 space-y-2">
+                            <p className="text-xs text-muted-foreground mb-3">{item.description}</p>
+                            <ul className="space-y-2">
                               {item.tasks.map((task, taskIdx) => (
                                 <li key={taskIdx} className="flex items-start gap-2 text-sm text-foreground/80">
                                   <span className="text-primary font-bold mt-0.5">•</span>
@@ -332,6 +402,19 @@ export default function Home() {
                       </CardContent>
                     </Card>
                   ))}
+
+                  {/* Vantagem */}
+                  <Card className="border-2 border-chart-3/30 bg-chart-3/5">
+                    <CardContent className="pt-6">
+                      <p className="font-bold text-chart-3 mb-3">💡 Vantagem dessa Rotina</p>
+                      <p className="text-sm text-foreground/80">
+                        Analisando à noite e operando pela manhã, o mercado já terá se movido durante a madrugada. 
+                        Isso permite <strong>ver se as regiões traçadas estão sendo buscadas ou respeitadas</strong>, 
+                        sem a agonia de traçar uma região e em 30 minutos já estar tomando trade lá. 
+                        A separação entre análise e execução traz mais clareza e disciplina.
+                      </p>
+                    </CardContent>
+                  </Card>
 
                   <Card className="border-2 border-destructive/30 bg-destructive/5">
                     <CardContent className="pt-6">
@@ -355,17 +438,15 @@ export default function Home() {
                     </CardContent>
                   </Card>
 
-                  <Card className="border-2 border-primary/30 bg-primary/5">
+                  {/* Regra de ouro */}
+                  <Card className="border-2 border-warning/30 bg-warning/5">
                     <CardContent className="pt-6">
-                      <p className="font-bold text-primary mb-4">📅 Dias de Operação</p>
-                      <div className="flex flex-wrap gap-2">
-                        {["Segunda", "Terça", "Quarta", "Quinta", "Sexta"].map((day) => (
-                          <span key={day} className="bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold">
-                            {day}
-                          </span>
-                        ))}
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-4">Fim de semana: Descanso, análise e planejamento</p>
+                      <p className="font-bold text-warning mb-3">🏆 Regra de Ouro</p>
+                      <p className="text-sm text-foreground/80">
+                        <strong>Sexta e sábado à noite: NÃO analiso.</strong> Domingo à noite volto a analisar para 
+                        preparar a semana. A disciplina de respeitar os dias de descanso é tão importante quanto a 
+                        disciplina de operar bem.
+                      </p>
                     </CardContent>
                   </Card>
                 </div>
