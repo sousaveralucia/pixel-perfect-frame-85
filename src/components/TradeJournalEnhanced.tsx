@@ -448,6 +448,7 @@ export default function TradeJournalEnhanced() {
         hydration: false,
         breathing: false,
         sleep: false,
+        meditation: false,
       },
       rational: trade.rational,
       preTradeImage: trade.preTradeImage || "",
