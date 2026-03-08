@@ -24,7 +24,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useTradeJournal } from "@/hooks/useTradeJournal";
 import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
 import { useAccountManager } from "@/hooks/useAccountManager";
-import { Plus, Trash2, Edit2, Image, FileSpreadsheet } from "lucide-react";
+import { Plus, Trash2, Edit2, Image, FileSpreadsheet, FileDown } from "lucide-react";
 import { toast } from "sonner";
 import { useTradeAlerts } from "@/hooks/useTradeAlerts";
 import { useExportTrades } from "@/hooks/useExportTrades";
@@ -469,6 +469,82 @@ export default function TradeJournalEnhanced() {
   const handleDeleteTrade = (id: string) => {
     deleteTradeUnified(id);
     toast.success("Trade removido!");
+  };
+
+  const handleExportTradePDF = async (trade: TradeWithChecklist) => {
+    const { jsPDF } = await import("jspdf");
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let y = 20;
+
+    // Header
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Trade Report - ${trade.asset}`, pageWidth / 2, y, { align: "center" });
+    y += 12;
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Data: ${trade.date || "N/A"}  |  Sessão: ${trade.session || "N/A"}  |  Resultado: ${trade.result}`, pageWidth / 2, y, { align: "center" });
+    y += 10;
+
+    doc.setDrawColor(200);
+    doc.line(14, y, pageWidth - 14, y);
+    y += 8;
+
+    const addSection = (title: string, items: [string, string][]) => {
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text(title, 14, y);
+      y += 7;
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      items.forEach(([label, value]) => {
+        doc.text(`${label}: ${value}`, 18, y);
+        y += 6;
+      });
+      y += 4;
+    };
+
+    addSection("📊 Dados do Trade", [
+      ["Ativo", trade.asset],
+      ["Preço de Entrada", trade.entryPrice || "N/A"],
+      ["Preço de Saída", trade.exitPrice || "N/A"],
+      ["Stop Loss", trade.stopLoss || "N/A"],
+      ["Take Profit", trade.takeProfit || "N/A"],
+      ["Resultado", trade.result],
+      ["R:R", String(trade.riskReward ?? "N/A")],
+      ["Resultado ($)", trade.moneyResult != null ? `$${trade.moneyResult.toFixed(2)}` : "N/A"],
+    ]);
+
+    addSection("✅ Checklist Operacional", [
+      ["CHOCH Válido HTF", trade.operational.chochValidoHTF ? "✔" : "✘"],
+      ["Caixa Gann Traçada", trade.operational.caixaGannTracada ? "✔" : "✘"],
+      ["Região Descontada 50%", trade.operational.regiaoDescontada50 ? "✔" : "✘"],
+      ["Order Block Identificado", trade.operational.orderBlockIdentificado ? "✔" : "✘"],
+      ["Entrada 50% OB", trade.operational.entrada50OB ? "✔" : "✘"],
+      ["Stop Risk Management", trade.operational.stopRiskManagement ? "✔" : "✘"],
+      ["Tempo Gráfico Operacional", trade.operational.tempoGraficoOperacional ? "✔" : "✘"],
+    ]);
+
+    addSection("🧠 Emocional", [
+      ["Hidratação", trade.emotional.hydration ? "✔" : "✘"],
+      ["Respiração", trade.emotional.breathing ? "✔" : "✘"],
+      ["Clareza Mental", trade.emotional.mentalClarity ? "✔" : "✘"],
+    ]);
+
+    addSection("📋 Racional", [
+      ["Análise Confirmada", trade.rational.analysisConfirmed ? "✔" : "✘"],
+      ["Plano Respeitado", trade.rational.planRespected ? "✔" : "✘"],
+      ["Risco Gerenciado", trade.rational.riskManaged ? "✔" : "✘"],
+    ]);
+
+    if (trade.notes) {
+      addSection("📝 Notas", [["", trade.notes]]);
+    }
+
+    doc.save(`Trade_${trade.asset}_${trade.date || "sem-data"}.pdf`);
+    toast.success("PDF exportado!");
   };
 
   const resetForm = () => {
@@ -1930,6 +2006,14 @@ export default function TradeJournalEnhanced() {
                         <Image className="w-4 h-4" />
                       </Button>
                     )}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleExportTradePDF(trade)}
+                      title="Exportar trade em PDF"
+                    >
+                      <FileDown className="w-4 h-4" />
+                    </Button>
                     <Button
                       size="sm"
                       variant="outline"
