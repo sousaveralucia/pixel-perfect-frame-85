@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface TradeWithChecklist {
   id: string;
@@ -11,9 +13,10 @@ export interface TradeWithChecklist {
   result: "WIN" | "LOSS" | "BREAK_EVEN" | "ONGOING";
   resultPrice: string;
   session: "Manha" | "Tarde" | "Noite" | "";
-  account: "Conta 1 ($100)" | "Conta 2 ($1000)" | "Conta 3 ($10000)";
+  account: string;
   notes: string;
   isFavorite: boolean;
+  moneyResult?: number;
   operational: {
     chochValidoHTF: boolean;
     caixaGannTracada: boolean;
@@ -45,115 +48,144 @@ export interface TradeWithChecklist {
   createdAt: number;
 }
 
+function mapRowToTrade(row: any): TradeWithChecklist {
+  return {
+    id: row.id,
+    date: row.date || "",
+    asset: row.asset || "",
+    entryPrice: row.entry_price || "",
+    exitPrice: row.exit_price || "",
+    stopLoss: row.stop_loss || "",
+    takeProfit: row.take_profit || "",
+    result: row.result || "ONGOING",
+    resultPrice: row.result_price || "",
+    session: row.session || "",
+    account: row.account_key || "",
+    notes: row.notes || "",
+    isFavorite: row.is_favorite || false,
+    moneyResult: row.money_result ? Number(row.money_result) : undefined,
+    operational: row.operational || { chochValidoHTF: false, caixaGannTracada: false, regiaoDescontada50: false, orderBlockIdentificado: false, entrada50OB: false, stopRiskManagement: false, tempoGraficoOperacional: false },
+    emotional: row.emotional || { hydration: false, breathing: false, mentalClarity: false },
+    rational: row.rational || { analysisConfirmed: false, planRespected: false, riskManaged: false },
+    routine: row.routine || { hydration: false, breathing: false, sleep: false, meditation: false },
+    preTradeImage: row.pre_trade_image || undefined,
+    tradingImage: row.trading_image || undefined,
+    postTradeImage: row.post_trade_image || undefined,
+    createdAt: new Date(row.created_at).getTime(),
+  };
+}
+
 export const useTradeJournalUnified = (accountId: string) => {
+  const { user } = useAuth();
   const [trades, setTrades] = useState<TradeWithChecklist[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Carregar trades do localStorage
+  const loadTrades = useCallback(async () => {
+    if (!user || !accountId) { setTrades([]); setIsLoaded(true); return; }
+    const { data, error } = await supabase
+      .from("trades")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("account_key", accountId)
+      .order("created_at", { ascending: true });
+    if (!error && data) {
+      setTrades(data.map(mapRowToTrade));
+    }
+    setIsLoaded(true);
+  }, [user, accountId]);
+
   useEffect(() => {
-    const loadTrades = () => {
-      const saved = localStorage.getItem(`trades_enhanced_${accountId}`);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          setTrades(parsed);
-        } catch (error) {
-          console.error("Erro ao carregar trades:", error);
-          setTrades([]);
-        }
-      }
-      setIsLoaded(true);
-    };
-
     loadTrades();
+  }, [loadTrades]);
 
-    // Listener para sincronizar em tempo real quando o localStorage muda
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === `trades_enhanced_${accountId}` && e.newValue) {
-        try {
-          const parsed = JSON.parse(e.newValue);
-          setTrades(parsed);
-        } catch (error) {
-          console.error("Erro ao sincronizar trades:", error);
-        }
-      }
-    };
-
-    // Listener para eventos customizados (sincronização entre abas)
-    const handleCustomEvent = () => {
-      loadTrades();
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    window.addEventListener("tradesUpdated", handleCustomEvent);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener("tradesUpdated", handleCustomEvent);
-    };
-  }, [accountId]);
-
-  // Salvar trades no localStorage
-  const saveTrades = (updatedTrades: TradeWithChecklist[]) => {
+  const saveTrades = useCallback((updatedTrades: TradeWithChecklist[]) => {
     setTrades(updatedTrades);
-    localStorage.setItem(`trades_enhanced_${accountId}`, JSON.stringify(updatedTrades));
-    // Disparar evento customizado para sincronizar entre componentes
-    window.dispatchEvent(new Event("tradesUpdated"));
-  };
+  }, []);
 
-  // Adicionar novo trade
-  const addTrade = (trade: Omit<TradeWithChecklist, "id" | "createdAt">) => {
-    const newTrade: TradeWithChecklist = {
-      ...trade,
-      id: `trade_${Date.now()}`,
-      createdAt: Date.now(),
-    };
-    saveTrades([...trades, newTrade]);
-    return newTrade;
-  };
+  const addTrade = useCallback(async (trade: Omit<TradeWithChecklist, "id" | "createdAt">) => {
+    if (!user) return null;
+    const { data, error } = await supabase.from("trades").insert({
+      user_id: user.id,
+      account_key: accountId,
+      date: trade.date,
+      asset: trade.asset,
+      entry_price: trade.entryPrice,
+      exit_price: trade.exitPrice,
+      stop_loss: trade.stopLoss,
+      take_profit: trade.takeProfit,
+      result: trade.result,
+      result_price: trade.resultPrice,
+      session: trade.session,
+      notes: trade.notes,
+      is_favorite: trade.isFavorite,
+      money_result: trade.moneyResult || null,
+      operational: trade.operational as any,
+      emotional: trade.emotional as any,
+      rational: trade.rational as any,
+      routine: trade.routine as any,
+      pre_trade_image: trade.preTradeImage || null,
+      trading_image: trade.tradingImage || null,
+      post_trade_image: trade.postTradeImage || null,
+    }).select().single();
+    if (!error && data) {
+      const newTrade = mapRowToTrade(data);
+      setTrades((prev) => [...prev, newTrade]);
+      return newTrade;
+    }
+    return null;
+  }, [user, accountId]);
 
-  // Atualizar trade existente
-  const updateTrade = (id: string, updates: Partial<TradeWithChecklist>) => {
-    const updated = trades.map((t) => (t.id === id ? { ...t, ...updates } : t));
-    saveTrades(updated);
-  };
+  const updateTrade = useCallback(async (id: string, updates: Partial<TradeWithChecklist>) => {
+    if (!user) return;
+    const dbUpdates: any = {};
+    if (updates.date !== undefined) dbUpdates.date = updates.date;
+    if (updates.asset !== undefined) dbUpdates.asset = updates.asset;
+    if (updates.entryPrice !== undefined) dbUpdates.entry_price = updates.entryPrice;
+    if (updates.exitPrice !== undefined) dbUpdates.exit_price = updates.exitPrice;
+    if (updates.stopLoss !== undefined) dbUpdates.stop_loss = updates.stopLoss;
+    if (updates.takeProfit !== undefined) dbUpdates.take_profit = updates.takeProfit;
+    if (updates.result !== undefined) dbUpdates.result = updates.result;
+    if (updates.resultPrice !== undefined) dbUpdates.result_price = updates.resultPrice;
+    if (updates.session !== undefined) dbUpdates.session = updates.session;
+    if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
+    if (updates.isFavorite !== undefined) dbUpdates.is_favorite = updates.isFavorite;
+    if (updates.moneyResult !== undefined) dbUpdates.money_result = updates.moneyResult;
+    if (updates.operational !== undefined) dbUpdates.operational = updates.operational;
+    if (updates.emotional !== undefined) dbUpdates.emotional = updates.emotional;
+    if (updates.rational !== undefined) dbUpdates.rational = updates.rational;
+    if (updates.routine !== undefined) dbUpdates.routine = updates.routine;
+    if (updates.preTradeImage !== undefined) dbUpdates.pre_trade_image = updates.preTradeImage;
+    if (updates.tradingImage !== undefined) dbUpdates.trading_image = updates.tradingImage;
+    if (updates.postTradeImage !== undefined) dbUpdates.post_trade_image = updates.postTradeImage;
 
-  // Alternar favorito
-  const toggleFavorite = (id: string) => {
-    const updated = trades.map((t) => (t.id === id ? { ...t, isFavorite: !t.isFavorite } : t));
-    saveTrades(updated);
-  };
+    await supabase.from("trades").update(dbUpdates).eq("id", id).eq("user_id", user.id);
+    setTrades((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)));
+  }, [user]);
 
-  // Deletar trade
-  const deleteTrade = (id: string) => {
-    saveTrades(trades.filter((t) => t.id !== id));
-  };
+  const toggleFavorite = useCallback(async (id: string) => {
+    const trade = trades.find((t) => t.id === id);
+    if (!trade || !user) return;
+    const newVal = !trade.isFavorite;
+    await supabase.from("trades").update({ is_favorite: newVal }).eq("id", id).eq("user_id", user.id);
+    setTrades((prev) => prev.map((t) => (t.id === id ? { ...t, isFavorite: newVal } : t)));
+  }, [trades, user]);
 
-  // Filtrar trades por sessão
-  const getTradesBySession = (session: string) => {
-    return trades.filter((t) => t.session === session);
-  };
+  const deleteTrade = useCallback(async (id: string) => {
+    if (!user) return;
+    await supabase.from("trades").delete().eq("id", id).eq("user_id", user.id);
+    setTrades((prev) => prev.filter((t) => t.id !== id));
+  }, [user]);
 
-  // Filtrar trades por ativo
-  const getTradesByAsset = (asset: string) => {
-    return trades.filter((t) => t.asset === asset);
-  };
+  const getTradesBySession = (session: string) => trades.filter((t) => t.session === session);
+  const getTradesByAsset = (asset: string) => trades.filter((t) => t.asset === asset);
 
-  // Obter estatísticas
   const getStatistics = () => {
     const wins = trades.filter((t) => t.result === "WIN").length;
     const losses = trades.filter((t) => t.result === "LOSS").length;
     const breakEven = trades.filter((t) => t.result === "BREAK_EVEN").length;
     const total = trades.length;
     const winRate = total > 0 ? (wins / total) * 100 : 0;
-
-    return {
-      total,
-      wins,
-      losses,
-      breakEven,
-      winRate: winRate.toFixed(1),
-    };
+    return { total, wins, losses, breakEven, winRate: winRate.toFixed(1) };
   };
 
   return {
