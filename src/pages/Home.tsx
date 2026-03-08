@@ -9,7 +9,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAccountManager } from "@/hooks/useAccountManager";
 import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
-import RiskCalculator from "@/components/RiskCalculator";
+import TradingCalculator from "@/components/TradingCalculator";
 import EconomicCalendar from "@/components/EconomicCalendar";
 import NewsAlerts from "@/components/NewsAlerts";
 import TradeJournalEnhanced from "@/components/TradeJournalEnhanced";
