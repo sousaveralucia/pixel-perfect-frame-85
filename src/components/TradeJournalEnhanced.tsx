@@ -2098,15 +2098,18 @@ export default function TradeJournalEnhanced() {
                       </div>
                       <div className="bg-white p-2 rounded border border-blue-200">
                         <p className="font-semibold text-blue-900 mb-1">
-                          🏃 Rotina e Saúde:
+                          📋 Rotina Operacional:
                         </p>
                         {trade.routine && (
                           <>
                             <p>
-                              {trade.routine.hydration ? "✓" : "✗"} Hidratação
+                              {trade.routine.nightAnalysis ? "✓" : "✗"} Análise Noturna
                             </p>
                             <p>
-                              {trade.routine.breathing ? "✓" : "✗"} Respiração
+                              {trade.routine.morningReview ? "✓" : "✗"} Revisão Manhã
+                            </p>
+                            <p>
+                              {trade.routine.regionsValidated ? "✓" : "✗"} Regiões Validadas
                             </p>
                             <p>{trade.routine.sleep ? "✓" : "✗"} Sono</p>
                           </>
