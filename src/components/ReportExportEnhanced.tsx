@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Download, FileText, AlertCircle, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
 import { exportCompleteReportToExcel } from "@/lib/excelExporter";
+import { useAccountManager } from "@/hooks/useAccountManager";
 
 interface TradeWithChecklist {
   id: string;
