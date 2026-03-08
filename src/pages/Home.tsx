@@ -19,8 +19,10 @@ import AnalysisHistory from "@/components/AnalysisHistory";
 import DailyValidation from "@/components/DailyValidation";
 import AssetPerformanceAnalysis from "@/components/AssetPerformanceAnalysis";
 import { TradingCalendar } from "@/components/TradingCalendar";
+import { TradingCalendar } from "@/components/TradingCalendar";
 import CalculationHistory from "@/components/CalculationHistory";
 import { EquityAndPerformanceCharts } from "@/components/EquityAndPerformanceCharts";
+import { CalendarAccountSelector } from "@/components/CalendarAccountSelector";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
