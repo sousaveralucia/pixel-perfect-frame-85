@@ -843,6 +843,45 @@ export default function PerformanceDashboard() {
             </Card>
           )}
 
+          {/* Horários */}
+          {dayOfWeekStats.hourChart && dayOfWeekStats.hourChart.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-indigo-500" />
+                  Performance por Horário
+                </CardTitle>
+                <CardDescription>
+                  {dayOfWeekStats.bestHour && (
+                    <span>Seu melhor horário é <strong>{dayOfWeekStats.bestHour.hour}</strong> (${dayOfWeekStats.bestHour.money})</span>
+                  )}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {dayOfWeekStats.hourChart.map((h, i) => (
+                    <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-border bg-secondary/20">
+                      <div>
+                        <p className="font-semibold text-sm">{h.hour}</p>
+                        <p className="text-xs text-muted-foreground">{h.trades} trades</p>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="text-center">
+                          <p className={`text-lg font-bold ${h.winRate >= 50 ? "text-green-600" : "text-red-600"}`}>{h.winRate}%</p>
+                          <p className="text-xs text-muted-foreground">Win Rate</p>
+                        </div>
+                        <div className="text-center min-w-[70px]">
+                          <p className={`text-lg font-bold ${h.money >= 0 ? "text-green-600" : "text-red-600"}`}>${h.money}</p>
+                          <p className="text-xs text-muted-foreground">Resultado</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Dica personalizada */}
           <Card className="border-2 border-primary/30 bg-primary/5">
             <CardContent className="pt-4">
