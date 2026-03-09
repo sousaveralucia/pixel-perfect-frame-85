@@ -315,7 +315,7 @@ function WeeklySummary({ trades }: {trades: Trade[];}) {
         const weekLabel = `${weekDate.toLocaleDateString("pt-BR")} - ${weekEnd.toLocaleDateString("pt-BR")}`;
 
         return (
-          <div key={weekKey} className="flex items-center justify-between p-3 rounded-lg border border-slate-500 border-dashed text-muted-foreground bg-[#e8e8e8]" style={{ backgroundColor: '#000000' }}>
+          <div key={weekKey} className="flex items-center justify-between p-3 rounded-lg border border-slate-500 border-dashed text-muted-foreground bg-neutral-600" style={{ backgroundColor: '#000000' }}>
               <div>
                 <span className="font-medium">{weekLabel}</span>
                 <p className="text-xs text-muted-foreground">

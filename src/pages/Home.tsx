@@ -56,12 +56,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#c7c7c7]">
       {/* Header */}
-      <header className="border-b border-border sticky top-0 z-10 bg-primary">
-        <div className="container py-6 bg-primary">
+      <header className="border-b border-border sticky top-0 z-10 bg-[#fbbd23]/[0.47]">
+        <div className="container py-6 bg-[#f59f0a]/0">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold bg-primary text-black">Trading JP </h1>
-              <p className="text-sm mt-1 text-black">Trading Journal Pofissional</p>
+              <h1 className="text-3xl font-bold text-black bg-[#d9f99f]/0">Trading Journal Profissional </h1>
+              <p className="mt-1 text-black text-xl text-left font-serif bg-[#d8ff8f]/0">Trading Journal Pofissional - Everything you need for to be a profissional trader.     </p>
             </div>
             <div className="flex items-center gap-3">
               <Select value={activeAccountId} onValueChange={switchAccount}>
@@ -92,8 +92,8 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="container py-12">
-        <Tabs defaultValue="calendario-trading" className="w-full">
+      <main className="container py-12 bg-[#fbbd23]/[0.47] border-black/0">
+        <Tabs defaultValue="calendario-trading" className="w-full bg-neutral-600">
           <TabsList className="flex w-full mb-8 overflow-x-auto gap-1 bg-secondary/30 p-1 rounded-lg border border-border">
             <TabsTrigger value="calendario-trading" className="text-xs whitespace-nowrap">Calendário</TabsTrigger>
             <TabsTrigger value="contas" className="text-xs whitespace-nowrap">Contas</TabsTrigger>
@@ -248,7 +248,7 @@ export default function Home() {
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-foreground">Minha Estratégia</h2>
+                <h2 className="text-xl font-bold text-foreground bg-neutral-600/0">Minha Estratégia</h2>
                 <p className="text-sm text-muted-foreground">Smart Money Concepts — Modelo Operacional Completo</p>
               </div>
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
