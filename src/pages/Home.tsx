@@ -54,9 +54,9 @@ export default function Home() {
   const isPositive = balancePct >= 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#c7c7c7]">
       {/* Header */}
-      <header className="border-b border-border bg-background sticky top-0 z-10">
+      <header className="border-b border-border sticky top-0 z-10 bg-[#fd6d0d]">
         <div className="container py-6">
           <div className="flex items-center justify-between">
             <div>
@@ -76,7 +76,7 @@ export default function Home() {
                   )}
                 </SelectContent>
               </Select>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-secondary/50">
+              <div className="gap-2 px-3 py-1.5 border-primary border-0 shadow-none opacity-100 flex-row border-none flex items-center justify-center text-[#e9560c]/0 rounded-xl bg-white">
                 <span className="text-sm font-bold text-foreground">${currentBalance.toFixed(2)}</span>
                 <span className={`text-xs font-semibold ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
                   {isPositive ? '+' : ''}{balancePct.toFixed(1)}%
