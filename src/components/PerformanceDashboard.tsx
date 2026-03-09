@@ -12,7 +12,7 @@ import {
   PolarAngleAxis, PolarRadiusAxis, ComposedChart, Area,
 } from "recharts";
 import {
-  TrendingUp, TrendingDown, Target, Shield, Brain, Heart, Flame, Calendar,
+  TrendingUp, TrendingDown, Target, Shield, Brain, Heart, Flame, Calendar, Clock,
   CheckCircle2, XCircle, AlertTriangle, Award, Zap, BarChart3, Filter, Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
