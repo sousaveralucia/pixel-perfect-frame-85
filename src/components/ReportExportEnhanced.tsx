@@ -481,49 +481,82 @@ export default function ReportExportEnhanced({ trades: allTradesRaw }: ReportExp
         y += 7;
       }
 
-      // ========== IMAGES ==========
+      // ========== IMAGES (compact grid - max 2 pages) ==========
       const tradesWithImages = filteredTrades.filter(t => t.preTradeImage || t.tradingImage || t.postTradeImage);
       if (tradesWithImages.length > 0) {
+        // Collect all images with labels
+        const allImages: { label: string; url: string }[] = [];
         for (const trade of tradesWithImages) {
-          doc.addPage();
-          y = 14;
-          doc.setFillColor(...co.primary);
-          doc.rect(0, 0, pw, 12, "F");
-          doc.setTextColor(...co.white);
-          doc.setFontSize(9);
-          doc.setFont("helvetica", "bold");
-          doc.text(`${trade.asset} — ${trade.date} (${trade.result}) — $${(trade.moneyResult || 0).toFixed(2)}`, m, 8);
-          y = 16;
+          const tradeLabel = `${trade.asset || "?"} ${trade.date || ""} (${trade.result === "WIN" ? "W" : trade.result === "LOSS" ? "L" : "BE"})`;
+          if (trade.preTradeImage) allImages.push({ label: `Pré: ${tradeLabel}`, url: trade.preTradeImage });
+          if (trade.tradingImage) allImages.push({ label: `Op: ${tradeLabel}`, url: trade.tradingImage });
+          if (trade.postTradeImage) allImages.push({ label: `Pós: ${tradeLabel}`, url: trade.postTradeImage });
+        }
 
-          const images: [string, string | undefined][] = [["Pré-Trade", trade.preTradeImage], ["Trade", trade.tradingImage], ["Pós-Trade", trade.postTradeImage]];
-          const validImgs = images.filter(([, u]) => u);
-          const imgW = pw - 2 * m;
-          const imgH = Math.min(82, (ph - y - 10 - validImgs.length * 8) / validImgs.length);
+        // Limit to max ~12 images (fits 2 pages in 2-col grid)
+        const maxImages = 12;
+        const imagesToRender = allImages.slice(0, maxImages);
 
-          for (const [label, url] of validImgs) {
-            if (!url) continue;
-            try {
-              const response = await fetch(url);
-              const blob = await response.blob();
-              const dataUrl = await new Promise<string>((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result as string);
-                reader.readAsDataURL(blob);
-              });
-              doc.setTextColor(...co.gray);
-              doc.setFontSize(7);
-              doc.setFont("helvetica", "bold");
-              doc.text(label, m, y);
-              y += 3;
-              doc.addImage(dataUrl, "JPEG", m, y, imgW, imgH);
-              y += imgH + 5;
-            } catch {
-              doc.setTextColor(...co.red);
-              doc.setFontSize(6);
-              doc.text(`${label}: indisponível`, m, y);
-              y += 6;
-            }
+        doc.addPage();
+        y = 14;
+        secHeader("Galeria de Imagens", "📸");
+
+        // 2 columns layout
+        const colW = (pw - 2 * m - 4) / 2;
+        const imgH = 50; // compact height
+        let col = 0;
+
+        for (const img of imagesToRender) {
+          // Check if we need a new page (only allow 1 extra page for images = 2 pages total for gallery)
+          if (y + imgH + 8 > ph - 15) {
+            if (doc.internal.pages.length - 1 >= 6) break; // hard cap total pages
+            doc.addPage();
+            y = 14;
+            col = 0;
           }
+
+          const xPos = m + col * (colW + 4);
+
+          try {
+            const response = await fetch(img.url);
+            const blob = await response.blob();
+            const dataUrl = await new Promise<string>((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result as string);
+              reader.readAsDataURL(blob);
+            });
+
+            // Label
+            doc.setTextColor(...co.gray);
+            doc.setFontSize(5.5);
+            doc.setFont("helvetica", "bold");
+            doc.text(img.label, xPos, y);
+
+            // Image with border
+            doc.setDrawColor(200, 210, 220);
+            doc.setLineWidth(0.3);
+            doc.addImage(dataUrl, "JPEG", xPos, y + 2, colW, imgH);
+            doc.rect(xPos, y + 2, colW, imgH, "S");
+          } catch {
+            doc.setTextColor(...co.red);
+            doc.setFontSize(5.5);
+            doc.text(`${img.label}: indisponível`, xPos, y + 4);
+          }
+
+          col++;
+          if (col >= 2) {
+            col = 0;
+            y += imgH + 8;
+          }
+        }
+
+        if (col > 0) y += imgH + 8; // finish partial row
+
+        if (allImages.length > maxImages) {
+          doc.setTextColor(...co.gray);
+          doc.setFontSize(6);
+          doc.setFont("helvetica", "italic");
+          doc.text(`+ ${allImages.length - maxImages} imagens omitidas para economizar páginas`, m, y);
         }
       }
 
