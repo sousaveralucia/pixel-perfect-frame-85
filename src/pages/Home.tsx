@@ -35,11 +35,11 @@ function ThemeToggle() {
       size="icon"
       onClick={toggleTheme}
       className="rounded-full"
-      title={`Alternar para tema ${theme === "light" ? "escuro" : "claro"}`}
-    >
+      title={`Alternar para tema ${theme === "light" ? "escuro" : "claro"}`}>
+      
       {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-    </Button>
-  );
+    </Button>);
+
 }
 
 export default function Home() {
@@ -50,7 +50,7 @@ export default function Home() {
   const activeAccount = getActiveAccount();
   const currentBalance = activeAccount?.currentBalance ?? 0;
   const initialBalance = activeAccount?.initialBalance ?? 0;
-  const balancePct = initialBalance > 0 ? ((currentBalance - initialBalance) / initialBalance * 100) : 0;
+  const balancePct = initialBalance > 0 ? (currentBalance - initialBalance) / initialBalance * 100 : 0;
   const isPositive = balancePct >= 0;
 
   return (
@@ -60,8 +60,8 @@ export default function Home() {
         <div className="container py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Trading Dashboard</h1>
-              <p className="text-sm text-muted-foreground mt-1">Plano Operacional - HackTrading Plan</p>
+              <h1 className="text-3xl font-bold text-foreground">Trading JP </h1>
+              <p className="text-sm text-muted-foreground mt-1">Trading Journal Pofissional</p>
             </div>
             <div className="flex items-center gap-3">
               <Select value={activeAccountId} onValueChange={switchAccount}>
@@ -69,11 +69,11 @@ export default function Home() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {accounts.map((account) => (
-                    <SelectItem key={account.id} value={account.id}>
+                  {accounts.map((account) =>
+                  <SelectItem key={account.id} value={account.id}>
                       {account.name}
                     </SelectItem>
-                  ))}
+                  )}
                 </SelectContent>
               </Select>
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-secondary/50">
@@ -151,19 +151,19 @@ export default function Home() {
                   <h3 className="font-bold text-foreground mb-3">5 Pontos Fortes</h3>
                   <div className="grid md:grid-cols-2 gap-3">
                     {[
-                      { title: "Persistência", desc: "Capacidade de continuar buscando o objetivo" },
-                      { title: "Força de vontade", desc: "Determinação para alcançar o sucesso" },
-                      { title: "Tempo para estudar", desc: "Dedicação extra ao aprendizado" },
-                      { title: "Foco no objetivo", desc: "Clareza sobre viver do mercado" },
-                      { title: "Paciência", desc: "Esperar pelas melhores oportunidades" },
-                    ].map((point, idx) => (
-                      <Card key={idx} className="bg-success/5 border-success/20">
+                    { title: "Persistência", desc: "Capacidade de continuar buscando o objetivo" },
+                    { title: "Força de vontade", desc: "Determinação para alcançar o sucesso" },
+                    { title: "Tempo para estudar", desc: "Dedicação extra ao aprendizado" },
+                    { title: "Foco no objetivo", desc: "Clareza sobre viver do mercado" },
+                    { title: "Paciência", desc: "Esperar pelas melhores oportunidades" }].
+                    map((point, idx) =>
+                    <Card key={idx} className="bg-success/5 border-success/20">
                         <CardContent className="pt-4">
                           <p className="font-bold text-success">{point.title}</p>
                           <p className="text-sm text-muted-foreground">{point.desc}</p>
                         </CardContent>
                       </Card>
-                    ))}
+                    )}
                   </div>
                 </div>
                 <Separator />
@@ -171,19 +171,19 @@ export default function Home() {
                   <h3 className="font-bold text-foreground mb-3">5 Pontos Fracos e Estratégias</h3>
                   <div className="grid md:grid-cols-2 gap-3">
                     {[
-                      { title: "Emocional", strategy: "Controle emocional através de mindfulness e revisão pós-trade" },
-                      { title: "Contas apertadas", strategy: "Gerenciar capital de forma conservadora" },
-                      { title: "Ansiedade", strategy: "Rotinas pré-trade e técnicas de respiração" },
-                      { title: "Falta de disciplina", strategy: "Checklist diário rigoroso" },
-                      { title: "Sair do plano", strategy: "Pausa forçada após cada desvio" },
-                    ].map((point, idx) => (
-                      <Card key={idx} className="bg-destructive/5 border-destructive/20">
+                    { title: "Emocional", strategy: "Controle emocional através de mindfulness e revisão pós-trade" },
+                    { title: "Contas apertadas", strategy: "Gerenciar capital de forma conservadora" },
+                    { title: "Ansiedade", strategy: "Rotinas pré-trade e técnicas de respiração" },
+                    { title: "Falta de disciplina", strategy: "Checklist diário rigoroso" },
+                    { title: "Sair do plano", strategy: "Pausa forçada após cada desvio" }].
+                    map((point, idx) =>
+                    <Card key={idx} className="bg-destructive/5 border-destructive/20">
                         <CardContent className="pt-4">
                           <p className="font-bold text-destructive">{point.title}</p>
                           <p className="text-sm text-muted-foreground">{point.strategy}</p>
                         </CardContent>
                       </Card>
-                    ))}
+                    )}
                   </div>
                 </div>
                 <Separator />
@@ -225,20 +225,20 @@ export default function Home() {
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-4">
                   {[
-                    { symbol: "EUR/USD", type: "Forex", session: "Sessão Europeia" },
-                    { symbol: "USDJPY", type: "Forex", session: "Sessão Asiática" },
-                    { symbol: "XAUUSD", type: "Commodity", session: "24 horas" },
-                    { symbol: "NASDAQ", type: "Índice", session: "Sessão Americana" },
-                    { symbol: "BTC USD", type: "Criptomoeda", session: "24 horas" },
-                  ].map((asset) => (
-                    <Card key={asset.symbol} className="border-l-4 border-l-primary">
+                  { symbol: "EUR/USD", type: "Forex", session: "Sessão Europeia" },
+                  { symbol: "USDJPY", type: "Forex", session: "Sessão Asiática" },
+                  { symbol: "XAUUSD", type: "Commodity", session: "24 horas" },
+                  { symbol: "NASDAQ", type: "Índice", session: "Sessão Americana" },
+                  { symbol: "BTC USD", type: "Criptomoeda", session: "24 horas" }].
+                  map((asset) =>
+                  <Card key={asset.symbol} className="border-l-4 border-l-primary">
                       <CardContent className="pt-6">
                         <p className="text-2xl font-bold text-primary">{asset.symbol}</p>
                         <p className="text-sm text-muted-foreground">{asset.type}</p>
                         <p className="text-xs text-muted-foreground mt-2">{asset.session}</p>
                       </CardContent>
                     </Card>
-                  ))}
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -291,80 +291,80 @@ export default function Home() {
               <CardContent className="pt-0">
                 <div className="space-y-2">
                   {[
-                    {
-                      step: 1,
-                      title: "CHoCH Válido em HTF",
-                      timeframe: "H4 / H2 / H1",
-                      desc: "Identificar mudança de caráter: um LOW ou HIGH protegido rompido com corpo de candle.",
-                      detail: "CHoCH = Change of Character. É a primeira confirmação de que o mercado pode estar mudando de direção. Sem CHoCH válido, não há setup.",
-                      tag: "Estrutura",
-                      tagColor: "bg-primary/10 text-primary border-primary/20",
-                    },
-                    {
-                      step: 2,
-                      title: "Caixa de Gann em M30",
-                      timeframe: "M30",
-                      desc: "Traçar do início do movimento até o fim do CHoCH. Usar regiões 0%, 50% e 100%.",
-                      detail: "A Caixa de Gann define a zona premium (acima de 50%) e discount (abaixo de 50%). Só opero em zonas de desconto para compra e premium para venda.",
-                      tag: "Gann",
-                      tagColor: "bg-chart-3/10 text-chart-3 border-chart-3/20",
-                    },
-                    {
-                      step: 3,
-                      title: "Order Blocks Descontados",
-                      timeframe: "50% da Gann",
-                      desc: "Apenas OBs abaixo de 50% (compra) ou acima de 50% (venda).",
-                      detail: "Order Blocks fora da zona de desconto têm menor probabilidade. A confluência com a Gann aumenta a taxa de acerto significativamente.",
-                      tag: "Desconto",
-                      tagColor: "bg-success/10 text-success border-success/20",
-                    },
-                    {
-                      step: 4,
-                      title: "Order Blocks Válidos",
-                      timeframe: "H4 / H2 / H1 / M30",
-                      desc: "Se candle com muito pavio e pouco corpo → traçar o candle inteiro.",
-                      detail: "Um OB válido é o último candle de baixa antes de um impulso de alta (ou vice-versa). Deve ter causado deslocamento significativo no preço.",
-                      tag: "OB",
-                      tagColor: "bg-warning/10 text-warning border-warning/20",
-                    },
-                    {
-                      step: 5,
-                      title: "Entrada no 50% do Order Block",
-                      timeframe: "M15 / M5",
-                      desc: "Identificar ineficiências de HTF e entrar sempre no 50% da região.",
-                      detail: "O 50% do OB é o ponto ótimo de entrada (OTE — Optimal Trade Entry). Garante melhor RR e stop mais curto. Usar limit order.",
-                      tag: "Entrada",
-                      tagColor: "bg-destructive/10 text-destructive border-destructive/20",
-                    },
-                    {
-                      step: 6,
-                      title: "Stop Loss com Folga",
-                      timeframe: "M30+",
-                      desc: "Stop abaixo/acima do OB com folga. Nunca stop no extremo exato.",
-                      detail: "Adicionar 5-10 pips de folga além do OB. Stops apertados demais são varridos por liquidez institucional antes do movimento real.",
-                      tag: "Proteção",
-                      tagColor: "bg-chart-2/10 text-chart-2 border-chart-2/20",
-                    },
-                    {
-                      step: 7,
-                      title: "Take Profit Mínimo 1:3",
-                      timeframe: "Obrigatório",
-                      desc: "RR mínimo de 1:3. Abaixo disso, não entrar.",
-                      detail: "Com 1:3, você pode errar 2 de cada 3 trades e ainda ficar positivo. É a base matemática que torna a estratégia sustentável no longo prazo.",
-                      tag: "RR",
-                      tagColor: "bg-chart-4/10 text-chart-4 border-chart-4/20",
-                    },
-                    {
-                      step: 8,
-                      title: "Confirmação em LTF",
-                      timeframe: "M15 / M5",
-                      desc: "Confirmar o setup no tempo gráfico operacional antes de executar.",
-                      detail: "Buscar CHoCH ou BOS em M15/M5 dentro do Order Block de HTF. É a confirmação final antes de posicionar a ordem.",
-                      tag: "Execução",
-                      tagColor: "bg-ring/10 text-ring border-ring/20",
-                    },
-                  ].map((item, idx) => (
-                    <details key={idx} className="group">
+                  {
+                    step: 1,
+                    title: "CHoCH Válido em HTF",
+                    timeframe: "H4 / H2 / H1",
+                    desc: "Identificar mudança de caráter: um LOW ou HIGH protegido rompido com corpo de candle.",
+                    detail: "CHoCH = Change of Character. É a primeira confirmação de que o mercado pode estar mudando de direção. Sem CHoCH válido, não há setup.",
+                    tag: "Estrutura",
+                    tagColor: "bg-primary/10 text-primary border-primary/20"
+                  },
+                  {
+                    step: 2,
+                    title: "Caixa de Gann em M30",
+                    timeframe: "M30",
+                    desc: "Traçar do início do movimento até o fim do CHoCH. Usar regiões 0%, 50% e 100%.",
+                    detail: "A Caixa de Gann define a zona premium (acima de 50%) e discount (abaixo de 50%). Só opero em zonas de desconto para compra e premium para venda.",
+                    tag: "Gann",
+                    tagColor: "bg-chart-3/10 text-chart-3 border-chart-3/20"
+                  },
+                  {
+                    step: 3,
+                    title: "Order Blocks Descontados",
+                    timeframe: "50% da Gann",
+                    desc: "Apenas OBs abaixo de 50% (compra) ou acima de 50% (venda).",
+                    detail: "Order Blocks fora da zona de desconto têm menor probabilidade. A confluência com a Gann aumenta a taxa de acerto significativamente.",
+                    tag: "Desconto",
+                    tagColor: "bg-success/10 text-success border-success/20"
+                  },
+                  {
+                    step: 4,
+                    title: "Order Blocks Válidos",
+                    timeframe: "H4 / H2 / H1 / M30",
+                    desc: "Se candle com muito pavio e pouco corpo → traçar o candle inteiro.",
+                    detail: "Um OB válido é o último candle de baixa antes de um impulso de alta (ou vice-versa). Deve ter causado deslocamento significativo no preço.",
+                    tag: "OB",
+                    tagColor: "bg-warning/10 text-warning border-warning/20"
+                  },
+                  {
+                    step: 5,
+                    title: "Entrada no 50% do Order Block",
+                    timeframe: "M15 / M5",
+                    desc: "Identificar ineficiências de HTF e entrar sempre no 50% da região.",
+                    detail: "O 50% do OB é o ponto ótimo de entrada (OTE — Optimal Trade Entry). Garante melhor RR e stop mais curto. Usar limit order.",
+                    tag: "Entrada",
+                    tagColor: "bg-destructive/10 text-destructive border-destructive/20"
+                  },
+                  {
+                    step: 6,
+                    title: "Stop Loss com Folga",
+                    timeframe: "M30+",
+                    desc: "Stop abaixo/acima do OB com folga. Nunca stop no extremo exato.",
+                    detail: "Adicionar 5-10 pips de folga além do OB. Stops apertados demais são varridos por liquidez institucional antes do movimento real.",
+                    tag: "Proteção",
+                    tagColor: "bg-chart-2/10 text-chart-2 border-chart-2/20"
+                  },
+                  {
+                    step: 7,
+                    title: "Take Profit Mínimo 1:3",
+                    timeframe: "Obrigatório",
+                    desc: "RR mínimo de 1:3. Abaixo disso, não entrar.",
+                    detail: "Com 1:3, você pode errar 2 de cada 3 trades e ainda ficar positivo. É a base matemática que torna a estratégia sustentável no longo prazo.",
+                    tag: "RR",
+                    tagColor: "bg-chart-4/10 text-chart-4 border-chart-4/20"
+                  },
+                  {
+                    step: 8,
+                    title: "Confirmação em LTF",
+                    timeframe: "M15 / M5",
+                    desc: "Confirmar o setup no tempo gráfico operacional antes de executar.",
+                    detail: "Buscar CHoCH ou BOS em M15/M5 dentro do Order Block de HTF. É a confirmação final antes de posicionar a ordem.",
+                    tag: "Execução",
+                    tagColor: "bg-ring/10 text-ring border-ring/20"
+                  }].
+                  map((item, idx) =>
+                  <details key={idx} className="group">
                       <summary className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-muted-foreground/30 cursor-pointer transition-colors bg-card">
                         <div className="w-7 h-7 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs flex-shrink-0">
                           {item.step}
@@ -383,7 +383,7 @@ export default function Home() {
                         <p className="text-xs text-foreground/80 leading-relaxed">{item.detail}</p>
                       </div>
                     </details>
-                  ))}
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -391,14 +391,14 @@ export default function Home() {
             {/* Conceitos Chave */}
             <div className="grid grid-cols-2 gap-3">
               {[
-                { icon: <TrendingUp className="w-4 h-4" />, title: "CHoCH", desc: "Mudança de caráter — primeiro sinal de reversão" },
-                { icon: <BarChart2 className="w-4 h-4" />, title: "BOS", desc: "Break of Structure — continuação de tendência" },
-                { icon: <Layers className="w-4 h-4" />, title: "Order Block", desc: "Última vela contrária antes do impulso" },
-                { icon: <Grid3X3 className="w-4 h-4" />, title: "Gann Box", desc: "Ferramenta de desconto — 0%, 50%, 100%" },
-                { icon: <Droplets className="w-4 h-4" />, title: "Liquidez", desc: "Pools de ordens acima/abaixo de highs/lows" },
-                { icon: <Zap className="w-4 h-4" />, title: "FVG / Imbalance", desc: "Gap de valor justo — região de ineficiência" },
-              ].map((concept, idx) => (
-                <Card key={idx} className="border hover:border-primary/30 transition-colors">
+              { icon: <TrendingUp className="w-4 h-4" />, title: "CHoCH", desc: "Mudança de caráter — primeiro sinal de reversão" },
+              { icon: <BarChart2 className="w-4 h-4" />, title: "BOS", desc: "Break of Structure — continuação de tendência" },
+              { icon: <Layers className="w-4 h-4" />, title: "Order Block", desc: "Última vela contrária antes do impulso" },
+              { icon: <Grid3X3 className="w-4 h-4" />, title: "Gann Box", desc: "Ferramenta de desconto — 0%, 50%, 100%" },
+              { icon: <Droplets className="w-4 h-4" />, title: "Liquidez", desc: "Pools de ordens acima/abaixo de highs/lows" },
+              { icon: <Zap className="w-4 h-4" />, title: "FVG / Imbalance", desc: "Gap de valor justo — região de ineficiência" }].
+              map((concept, idx) =>
+              <Card key={idx} className="border hover:border-primary/30 transition-colors">
                   <CardContent className="p-3">
                     <div className="flex items-center gap-2 mb-1.5">
                       <div className="w-7 h-7 rounded bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
@@ -409,7 +409,7 @@ export default function Home() {
                     <p className="text-[11px] text-muted-foreground leading-relaxed">{concept.desc}</p>
                   </CardContent>
                 </Card>
-              ))}
+              )}
             </div>
 
             {/* Gestão de Risco */}
@@ -438,17 +438,17 @@ export default function Home() {
 
                 <div className="mt-3 space-y-2">
                   {[
-                    { rule: "Nunca arriscar mais de 1-2% do capital por trade", icon: "🛡️" },
-                    { rule: "Se bater 3 losses, parar imediatamente — sem exceções", icon: "🛑" },
-                    { rule: "Após 2 wins, considerar encerrar o dia positivo", icon: "✅" },
-                    { rule: "Não operar por vingança ou FOMO — respeitar o plano", icon: "🧠" },
-                    { rule: "DXY é referência — se o dólar diverge, cautela redobrada", icon: "💵" },
-                  ].map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-muted/50">
+                  { rule: "Nunca arriscar mais de 1-2% do capital por trade", icon: "🛡️" },
+                  { rule: "Se bater 3 losses, parar imediatamente — sem exceções", icon: "🛑" },
+                  { rule: "Após 2 wins, considerar encerrar o dia positivo", icon: "✅" },
+                  { rule: "Não operar por vingança ou FOMO — respeitar o plano", icon: "🧠" },
+                  { rule: "DXY é referência — se o dólar diverge, cautela redobrada", icon: "💵" }].
+                  map((item, idx) =>
+                  <div key={idx} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-muted/50">
                       <span className="text-sm">{item.icon}</span>
                       <span className="text-xs text-foreground/80">{item.rule}</span>
                     </div>
-                  ))}
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -464,17 +464,17 @@ export default function Home() {
                     <p className="font-semibold text-sm text-foreground mb-2">Mentalidade de Trader Profissional</p>
                     <div className="space-y-1.5">
                       {[
-                        "O resultado de um trade individual é irrelevante — foco no processo",
-                        "Perdas fazem parte. Um trader lucrativo perde regularmente",
-                        "A disciplina de NÃO operar é tão valiosa quanto a de operar",
-                        "Consistência > resultados excepcionais esporádicos",
-                        "Analisar à noite, operar de dia — separar emoção de execução",
-                      ].map((tip, idx) => (
-                        <p key={idx} className="text-xs text-foreground/70 flex items-start gap-1.5">
+                      "O resultado de um trade individual é irrelevante — foco no processo",
+                      "Perdas fazem parte. Um trader lucrativo perde regularmente",
+                      "A disciplina de NÃO operar é tão valiosa quanto a de operar",
+                      "Consistência > resultados excepcionais esporádicos",
+                      "Analisar à noite, operar de dia — separar emoção de execução"].
+                      map((tip, idx) =>
+                      <p key={idx} className="text-xs text-foreground/70 flex items-start gap-1.5">
                           <span className="text-warning mt-0.5">▸</span>
                           {tip}
                         </p>
-                      ))}
+                      )}
                     </div>
                   </div>
                 </div>
@@ -503,37 +503,37 @@ export default function Home() {
                       <p className="font-bold text-primary mb-4">📅 Calendário Semanal</p>
                       <div className="grid grid-cols-7 gap-2">
                         {[
-                          { day: "DOM", analysis: true, operation: false, color: "bg-chart-3/20 border-chart-3" },
-                          { day: "SEG", analysis: true, operation: true, color: "bg-primary/20 border-primary" },
-                          { day: "TER", analysis: true, operation: true, color: "bg-primary/20 border-primary" },
-                          { day: "QUA", analysis: true, operation: true, color: "bg-primary/20 border-primary" },
-                          { day: "QUI", analysis: true, operation: true, color: "bg-primary/20 border-primary" },
-                          { day: "SEX", analysis: false, operation: true, color: "bg-warning/20 border-warning" },
-                          { day: "SÁB", analysis: false, operation: false, color: "bg-muted border-border" },
-                        ].map((item) => (
-                          <Card key={item.day} className={`border ${item.color} text-center`}>
+                        { day: "DOM", analysis: true, operation: false, color: "bg-chart-3/20 border-chart-3" },
+                        { day: "SEG", analysis: true, operation: true, color: "bg-primary/20 border-primary" },
+                        { day: "TER", analysis: true, operation: true, color: "bg-primary/20 border-primary" },
+                        { day: "QUA", analysis: true, operation: true, color: "bg-primary/20 border-primary" },
+                        { day: "QUI", analysis: true, operation: true, color: "bg-primary/20 border-primary" },
+                        { day: "SEX", analysis: false, operation: true, color: "bg-warning/20 border-warning" },
+                        { day: "SÁB", analysis: false, operation: false, color: "bg-muted border-border" }].
+                        map((item) =>
+                        <Card key={item.day} className={`border ${item.color} text-center`}>
                             <CardContent className="pt-3 pb-3 px-1">
                               <p className="font-bold text-foreground text-sm">{item.day}</p>
                               <div className="mt-2 space-y-1">
-                                {item.analysis && (
-                                  <Badge variant="outline" className="text-[10px] px-1 py-0 block bg-chart-3/10 text-chart-3 border-chart-3/30">
+                                {item.analysis &&
+                              <Badge variant="outline" className="text-[10px] px-1 py-0 block bg-chart-3/10 text-chart-3 border-chart-3/30">
                                     🌙 Análise
                                   </Badge>
-                                )}
-                                {item.operation && (
-                                  <Badge variant="outline" className="text-[10px] px-1 py-0 block bg-primary/10 text-primary border-primary/30">
+                              }
+                                {item.operation &&
+                              <Badge variant="outline" className="text-[10px] px-1 py-0 block bg-primary/10 text-primary border-primary/30">
                                     📈 Operar
                                   </Badge>
-                                )}
-                                {!item.analysis && !item.operation && (
-                                  <Badge variant="outline" className="text-[10px] px-1 py-0 block text-muted-foreground">
+                              }
+                                {!item.analysis && !item.operation &&
+                              <Badge variant="outline" className="text-[10px] px-1 py-0 block text-muted-foreground">
                                     😴 Folga
                                   </Badge>
-                                )}
+                              }
                               </div>
                             </CardContent>
                           </Card>
-                        ))}
+                        )}
                       </div>
                       <div className="flex flex-wrap gap-3 mt-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-chart-3/30 inline-block"></span> Noite de Análise</span>
@@ -546,41 +546,41 @@ export default function Home() {
 
                   {/* Routine Flow */}
                   {[
-                    {
-                      period: "Noite (20h-20h30) — Análise", icon: "🌙",
-                      description: "Dom, Seg, Ter, Qua, Qui",
-                      tasks: [
-                        "Análise de mercado dos ativos que opero",
-                        "Traçar regiões de interesse (Order Blocks, Gann, etc.)",
-                        "Marcar zonas de liquidez e pontos de entrada",
-                        "Definir cenários para o dia seguinte",
-                        "Registrar análises na aba Análises"
-                      ]
-                    },
-                    {
-                      period: "Manhã (ao acordar) — Revisão", icon: "🌅",
-                      description: "Seg a Sex",
-                      tasks: [
-                        "Revisar as marcações feitas na noite anterior",
-                        "Observar como o mercado se moveu durante a madrugada",
-                        "Verificar se as regiões traçadas estão sendo buscadas ou respeitadas",
-                        "Entender melhor o contexto sem a pressão de traçar e operar na hora",
-                        "Ajustar cenários se necessário"
-                      ]
-                    },
-                    {
-                      period: "Dia — Operação", icon: "📈",
-                      description: "Seg a Sex",
-                      tasks: [
-                        "Operar baseado nas marcações da noite anterior",
-                        "Aguardar o preço chegar nas regiões marcadas",
-                        "Executar conforme o checklist operacional",
-                        "Registrar trades no Diário com todos os checklists",
-                        "Respeitar limites de perdas e ganhos diários"
-                      ]
-                    },
-                  ].map((item, idx) => (
-                    <Card key={idx} className="border-l-4 border-l-primary">
+                  {
+                    period: "Noite (20h-20h30) — Análise", icon: "🌙",
+                    description: "Dom, Seg, Ter, Qua, Qui",
+                    tasks: [
+                    "Análise de mercado dos ativos que opero",
+                    "Traçar regiões de interesse (Order Blocks, Gann, etc.)",
+                    "Marcar zonas de liquidez e pontos de entrada",
+                    "Definir cenários para o dia seguinte",
+                    "Registrar análises na aba Análises"]
+
+                  },
+                  {
+                    period: "Manhã (ao acordar) — Revisão", icon: "🌅",
+                    description: "Seg a Sex",
+                    tasks: [
+                    "Revisar as marcações feitas na noite anterior",
+                    "Observar como o mercado se moveu durante a madrugada",
+                    "Verificar se as regiões traçadas estão sendo buscadas ou respeitadas",
+                    "Entender melhor o contexto sem a pressão de traçar e operar na hora",
+                    "Ajustar cenários se necessário"]
+
+                  },
+                  {
+                    period: "Dia — Operação", icon: "📈",
+                    description: "Seg a Sex",
+                    tasks: [
+                    "Operar baseado nas marcações da noite anterior",
+                    "Aguardar o preço chegar nas regiões marcadas",
+                    "Executar conforme o checklist operacional",
+                    "Registrar trades no Diário com todos os checklists",
+                    "Respeitar limites de perdas e ganhos diários"]
+
+                  }].
+                  map((item, idx) =>
+                  <Card key={idx} className="border-l-4 border-l-primary">
                       <CardContent className="pt-6">
                         <div className="flex items-start gap-4">
                           <div className="text-3xl">{item.icon}</div>
@@ -588,18 +588,18 @@ export default function Home() {
                             <p className="font-bold text-foreground text-lg">{item.period}</p>
                             <p className="text-xs text-muted-foreground mb-3">{item.description}</p>
                             <ul className="space-y-2">
-                              {item.tasks.map((task, taskIdx) => (
-                                <li key={taskIdx} className="flex items-start gap-2 text-sm text-foreground/80">
+                              {item.tasks.map((task, taskIdx) =>
+                            <li key={taskIdx} className="flex items-start gap-2 text-sm text-foreground/80">
                                   <span className="text-primary font-bold mt-0.5">•</span>
                                   <span>{task}</span>
                                 </li>
-                              ))}
+                            )}
                             </ul>
                           </div>
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
+                  )}
 
                   {/* Vantagem */}
                   <Card className="border-2 border-chart-3/30 bg-chart-3/5">
@@ -826,6 +826,6 @@ export default function Home() {
           </DialogContent>
         </Dialog>
       </main>
-    </div>
-  );
+    </div>);
+
 }
