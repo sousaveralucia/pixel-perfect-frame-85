@@ -342,7 +342,33 @@ export default function PerformanceDashboard() {
       money: Math.round(data.money * 100) / 100,
     }));
 
-    return { chartData, bestDay, worstDay, mostActive, sessionChart };
+    // Hour stats
+    const hourStats: Record<string, { wins: number; losses: number; total: number; money: number }> = {};
+    trades.forEach(t => {
+      if (t.entryTime) {
+        const hour = t.entryTime.split(':')[0] + 'h';
+        if (!hourStats[hour]) hourStats[hour] = { wins: 0, losses: 0, total: 0, money: 0 };
+        hourStats[hour].total++;
+        if (t.result === "WIN") hourStats[hour].wins++;
+        if (t.result === "LOSS") hourStats[hour].losses++;
+        hourStats[hour].money += t.moneyResult || 0;
+      }
+    });
+
+    const hourChart = Object.entries(hourStats)
+      .map(([hour, data]) => ({
+        hour,
+        winRate: data.total > 0 ? Math.round((data.wins / data.total) * 100) : 0,
+        trades: data.total,
+        money: Math.round(data.money * 100) / 100,
+        wins: data.wins,
+        losses: data.losses,
+      }))
+      .sort((a, b) => parseInt(a.hour) - parseInt(b.hour));
+
+    const bestHour = hourChart.length > 0 ? hourChart.reduce((a, b) => (b.money > a.money ? b : a), hourChart[0]) : null;
+
+    return { chartData, bestDay, worstDay, mostActive, sessionChart, hourChart, bestHour };
   }, [trades]);
 
   // ============ DAILY STATS for existing charts ============
