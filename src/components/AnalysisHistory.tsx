@@ -238,7 +238,13 @@ export default function AnalysisHistory() {
       doc.setFont(undefined as any, "bold");
       doc.setTextColor(16, 185, 129);
       doc.text("Imagens da Análise", margin, y + 5);
-      y += 12;
+      y += 10;
+
+      // Linha para anotação manual a caneta
+      doc.setDrawColor(180, 190, 200);
+      doc.setLineWidth(0.3);
+      doc.line(margin, y, margin + contentWidth, y);
+      y += 8;
 
       images.forEach((imgUrl, idx) => {
         const img = new Image();
