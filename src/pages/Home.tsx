@@ -56,12 +56,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#c7c7c7]">
       {/* Header */}
-      <header className="border-b border-border sticky top-0 z-10 bg-[#fd6d0d]">
-        <div className="container py-6">
+      <header className="border-b border-border sticky top-0 z-10 bg-primary">
+        <div className="container py-6 bg-primary">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Trading JP </h1>
-              <p className="text-sm text-muted-foreground mt-1">Trading Journal Pofissional</p>
+              <h1 className="text-3xl font-bold bg-primary text-black">Trading JP </h1>
+              <p className="text-sm mt-1 text-black">Trading Journal Pofissional</p>
             </div>
             <div className="flex items-center gap-3">
               <Select value={activeAccountId} onValueChange={switchAccount}>
