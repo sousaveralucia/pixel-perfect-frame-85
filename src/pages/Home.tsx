@@ -92,7 +92,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="container py-12 bg-[#fbbd23]/[0.47] border-black/0">
+      <main className="container py-12 border-black/0 bg-[#fbbd23]/0">
         <Tabs defaultValue="calendario-trading" className="w-full bg-neutral-600">
           <TabsList className="flex w-full mb-8 overflow-x-auto gap-1 bg-secondary/30 p-1 rounded-lg border border-border">
             <TabsTrigger value="calendario-trading" className="text-xs whitespace-nowrap">Calendário</TabsTrigger>
