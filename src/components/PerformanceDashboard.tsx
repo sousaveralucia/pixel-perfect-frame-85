@@ -12,7 +12,7 @@ import {
   PolarAngleAxis, PolarRadiusAxis, ComposedChart, Area,
 } from "recharts";
 import {
-  TrendingUp, TrendingDown, Target, Shield, Brain, Heart, Flame, Calendar,
+  TrendingUp, TrendingDown, Target, Shield, Brain, Heart, Flame, Calendar, Clock,
   CheckCircle2, XCircle, AlertTriangle, Award, Zap, BarChart3, Filter, Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -342,7 +342,33 @@ export default function PerformanceDashboard() {
       money: Math.round(data.money * 100) / 100,
     }));
 
-    return { chartData, bestDay, worstDay, mostActive, sessionChart };
+    // Hour stats
+    const hourStats: Record<string, { wins: number; losses: number; total: number; money: number }> = {};
+    trades.forEach(t => {
+      if (t.entryTime) {
+        const hour = t.entryTime.split(':')[0] + 'h';
+        if (!hourStats[hour]) hourStats[hour] = { wins: 0, losses: 0, total: 0, money: 0 };
+        hourStats[hour].total++;
+        if (t.result === "WIN") hourStats[hour].wins++;
+        if (t.result === "LOSS") hourStats[hour].losses++;
+        hourStats[hour].money += t.moneyResult || 0;
+      }
+    });
+
+    const hourChart = Object.entries(hourStats)
+      .map(([hour, data]) => ({
+        hour,
+        winRate: data.total > 0 ? Math.round((data.wins / data.total) * 100) : 0,
+        trades: data.total,
+        money: Math.round(data.money * 100) / 100,
+        wins: data.wins,
+        losses: data.losses,
+      }))
+      .sort((a, b) => parseInt(a.hour) - parseInt(b.hour));
+
+    const bestHour = hourChart.length > 0 ? hourChart.reduce((a, b) => (b.money > a.money ? b : a), hourChart[0]) : null;
+
+    return { chartData, bestDay, worstDay, mostActive, sessionChart, hourChart, bestHour };
   }, [trades]);
 
   // ============ DAILY STATS for existing charts ============
@@ -807,6 +833,45 @@ export default function PerformanceDashboard() {
                         </div>
                         <div className="text-center min-w-[70px]">
                           <p className={`text-lg font-bold ${s.money >= 0 ? "text-green-600" : "text-red-600"}`}>${s.money}</p>
+                          <p className="text-xs text-muted-foreground">Resultado</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Horários */}
+          {dayOfWeekStats.hourChart && dayOfWeekStats.hourChart.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-indigo-500" />
+                  Performance por Horário
+                </CardTitle>
+                <CardDescription>
+                  {dayOfWeekStats.bestHour && (
+                    <span>Seu melhor horário é <strong>{dayOfWeekStats.bestHour.hour}</strong> (${dayOfWeekStats.bestHour.money})</span>
+                  )}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {dayOfWeekStats.hourChart.map((h, i) => (
+                    <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-border bg-secondary/20">
+                      <div>
+                        <p className="font-semibold text-sm">{h.hour}</p>
+                        <p className="text-xs text-muted-foreground">{h.trades} trades</p>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="text-center">
+                          <p className={`text-lg font-bold ${h.winRate >= 50 ? "text-green-600" : "text-red-600"}`}>{h.winRate}%</p>
+                          <p className="text-xs text-muted-foreground">Win Rate</p>
+                        </div>
+                        <div className="text-center min-w-[70px]">
+                          <p className={`text-lg font-bold ${h.money >= 0 ? "text-green-600" : "text-red-600"}`}>${h.money}</p>
                           <p className="text-xs text-muted-foreground">Resultado</p>
                         </div>
                       </div>
