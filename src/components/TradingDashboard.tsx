@@ -37,7 +37,7 @@ export function TradingDashboard({ activeAccountId: propAccountId }: TradingDash
         totalRR: 0,
         grossProfit: 0,
         grossLoss: 0,
-        netResult: 0,
+        netResult: 0
       };
     }
 
@@ -63,7 +63,7 @@ export function TradingDashboard({ activeAccountId: propAccountId }: TradingDash
     });
 
     const totalRR = trades.reduce((sum: number, trade: Trade) => sum + (trade.riskReward || 0), 0);
-    const winRate = (wins / trades.length) * 100;
+    const winRate = wins / trades.length * 100;
 
     return {
       totalResult,
@@ -72,7 +72,7 @@ export function TradingDashboard({ activeAccountId: propAccountId }: TradingDash
       totalRR,
       grossProfit,
       grossLoss,
-      netResult: totalResult,
+      netResult: totalResult
     };
   }, [trades]);
 
@@ -192,15 +192,15 @@ export function TradingDashboard({ activeAccountId: propAccountId }: TradingDash
           <WeeklySummary trades={trades} />
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>);
+
 }
 
-function DayOfWeekSummary({ trades }: { trades: Trade[] }) {
+function DayOfWeekSummary({ trades }: {trades: Trade[];}) {
   const daysOfWeek = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 
   const dayStats = useMemo(() => {
-    const stats: { [key: number]: { trades: number; wins: number; losses: number; result: number } } = {};
+    const stats: {[key: number]: {trades: number;wins: number;losses: number;result: number;};} = {};
 
     for (let i = 0; i < 7; i++) {
       stats[i] = { trades: 0, wins: 0, losses: 0, result: 0 };
@@ -233,11 +233,11 @@ function DayOfWeekSummary({ trades }: { trades: Trade[] }) {
             <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <span className="font-medium">{day}</span>
               <span className="text-sm text-muted-foreground">Sem operações</span>
-            </div>
-          );
+            </div>);
+
         }
 
-        const winRate = ((stat.wins / stat.trades) * 100).toFixed(0);
+        const winRate = (stat.wins / stat.trades * 100).toFixed(0);
         return (
           <div key={idx} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
             <div>
@@ -250,16 +250,16 @@ function DayOfWeekSummary({ trades }: { trades: Trade[] }) {
               {stat.result > 0 ? "+" : ""}
               {stat.result.toFixed(2)}
             </div>
-          </div>
-        );
+          </div>);
+
       })}
-    </div>
-  );
+    </div>);
+
 }
 
-function WeeklySummary({ trades }: { trades: Trade[] }) {
+function WeeklySummary({ trades }: {trades: Trade[];}) {
   const weeklySummary = useMemo(() => {
-    const weeks: { [key: string]: { trades: number; wins: number; losses: number; result: number; days: number } } = {};
+    const weeks: {[key: string]: {trades: number;wins: number;losses: number;result: number;days: number;};} = {};
 
     trades.forEach((trade: Trade) => {
       const date = new Date(trade.date);
@@ -297,25 +297,25 @@ function WeeklySummary({ trades }: { trades: Trade[] }) {
       weeks[weekKey].days = daysInWeek.size;
     });
 
-    return Object.entries(weeks)
-      .sort(([a], [b]) => b.localeCompare(a))
-      .slice(0, 10);
+    return Object.entries(weeks).
+    sort(([a], [b]) => b.localeCompare(a)).
+    slice(0, 10);
   }, [trades]);
 
   return (
     <div className="space-y-3">
-      {weeklySummary.length === 0 ? (
-        <p className="text-center text-muted-foreground py-4">Nenhum trade registrado</p>
-      ) : (
-        weeklySummary.map(([weekKey, stat]) => {
-          const winRate = ((stat.wins / stat.trades) * 100).toFixed(0);
-          const weekDate = new Date(weekKey);
-          const weekEnd = new Date(weekDate);
-          weekEnd.setDate(weekDate.getDate() + 6);
-          const weekLabel = `${weekDate.toLocaleDateString("pt-BR")} - ${weekEnd.toLocaleDateString("pt-BR")}`;
+      {weeklySummary.length === 0 ?
+      <p className="text-center text-muted-foreground py-4">Nenhum trade registrado</p> :
 
-          return (
-            <div key={weekKey} className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200" style={{backgroundColor: '#000000'}}>
+      weeklySummary.map(([weekKey, stat]) => {
+        const winRate = (stat.wins / stat.trades * 100).toFixed(0);
+        const weekDate = new Date(weekKey);
+        const weekEnd = new Date(weekDate);
+        weekEnd.setDate(weekDate.getDate() + 6);
+        const weekLabel = `${weekDate.toLocaleDateString("pt-BR")} - ${weekEnd.toLocaleDateString("pt-BR")}`;
+
+        return (
+          <div key={weekKey} className="flex items-center justify-between p-3 rounded-lg border border-slate-500 border-dashed text-muted-foreground bg-[#e8e8e8]" style={{ backgroundColor: '#000000' }}>
               <div>
                 <span className="font-medium">{weekLabel}</span>
                 <p className="text-xs text-muted-foreground">
@@ -326,10 +326,10 @@ function WeeklySummary({ trades }: { trades: Trade[] }) {
                 {stat.result > 0 ? "+" : ""}
                 {stat.result.toFixed(2)}
               </div>
-            </div>
-          );
-        })
-      )}
-    </div>
-  );
+            </div>);
+
+      })
+      }
+    </div>);
+
 }
