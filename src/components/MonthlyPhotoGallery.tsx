@@ -108,7 +108,7 @@ export function MonthlyPhotoGallery({ activeAccountId: propAccountId }: MonthlyP
               <p className="text-muted-foreground">Nenhuma foto pós-trading neste mês</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
               {monthlyPhotos.map((trade: Trade) => (
                 <button
                   key={trade.id}
