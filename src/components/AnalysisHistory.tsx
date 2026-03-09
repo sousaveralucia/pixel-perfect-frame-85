@@ -240,11 +240,14 @@ export default function AnalysisHistory() {
       doc.text("Imagens da Análise", margin, y + 5);
       y += 10;
 
-      // Linha para anotação manual a caneta
+      // Linhas para anotação manual a caneta (preenche até o final da página)
       doc.setDrawColor(180, 190, 200);
       doc.setLineWidth(0.3);
-      doc.line(margin, y, margin + contentWidth, y);
-      y += 8;
+      const lineSpacing = 8;
+      while (y + lineSpacing < pageHeight - 15) {
+        doc.line(margin, y, margin + contentWidth, y);
+        y += lineSpacing;
+      }
 
       images.forEach((imgUrl, idx) => {
         const img = new Image();
