@@ -107,7 +107,7 @@ export default function Home() {
             <TabsTrigger value="calculadora" className="text-xs whitespace-nowrap">Calculadora</TabsTrigger>
             <TabsTrigger value="diario" className="text-xs whitespace-nowrap">Diário</TabsTrigger>
             <TabsTrigger value="calendario" className="text-xs whitespace-nowrap">Cal. Econômico</TabsTrigger>
-            <TabsTrigger value="insights" className="text-xs whitespace-nowrap">Performance</TabsTrigger>
+            <TabsTrigger value="insights" className="text-xs whitespace-nowrap">Insights</TabsTrigger>
             <TabsTrigger value="comparacao" className="text-xs whitespace-nowrap">Comparação</TabsTrigger>
             <TabsTrigger value="relatorio" className="text-xs whitespace-nowrap">Relatório</TabsTrigger>
             <TabsTrigger value="saques" className="text-xs whitespace-nowrap">Saques</TabsTrigger>
