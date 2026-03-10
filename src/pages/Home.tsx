@@ -736,101 +736,85 @@ export default function Home() {
             </DialogHeader>
 
             <div className="space-y-4 mt-2">
-              {/* Etapa 1 */}
-              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
-                <h3 className="font-bold text-sm text-primary flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">1</span>
-                  Confirmação de Estrutura (HTF)
-                </h3>
-                <div className="flex items-start gap-2 ml-8">
-                  <ArrowRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                  <p className="text-sm text-foreground/80">CHoCH (Change of Character) validado em timeframe maior</p>
-                </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Etapas do Plano</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setEditingPlan(true)}
+                  className="h-7 gap-1 text-xs"
+                >
+                  <Pencil className="w-3 h-3" />
+                  Editar
+                </Button>
               </div>
 
-              {/* Etapa 2 */}
-              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
-                <h3 className="font-bold text-sm text-primary flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">2</span>
-                  Caixa de Gann Traçada
-                </h3>
-                <div className="flex items-start gap-2 ml-8">
-                  <ArrowRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                  <p className="text-sm text-foreground/80">Desenhar a Gann Box no movimento principal para identificar níveis</p>
-                </div>
-              </div>
-
-              {/* Etapa 3 */}
-              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
-                <h3 className="font-bold text-sm text-primary flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">3</span>
-                  Região Descontada (50%)
-                </h3>
-                <div className="flex items-start gap-2 ml-8">
-                  <ArrowRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                  <p className="text-sm text-foreground/80">Preço está na região de desconto (abaixo de 50% da Gann Box)</p>
-                </div>
-              </div>
-
-              {/* Etapa 4 */}
-              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
-                <h3 className="font-bold text-sm text-primary flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">4</span>
-                  Order Block Identificado
-                </h3>
-                <div className="flex items-start gap-2 ml-8">
-                  <ArrowRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                  <p className="text-sm text-foreground/80">Identificar o Order Block (OB) na zona de interesse</p>
-                </div>
-              </div>
-
-              {/* Etapa 5 */}
-              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
-                <h3 className="font-bold text-sm text-primary flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">5</span>
-                  Entrada nos 50% do OB
-                </h3>
-                <div className="flex items-start gap-2 ml-8">
-                  <ArrowRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                  <p className="text-sm text-foreground/80">Posicionar entrada nos 50% do Order Block para melhor R:R</p>
-                </div>
-              </div>
-
-              {/* Etapa 6 */}
-              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
-                <h3 className="font-bold text-sm text-primary flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">6</span>
-                  Stop & Risk Management
-                </h3>
-                <div className="flex items-start gap-2 ml-8">
-                  <ArrowRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                  <p className="text-sm text-foreground/80">Stop loss posicionado corretamente, risco controlado (máx 1-2% do capital)</p>
-                </div>
-              </div>
-
-              {/* Etapa 7 */}
-              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
-                <h3 className="font-bold text-sm text-primary flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">7</span>
-                  Tempo Gráfico Operacional
-                </h3>
-                <div className="flex items-start gap-2 ml-8">
-                  <ArrowRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                  <p className="text-sm text-foreground/80">Confirmação no timeframe operacional antes de executar</p>
-                </div>
-              </div>
+              {planChecklist.items.map((item, idx) => {
+                const parts = item.label.split("|");
+                const title = parts[0];
+                const desc = parts[1] || "";
+                return (
+                  <div key={item.key} className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
+                    <h3 className="font-bold text-sm text-primary flex items-center gap-2">
+                      <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">{idx + 1}</span>
+                      {title}
+                    </h3>
+                    {desc && (
+                      <div className="flex items-start gap-2 ml-8">
+                        <ArrowRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                        <p className="text-sm text-foreground/80">{desc}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
 
               {/* Regra de ouro */}
-              <div className="rounded-lg border-2 border-primary/50 bg-primary/5 p-4 mt-4">
-                <h3 className="font-bold text-sm text-primary mb-2">⚡ Regra de Ouro</h3>
-                <p className="text-sm text-foreground/80">
-                  Somente execute se <strong>todos os 7 itens</strong> estiverem confirmados. Setup incompleto = sem entrada. 
-                  Alvo mínimo de <strong>R:R 1:3</strong>.
-                </p>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Regra de Ouro</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setEditingGoldenRule(true)}
+                  className="h-7 gap-1 text-xs"
+                >
+                  <Pencil className="w-3 h-3" />
+                  Editar
+                </Button>
               </div>
+              {goldenRuleChecklist.items.map((item) => {
+                const parts = item.label.split("|");
+                const title = parts[0];
+                const desc = parts[1] || "";
+                return (
+                  <div key={item.key} className="rounded-lg border-2 border-primary/50 bg-primary/5 p-4">
+                    <h3 className="font-bold text-sm text-primary mb-2">{item.emoji} {title}</h3>
+                    {desc && <p className="text-sm text-foreground/80">{desc}</p>}
+                  </div>
+                );
+              })}
             </div>
           </DialogContent>
         </Dialog>
+
+        <ChecklistEditor
+          items={planChecklist.items}
+          onSave={planChecklist.saveItems}
+          onReset={planChecklist.resetToDefaults}
+          isCustomized={planChecklist.isCustomized}
+          title="Plano Operacional"
+          open={editingPlan}
+          onOpenChange={setEditingPlan}
+        />
+        <ChecklistEditor
+          items={goldenRuleChecklist.items}
+          onSave={goldenRuleChecklist.saveItems}
+          onReset={goldenRuleChecklist.resetToDefaults}
+          isCustomized={goldenRuleChecklist.isCustomized}
+          title="Regra de Ouro"
+          open={editingGoldenRule}
+          onOpenChange={setEditingGoldenRule}
+        />
       </main>
     </div>);
 
