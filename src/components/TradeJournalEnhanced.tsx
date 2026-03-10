@@ -538,26 +538,18 @@ export default function TradeJournalEnhanced() {
 
     // Left: Operacional
     secTitle("Checklist Operacional", c.accent);
-    const opItems: [string, boolean][] = [
-      ["CHOCH Valido HTF", trade.operational.chochValidoHTF],
-      ["Caixa Gann Tracada", trade.operational.caixaGannTracada],
-      ["Regiao Descontada 50%", trade.operational.regiaoDescontada50],
-      ["Order Block ID", trade.operational.orderBlockIdentificado],
-      ["Entrada 50% OB", trade.operational.entrada50OB],
-      ["Stop Risk Mgmt", trade.operational.stopRiskManagement],
-      ["Tempo Graf. Op.", trade.operational.tempoGraficoOperacional],
-    ];
+    const opItems: [string, boolean][] = opChecklist.items.map(i => [
+      `${i.emoji} ${i.label.substring(0, 30)}`, !!(trade.operational as any)?.[i.key]
+    ]);
     opItems.forEach(([l, v]) => chk(l, v, m, colW));
     y += 3;
 
     // Side-by-side: Emocional + Racional
     const twoColY = y;
     secTitle("Emocional", [139, 92, 246]);
-    const emoItems: [string, boolean][] = [
-      ["Hidratacao", trade.emotional.hydration],
-      ["Respiracao", trade.emotional.breathing],
-      ["Clareza Mental", trade.emotional.mentalClarity],
-    ];
+    const emoItems: [string, boolean][] = emChecklist.items.map(i => [
+      `${i.emoji} ${i.label.substring(0, 25)}`, !!(trade.emotional as any)?.[i.key]
+    ]);
     emoItems.forEach(([l, v]) => chk(l, v, m, colW));
     const emoEnd = y;
 
@@ -568,11 +560,9 @@ export default function TradeJournalEnhanced() {
     doc.setTextColor(...c.primary); doc.setFontSize(9); doc.setFont("helvetica", "bold");
     doc.text("Racional", m + colW + 9, y + 4.5);
     y += 8;
-    const ratItems: [string, boolean][] = [
-      ["Analise Confirmada", trade.rational.analysisConfirmed],
-      ["Plano Respeitado", trade.rational.planRespected],
-      ["Risco Gerenciado", trade.rational.riskManaged],
-    ];
+    const ratItems: [string, boolean][] = raChecklist.items.map(i => [
+      `${i.emoji} ${i.label.substring(0, 25)}`, !!(trade.rational as any)?.[i.key]
+    ]);
     ratItems.forEach(([l, v]) => {
       doc.setFillColor(...(v ? c.green : c.red));
       doc.circle(m + colW + 8, y + 0.5, 1.8, "F");
@@ -586,12 +576,9 @@ export default function TradeJournalEnhanced() {
 
     // Rotina (compact single row)
     secTitle("Rotina", c.green);
-    const routItems: [string, boolean][] = [
-      ["Analise Noturna", trade.routine.nightAnalysis],
-      ["Revisao Manha", trade.routine.morningReview],
-      ["Regioes Validadas", trade.routine.regionsValidated],
-      ["Sono", trade.routine.sleep],
-    ];
+    const routItems: [string, boolean][] = rtChecklist.items.map(i => [
+      `${i.emoji} ${i.label.substring(0, 20)}`, !!(trade.routine as any)?.[i.key]
+    ]);
     // Inline horizontal
     const rItemW = (pw - 2 * m) / routItems.length;
     routItems.forEach(([l, v], i) => {
