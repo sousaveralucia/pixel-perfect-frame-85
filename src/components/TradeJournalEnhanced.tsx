@@ -193,6 +193,13 @@ export default function TradeJournalEnhanced() {
   
   const { trades, isLoaded, addTrade: addTradeUnified, updateTrade: updateTradeUnified, deleteTrade: deleteTradeUnified, toggleFavorite: toggleFavoriteUnified } = useTradeJournalUnified(activeAccountId);
 
+  // Custom checklists
+  const opChecklist = useCustomChecklists("operational");
+  const emChecklist = useCustomChecklists("emotional");
+  const rtChecklist = useCustomChecklists("routine");
+  const raChecklist = useCustomChecklists("rational");
+  const [editingChecklist, setEditingChecklist] = useState<string | null>(null);
+
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imageViewerOpen, setImageViewerOpen] = useState(false);
@@ -203,6 +210,14 @@ export default function TradeJournalEnhanced() {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [selectedTradeForGallery, setSelectedTradeForGallery] =
     useState<TradeWithChecklist | null>(null);
+
+  // Build dynamic initial state from checklist items
+  const buildChecklistState = (items: ChecklistItem[]) => {
+    const state: Record<string, boolean> = {};
+    items.forEach(i => { state[i.key] = false; });
+    return state;
+  };
+
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split("T")[0],
     entryTime: "",
@@ -224,35 +239,25 @@ export default function TradeJournalEnhanced() {
     moneyResult: 0,
     notes: "",
     isFavorite: false,
-    operational: {
-      chochValidoHTF: false,
-      caixaGannTracada: false,
-      regiaoDescontada50: false,
-      orderBlockIdentificado: false,
-      entrada50OB: false,
-      stopRiskManagement: false,
-      tempoGraficoOperacional: false,
-    },
-    emotional: {
-      hydration: false,
-      breathing: false,
-      mentalClarity: false,
-    },
-    routine: {
-      nightAnalysis: false,
-      morningReview: false,
-      regionsValidated: false,
-      sleep: false,
-    },
-    rational: {
-      analysisConfirmed: false,
-      planRespected: false,
-      riskManaged: false,
-    },
+    operational: {} as Record<string, boolean>,
+    emotional: {} as Record<string, boolean>,
+    routine: {} as Record<string, boolean>,
+    rational: {} as Record<string, boolean>,
     preTradeImage: "",
     tradingImage: "",
     postTradeImage: "",
   });
+
+  // Sync checklist defaults when items load
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      operational: { ...buildChecklistState(opChecklist.items), ...prev.operational },
+      emotional: { ...buildChecklistState(emChecklist.items), ...prev.emotional },
+      routine: { ...buildChecklistState(rtChecklist.items), ...prev.routine },
+      rational: { ...buildChecklistState(raChecklist.items), ...prev.rational },
+    }));
+  }, [opChecklist.items, emChecklist.items, rtChecklist.items, raChecklist.items]);
 
   // Usar hook de alertas
   useTradeAlerts(trades, activeAccountId);
