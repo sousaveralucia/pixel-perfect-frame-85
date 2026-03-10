@@ -161,6 +161,33 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_checklists: {
+        Row: {
+          checklist_group: string
+          created_at: string
+          id: string
+          items: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          checklist_group: string
+          created_at?: string
+          id?: string
+          items?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          checklist_group?: string
+          created_at?: string
+          id?: string
+          items?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_validations: {
         Row: {
           account_key: string
