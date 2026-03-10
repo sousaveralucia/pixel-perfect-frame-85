@@ -22,9 +22,9 @@ import {
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTradeJournal } from "@/hooks/useTradeJournal";
-import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
+import { useTradeJournalUnified, TradeWithChecklist } from "@/hooks/useTradeJournalUnified";
 import { useAccountManager } from "@/hooks/useAccountManager";
-import { Plus, Trash2, Edit2, Image, FileSpreadsheet, FileDown } from "lucide-react";
+import { Plus, Trash2, Edit2, Image, FileSpreadsheet, FileDown, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { useTradeAlerts } from "@/hooks/useTradeAlerts";
 
@@ -37,55 +37,10 @@ import { Download } from "lucide-react";
 import { exportTradesToExcel, exportToCSV as exportToCSVFile } from "@/lib/excelExporter";
 import { SimpleImageViewer } from "./SimpleImageViewer";
 import { TradeImageGallery } from "./TradeImageGallery";
+import { useCustomChecklists, ChecklistItem } from "@/hooks/useCustomChecklists";
+import ChecklistEditor from "./ChecklistEditor";
 
-interface TradeWithChecklist {
-  id: string;
-  date: string;
-  entryTime?: string;
-  asset: string;
-  entryPrice: string;
-  exitPrice: string;
-  stopLoss: string;
-  takeProfit: string;
-  resultPrice: string;
-  session: "Manha" | "Tarde" | "Noite" | "";
-  marketSession?: "NY" | "Londres" | "Ásia" | "Sobreposição" | "Fechado";
-  account: string;
-  result: "WIN" | "LOSS" | "BREAK_EVEN" | "ONGOING";
-  riskReward?: number;
-  moneyResult?: number;
-  notes: string;
-  isFavorite: boolean;
-  operational: {
-    chochValidoHTF: boolean;
-    caixaGannTracada: boolean;
-    regiaoDescontada50: boolean;
-    orderBlockIdentificado: boolean;
-    entrada50OB: boolean;
-    stopRiskManagement: boolean;
-    tempoGraficoOperacional: boolean;
-  };
-  emotional: {
-    hydration: boolean;
-    breathing: boolean;
-    mentalClarity: boolean;
-  };
-  routine: {
-    nightAnalysis: boolean;
-    morningReview: boolean;
-    regionsValidated: boolean;
-    sleep: boolean;
-  };
-  rational: {
-    analysisConfirmed: boolean;
-    planRespected: boolean;
-    riskManaged: boolean;
-  };
-  preTradeImage?: string;
-  tradingImage?: string;
-  postTradeImage?: string;
-  createdAt: number;
-}
+// Using TradeWithChecklist from useTradeJournalUnified
 
 // Função para obter informações de sessão de mercado (sem hook)
 function getMarketSessionInfo(
@@ -191,6 +146,13 @@ export default function TradeJournalEnhanced() {
   
   const { trades, isLoaded, addTrade: addTradeUnified, updateTrade: updateTradeUnified, deleteTrade: deleteTradeUnified, toggleFavorite: toggleFavoriteUnified } = useTradeJournalUnified(activeAccountId);
 
+  // Custom checklists
+  const opChecklist = useCustomChecklists("operational");
+  const emChecklist = useCustomChecklists("emotional");
+  const rtChecklist = useCustomChecklists("routine");
+  const raChecklist = useCustomChecklists("rational");
+  const [editingChecklist, setEditingChecklist] = useState<string | null>(null);
+
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imageViewerOpen, setImageViewerOpen] = useState(false);
@@ -201,6 +163,14 @@ export default function TradeJournalEnhanced() {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [selectedTradeForGallery, setSelectedTradeForGallery] =
     useState<TradeWithChecklist | null>(null);
+
+  // Build dynamic initial state from checklist items
+  const buildChecklistState = (items: ChecklistItem[]) => {
+    const state: Record<string, boolean> = {};
+    items.forEach(i => { state[i.key] = false; });
+    return state;
+  };
+
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split("T")[0],
     entryTime: "",
@@ -222,35 +192,25 @@ export default function TradeJournalEnhanced() {
     moneyResult: 0,
     notes: "",
     isFavorite: false,
-    operational: {
-      chochValidoHTF: false,
-      caixaGannTracada: false,
-      regiaoDescontada50: false,
-      orderBlockIdentificado: false,
-      entrada50OB: false,
-      stopRiskManagement: false,
-      tempoGraficoOperacional: false,
-    },
-    emotional: {
-      hydration: false,
-      breathing: false,
-      mentalClarity: false,
-    },
-    routine: {
-      nightAnalysis: false,
-      morningReview: false,
-      regionsValidated: false,
-      sleep: false,
-    },
-    rational: {
-      analysisConfirmed: false,
-      planRespected: false,
-      riskManaged: false,
-    },
+    operational: {} as Record<string, boolean>,
+    emotional: {} as Record<string, boolean>,
+    routine: {} as Record<string, boolean>,
+    rational: {} as Record<string, boolean>,
     preTradeImage: "",
     tradingImage: "",
     postTradeImage: "",
   });
+
+  // Sync checklist defaults when items load
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      operational: { ...buildChecklistState(opChecklist.items), ...prev.operational },
+      emotional: { ...buildChecklistState(emChecklist.items), ...prev.emotional },
+      routine: { ...buildChecklistState(rtChecklist.items), ...prev.routine },
+      rational: { ...buildChecklistState(raChecklist.items), ...prev.rational },
+    }));
+  }, [opChecklist.items, emChecklist.items, rtChecklist.items, raChecklist.items]);
 
   // Usar hook de alertas
   useTradeAlerts(trades, activeAccountId);
@@ -578,26 +538,18 @@ export default function TradeJournalEnhanced() {
 
     // Left: Operacional
     secTitle("Checklist Operacional", c.accent);
-    const opItems: [string, boolean][] = [
-      ["CHOCH Valido HTF", trade.operational.chochValidoHTF],
-      ["Caixa Gann Tracada", trade.operational.caixaGannTracada],
-      ["Regiao Descontada 50%", trade.operational.regiaoDescontada50],
-      ["Order Block ID", trade.operational.orderBlockIdentificado],
-      ["Entrada 50% OB", trade.operational.entrada50OB],
-      ["Stop Risk Mgmt", trade.operational.stopRiskManagement],
-      ["Tempo Graf. Op.", trade.operational.tempoGraficoOperacional],
-    ];
+    const opItems: [string, boolean][] = opChecklist.items.map(i => [
+      `${i.emoji} ${i.label.substring(0, 30)}`, !!(trade.operational as any)?.[i.key]
+    ]);
     opItems.forEach(([l, v]) => chk(l, v, m, colW));
     y += 3;
 
     // Side-by-side: Emocional + Racional
     const twoColY = y;
     secTitle("Emocional", [139, 92, 246]);
-    const emoItems: [string, boolean][] = [
-      ["Hidratacao", trade.emotional.hydration],
-      ["Respiracao", trade.emotional.breathing],
-      ["Clareza Mental", trade.emotional.mentalClarity],
-    ];
+    const emoItems: [string, boolean][] = emChecklist.items.map(i => [
+      `${i.emoji} ${i.label.substring(0, 25)}`, !!(trade.emotional as any)?.[i.key]
+    ]);
     emoItems.forEach(([l, v]) => chk(l, v, m, colW));
     const emoEnd = y;
 
@@ -608,11 +560,9 @@ export default function TradeJournalEnhanced() {
     doc.setTextColor(...c.primary); doc.setFontSize(9); doc.setFont("helvetica", "bold");
     doc.text("Racional", m + colW + 9, y + 4.5);
     y += 8;
-    const ratItems: [string, boolean][] = [
-      ["Analise Confirmada", trade.rational.analysisConfirmed],
-      ["Plano Respeitado", trade.rational.planRespected],
-      ["Risco Gerenciado", trade.rational.riskManaged],
-    ];
+    const ratItems: [string, boolean][] = raChecklist.items.map(i => [
+      `${i.emoji} ${i.label.substring(0, 25)}`, !!(trade.rational as any)?.[i.key]
+    ]);
     ratItems.forEach(([l, v]) => {
       doc.setFillColor(...(v ? c.green : c.red));
       doc.circle(m + colW + 8, y + 0.5, 1.8, "F");
@@ -626,12 +576,9 @@ export default function TradeJournalEnhanced() {
 
     // Rotina (compact single row)
     secTitle("Rotina", c.green);
-    const routItems: [string, boolean][] = [
-      ["Analise Noturna", trade.routine.nightAnalysis],
-      ["Revisao Manha", trade.routine.morningReview],
-      ["Regioes Validadas", trade.routine.regionsValidated],
-      ["Sono", trade.routine.sleep],
-    ];
+    const routItems: [string, boolean][] = rtChecklist.items.map(i => [
+      `${i.emoji} ${i.label.substring(0, 20)}`, !!(trade.routine as any)?.[i.key]
+    ]);
     // Inline horizontal
     const rItemW = (pw - 2 * m) / routItems.length;
     routItems.forEach(([l, v], i) => {
@@ -750,31 +697,10 @@ export default function TradeJournalEnhanced() {
       takeProfitTicks: "",
       stopLossDollars: "",
       takeProfitDollars: "",
-      operational: {
-        chochValidoHTF: false,
-        caixaGannTracada: false,
-        regiaoDescontada50: false,
-        orderBlockIdentificado: false,
-        entrada50OB: false,
-        stopRiskManagement: false,
-        tempoGraficoOperacional: false,
-      },
-      emotional: {
-        hydration: false,
-        breathing: false,
-        mentalClarity: false,
-      },
-    routine: {
-      nightAnalysis: false,
-      morningReview: false,
-      regionsValidated: false,
-      sleep: false,
-    },
-      rational: {
-        analysisConfirmed: false,
-        planRespected: false,
-        riskManaged: false,
-      },
+      operational: buildChecklistState(opChecklist.items),
+      emotional: buildChecklistState(emChecklist.items),
+      routine: buildChecklistState(rtChecklist.items),
+      rational: buildChecklistState(raChecklist.items),
       preTradeImage: "",
       tradingImage: "",
       postTradeImage: "",
@@ -1402,430 +1328,69 @@ export default function TradeJournalEnhanced() {
               </div>
             </div>
 
-            {/* Operational Checklist */}
-            <div className="space-y-3 bg-purple-50 p-4 rounded-lg border border-purple-300">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">📋</span>
-                <h3 className="font-bold text-purple-900">
-                  Checklist Operacional
-                </h3>
-              </div>
-              <p className="text-xs text-purple-700">
-                Marque os itens que foram validados antes do trade
-              </p>
+            {/* Dynamic Checklist Sections */}
+            {[
+              { group: "operational", checklist: opChecklist, title: "Checklist Operacional", icon: "📋", bgClass: "bg-purple-50 dark:bg-purple-950/30", borderClass: "border-purple-300 dark:border-purple-700", textClass: "text-purple-900 dark:text-purple-200", formKey: "operational" as const },
+              { group: "emotional", checklist: emChecklist, title: "Checklist Emocional", icon: "❤️", bgClass: "bg-red-50 dark:bg-red-950/30", borderClass: "border-red-200 dark:border-red-700", textClass: "text-red-900 dark:text-red-200", formKey: "emotional" as const },
+              { group: "routine", checklist: rtChecklist, title: "Checklist Rotina Operacional", icon: "📋", bgClass: "bg-blue-50 dark:bg-blue-950/30", borderClass: "border-blue-200 dark:border-blue-700", textClass: "text-blue-900 dark:text-blue-200", formKey: "routine" as const },
+              { group: "rational", checklist: raChecklist, title: "Checklist Racional (Análise e Plano)", icon: "🧠", bgClass: "bg-green-50 dark:bg-green-950/30", borderClass: "border-green-200 dark:border-green-700", textClass: "text-green-900 dark:text-green-200", formKey: "rational" as const },
+            ].map(({ group, checklist, title, icon, bgClass, borderClass, textClass, formKey }) => (
+              <div key={group} className={`space-y-3 ${bgClass} p-4 rounded-lg border ${borderClass}`}>
+                <div className="flex items-center gap-2 justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{icon}</span>
+                    <h3 className={`font-bold ${textClass}`}>{title}</h3>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setEditingChecklist(group)}
+                    className="h-7 w-7 p-0 opacity-60 hover:opacity-100"
+                    title="Editar checklist"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+                {group === "emotional" && (
+                  <p className="text-xs opacity-70">3 Perguntas Essenciais</p>
+                )}
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="chochValidoHTF"
-                  checked={formData.operational.chochValidoHTF}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      operational: {
-                        ...formData.operational,
-                        chochValidoHTF: checked as boolean,
-                      },
-                    })
-                  }
+                {checklist.items.map((item) => (
+                  <div key={item.key} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`${group}-${item.key}`}
+                      checked={!!formData[formKey]?.[item.key]}
+                      onCheckedChange={checked =>
+                        setFormData({
+                          ...formData,
+                          [formKey]: {
+                            ...formData[formKey],
+                            [item.key]: checked as boolean,
+                          },
+                        })
+                      }
+                    />
+                    <Label
+                      htmlFor={`${group}-${item.key}`}
+                      className={`text-sm ${textClass} cursor-pointer`}
+                    >
+                      {item.emoji} {item.label}
+                    </Label>
+                  </div>
+                ))}
+
+                <ChecklistEditor
+                  items={checklist.items}
+                  onSave={checklist.saveItems}
+                  onReset={checklist.resetToDefaults}
+                  isCustomized={checklist.isCustomized}
+                  title={title}
+                  open={editingChecklist === group}
+                  onOpenChange={(open) => { if (!open) setEditingChecklist(null); }}
                 />
-                <Label
-                  htmlFor="chochValidoHTF"
-                  className="text-sm text-purple-900 cursor-pointer"
-                >
-                  📊 CHoCH válido em HTF (H4, H2 ou H1): Identificar um Change
-                  of Character válido em timeframes superiores
-                </Label>
               </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="caixaGannTracada"
-                  checked={formData.operational.caixaGannTracada}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      operational: {
-                        ...formData.operational,
-                        caixaGannTracada: checked as boolean,
-                      },
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="caixaGannTracada"
-                  className="text-sm text-purple-900 cursor-pointer"
-                >
-                  📦 Caixa de Gann em M30: Traçar do início do show até o fim do
-                  CHoCH (High até Low para vendas, Low até High para compras)
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="regiaoDescontada50"
-                  checked={formData.operational.regiaoDescontada50}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      operational: {
-                        ...formData.operational,
-                        regiaoDescontada50: checked as boolean,
-                      },
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="regiaoDescontada50"
-                  className="text-sm text-purple-900 cursor-pointer"
-                >
-                  📉 Order Blocks abaixo da Gann (50% para compra) ou acima (50%
-                  para venda): Apenas Order Blocks válidos em regiões
-                  descontadas
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="orderBlockIdentificado"
-                  checked={formData.operational.orderBlockIdentificado}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      operational: {
-                        ...formData.operational,
-                        orderBlockIdentificado: checked as boolean,
-                      },
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="orderBlockIdentificado"
-                  className="text-sm text-purple-900 cursor-pointer"
-                >
-                  🎯 Order Blocks de HTF (H4, H2, H1 ou M30): Identificar Order
-                  Blocks válidos em timeframes superiores
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="entrada50OB"
-                  checked={formData.operational.entrada50OB}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      operational: {
-                        ...formData.operational,
-                        entrada50OB: checked as boolean,
-                      },
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="entrada50OB"
-                  className="text-sm text-purple-900 cursor-pointer"
-                >
-                  💰 Entrada nos 50% do Order Block de HTF: Venda ou compra
-                  apenas nos 50% do Order Block (mínimo M30)
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="stopRiskManagement"
-                  checked={formData.operational.stopRiskManagement}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      operational: {
-                        ...formData.operational,
-                        stopRiskManagement: checked as boolean,
-                      },
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="stopRiskManagement"
-                  className="text-sm text-purple-900 cursor-pointer"
-                >
-                  🛑 Stop Loss e Take Profit 1:3: Stop abaixo/acima do Order
-                  Block de HTF (mínimo M30), Take Profit sempre 1:3 no mínimo
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="tempoGraficoOperacional"
-                  checked={formData.operational.tempoGraficoOperacional}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      operational: {
-                        ...formData.operational,
-                        tempoGraficoOperacional: checked as boolean,
-                      },
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="tempoGraficoOperacional"
-                  className="text-sm text-purple-900 cursor-pointer"
-                >
-                  ⏱️ Tempo Gráfico Operacional em M15 ou M5: Confirmar entrada
-                  em timeframe operacional
-                </Label>
-              </div>
-            </div>
-
-            {/* Emotional Checklist - 3 Essential Questions */}
-            <div className="space-y-3 bg-red-50 p-4 rounded-lg border border-red-200">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">❤️</span>
-                <h3 className="font-bold text-red-900">
-                  Checklist Emocional (3 Perguntas Essenciais)
-                </h3>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="hydration"
-                  checked={formData.emotional.hydration}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      emotional: {
-                        ...formData.emotional,
-                        hydration: checked as boolean,
-                      },
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="hydration"
-                  className="text-sm text-red-900 cursor-pointer font-semibold"
-                >
-                  ❓ Estou mentalmente preparado para fazer este trade?
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="breathing"
-                  checked={formData.emotional.breathing}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      emotional: {
-                        ...formData.emotional,
-                        breathing: checked as boolean,
-                      },
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="breathing"
-                  className="text-sm text-red-900 cursor-pointer font-semibold"
-                >
-                  ❓ Estou emocionalmente estável neste momento?
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="mentalClarity"
-                  checked={formData.emotional.mentalClarity}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      emotional: {
-                        ...formData.emotional,
-                        mentalClarity: checked as boolean,
-                      },
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="mentalClarity"
-                  className="text-sm text-red-900 cursor-pointer font-semibold"
-                >
-                  ❓ Tenho confiança no meu plano de trading?
-                </Label>
-              </div>
-            </div>
-
-            {/* Routine Checklist */}
-            <div className="space-y-3 bg-blue-50 p-4 rounded-lg border border-blue-200">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">📋</span>
-                <h3 className="font-bold text-blue-900">
-                  Checklist Rotina Operacional
-                </h3>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="nightAnalysis"
-                  checked={formData.routine.nightAnalysis}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      routine: {
-                        ...formData.routine,
-                        nightAnalysis: checked as boolean,
-                      },
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="nightAnalysis"
-                  className="text-sm text-blue-900 cursor-pointer"
-                >
-                  🌙 Fiz análise de mercado na noite anterior (20h-20h30)
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="morningReview"
-                  checked={formData.routine.morningReview}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      routine: {
-                        ...formData.routine,
-                        morningReview: checked as boolean,
-                      },
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="morningReview"
-                  className="text-sm text-blue-900 cursor-pointer"
-                >
-                  🌅 Revisei as marcações da noite ao acordar
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="regionsValidated"
-                  checked={formData.routine.regionsValidated}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      routine: {
-                        ...formData.routine,
-                        regionsValidated: checked as boolean,
-                      },
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="regionsValidated"
-                  className="text-sm text-blue-900 cursor-pointer"
-                >
-                  🎯 Verifiquei se as regiões traçadas estão sendo buscadas/respeitadas
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="sleepRoutine"
-                  checked={formData.routine.sleep}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      routine: {
-                        ...formData.routine,
-                        sleep: checked as boolean,
-                      },
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="sleepRoutine"
-                  className="text-sm text-blue-900 cursor-pointer"
-                >
-                  😴 Dormi bem e estou descansado
-                </Label>
-              </div>
-            </div>
-
-            {/* Rational Checklist */}
-            <div className="space-y-3 bg-green-50 p-4 rounded-lg border border-green-200">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">🧠</span>
-                <h3 className="font-bold text-green-900">
-                  Checklist Racional (Análise e Plano)
-                </h3>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="analysisConfirmed"
-                  checked={formData.rational.analysisConfirmed}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      rational: {
-                        ...formData.rational,
-                        analysisConfirmed: checked as boolean,
-                      },
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="analysisConfirmed"
-                  className="text-sm text-green-900 cursor-pointer"
-                >
-                  ✅ Confirmei a análise técnica
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="planRespected"
-                  checked={formData.rational.planRespected}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      rational: {
-                        ...formData.rational,
-                        planRespected: checked as boolean,
-                      },
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="planRespected"
-                  className="text-sm text-green-900 cursor-pointer"
-                >
-                  📋 Respeitei o plano operacional
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="riskManaged"
-                  checked={formData.rational.riskManaged}
-                  onCheckedChange={checked =>
-                    setFormData({
-                      ...formData,
-                      rational: {
-                        ...formData.rational,
-                        riskManaged: checked as boolean,
-                      },
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="riskManaged"
-                  className="text-sm text-green-900 cursor-pointer"
-                >
-                  🛡️ Gerenciei o risco corretamente
-                </Label>
-              </div>
-            </div>
+            ))}
 
             {/* Validation Warning */}
             {(() => {

@@ -20,31 +20,10 @@ export interface TradeWithChecklist {
   isFavorite: boolean;
   moneyResult?: number;
   riskReward?: number;
-  operational: {
-    chochValidoHTF: boolean;
-    caixaGannTracada: boolean;
-    regiaoDescontada50: boolean;
-    orderBlockIdentificado: boolean;
-    entrada50OB: boolean;
-    stopRiskManagement: boolean;
-    tempoGraficoOperacional: boolean;
-  };
-  emotional: {
-    hydration: boolean;
-    breathing: boolean;
-    mentalClarity: boolean;
-  };
-  rational: {
-    analysisConfirmed: boolean;
-    planRespected: boolean;
-    riskManaged: boolean;
-  };
-  routine: {
-    nightAnalysis: boolean;
-    morningReview: boolean;
-    regionsValidated: boolean;
-    sleep: boolean;
-  };
+  operational: Record<string, boolean>;
+  emotional: Record<string, boolean>;
+  rational: Record<string, boolean>;
+  routine: Record<string, boolean>;
   preTradeImage?: string;
   tradingImage?: string;
   postTradeImage?: string;

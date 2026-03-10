@@ -9,16 +9,8 @@ interface TradeWithChecklist {
   exitPrice: string;
   result: "WIN" | "LOSS" | "BREAK_EVEN" | "ONGOING";
   notes: string;
-  emotional: {
-    hydration: boolean;
-    breathing: boolean;
-    mentalClarity: boolean;
-  };
-  rational: {
-    analysisConfirmed: boolean;
-    planRespected: boolean;
-    riskManaged: boolean;
-  };
+  emotional: Record<string, boolean>;
+  rational: Record<string, boolean>;
   createdAt: number;
 }
 
