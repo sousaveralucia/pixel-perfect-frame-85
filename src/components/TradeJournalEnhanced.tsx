@@ -40,33 +40,7 @@ import { TradeImageGallery } from "./TradeImageGallery";
 import { useCustomChecklists, ChecklistItem } from "@/hooks/useCustomChecklists";
 import ChecklistEditor from "./ChecklistEditor";
 
-interface TradeWithChecklist {
-  id: string;
-  date: string;
-  entryTime?: string;
-  asset: string;
-  entryPrice: string;
-  exitPrice: string;
-  stopLoss: string;
-  takeProfit: string;
-  resultPrice: string;
-  session: "Manha" | "Tarde" | "Noite" | "";
-  marketSession?: "NY" | "Londres" | "Ásia" | "Sobreposição" | "Fechado";
-  account: string;
-  result: "WIN" | "LOSS" | "BREAK_EVEN" | "ONGOING";
-  riskReward?: number;
-  moneyResult?: number;
-  notes: string;
-  isFavorite: boolean;
-  operational: Record<string, boolean>;
-  emotional: Record<string, boolean>;
-  routine: Record<string, boolean>;
-  rational: Record<string, boolean>;
-  preTradeImage?: string;
-  tradingImage?: string;
-  postTradeImage?: string;
-  createdAt: number;
-}
+// Using TradeWithChecklist from useTradeJournalUnified
 
 // Função para obter informações de sessão de mercado (sem hook)
 function getMarketSessionInfo(
