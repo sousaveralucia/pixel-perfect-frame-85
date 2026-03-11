@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, lazy, Suspense, useCallback } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,21 +13,27 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAccountManager } from "@/hooks/useAccountManager";
 import { useTradeJournalUnified } from "@/hooks/useTradeJournalUnified";
-import TradingCalculator from "@/components/TradingCalculator";
-import EconomicCalendar from "@/components/EconomicCalendar";
-import NewsAlerts from "@/components/NewsAlerts";
-import TradeJournalEnhanced from "@/components/TradeJournalEnhanced";
-import PerformanceDashboard from "@/components/PerformanceDashboard";
-import StrategyComparisonEnhanced from "@/components/StrategyComparisonEnhanced";
-import ReportExportEnhanced from "@/components/ReportExportEnhanced";
-import AccountSelector from "@/components/AccountSelector";
-import AnalysisHistory from "@/components/AnalysisHistory";
-import DailyValidation from "@/components/DailyValidation";
-import AssetPerformanceAnalysis from "@/components/AssetPerformanceAnalysis";
-import { TradingCalendar } from "@/components/TradingCalendar";
-import CalculationHistory from "@/components/CalculationHistory";
-import { EquityAndPerformanceCharts } from "@/components/EquityAndPerformanceCharts";
-import Withdrawals from "@/components/Withdrawals";
+import TabSkeleton from "@/components/TabSkeleton";
+import MobileNav from "@/components/MobileNav";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { AnimatePresence, motion } from "framer-motion";
+
+// Lazy load all heavy components
+const TradingCalculator = lazy(() => import("@/components/TradingCalculator"));
+const EconomicCalendar = lazy(() => import("@/components/EconomicCalendar"));
+const NewsAlerts = lazy(() => import("@/components/NewsAlerts"));
+const TradeJournalEnhanced = lazy(() => import("@/components/TradeJournalEnhanced"));
+const PerformanceDashboard = lazy(() => import("@/components/PerformanceDashboard"));
+const StrategyComparisonEnhanced = lazy(() => import("@/components/StrategyComparisonEnhanced"));
+const ReportExportEnhanced = lazy(() => import("@/components/ReportExportEnhanced"));
+const AccountSelector = lazy(() => import("@/components/AccountSelector"));
+const AnalysisHistory = lazy(() => import("@/components/AnalysisHistory"));
+const DailyValidation = lazy(() => import("@/components/DailyValidation"));
+const AssetPerformanceAnalysis = lazy(() => import("@/components/AssetPerformanceAnalysis"));
+const TradingCalendar = lazy(() => import("@/components/TradingCalendar").then(m => ({ default: m.TradingCalendar })));
+const CalculationHistory = lazy(() => import("@/components/CalculationHistory"));
+const EquityAndPerformanceCharts = lazy(() => import("@/components/EquityAndPerformanceCharts").then(m => ({ default: m.EquityAndPerformanceCharts })));
+const Withdrawals = lazy(() => import("@/components/Withdrawals"));
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
