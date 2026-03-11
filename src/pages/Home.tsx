@@ -57,8 +57,10 @@ export default function Home() {
   const [showPlanDialog, setShowPlanDialog] = useState(false);
   const [editingPlan, setEditingPlan] = useState(false);
   const [editingGoldenRule, setEditingGoldenRule] = useState(false);
+  const [activeTab, setActiveTab] = useState("calendario-trading");
   const planChecklist = useCustomChecklists("plan");
   const goldenRuleChecklist = useCustomChecklists("goldenRule");
+  const isMobile = useIsMobile();
   const activeAccount = getActiveAccount();
   const currentBalance = activeAccount?.currentBalance ?? 0;
   const initialBalance = activeAccount?.initialBalance ?? 0;
