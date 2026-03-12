@@ -626,6 +626,10 @@ export default function Home() {
             <LazyTab><DailyValidation /></LazyTab>
           </TabsContent>
 
+          <TabsContent value="disciplina" className="space-y-6">
+            <LazyTab><DisciplineAnalysis /></LazyTab>
+          </TabsContent>
+
             </motion.div>
           </AnimatePresence>
         </Tabs>
