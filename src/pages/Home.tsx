@@ -111,24 +111,27 @@ export default function Home() {
       <main className="container py-4 md:py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Desktop tabs */}
-          <TabsList className="hidden md:flex w-full mb-6 overflow-x-auto gap-1 bg-secondary/30 p-1 rounded-lg border border-border">
-            <TabsTrigger value="calendario-trading" className="text-xs whitespace-nowrap">Calendário</TabsTrigger>
-            <TabsTrigger value="contas" className="text-xs whitespace-nowrap">Contas</TabsTrigger>
-            <TabsTrigger value="autoconhecimento" className="text-xs whitespace-nowrap">Pessoal</TabsTrigger>
-            <TabsTrigger value="ativos" className="text-xs whitespace-nowrap">Ativos</TabsTrigger>
-            <TabsTrigger value="estrategia" className="text-xs whitespace-nowrap">Estratégia</TabsTrigger>
-            <TabsTrigger value="validacao" className="text-xs whitespace-nowrap">Pré-Op</TabsTrigger>
-            <TabsTrigger value="rotina" className="text-xs whitespace-nowrap">Rotina</TabsTrigger>
-            <TabsTrigger value="alertas" className="text-xs whitespace-nowrap">Alertas</TabsTrigger>
-            <TabsTrigger value="analises" className="text-xs whitespace-nowrap">Análises</TabsTrigger>
-            <TabsTrigger value="calculadora" className="text-xs whitespace-nowrap">Calculadora</TabsTrigger>
-            <TabsTrigger value="diario" className="text-xs whitespace-nowrap">Diário</TabsTrigger>
-            <TabsTrigger value="calendario" className="text-xs whitespace-nowrap">Cal. Econômico</TabsTrigger>
-            <TabsTrigger value="insights" className="text-xs whitespace-nowrap">Insights</TabsTrigger>
-            <TabsTrigger value="comparacao" className="text-xs whitespace-nowrap">Comparação</TabsTrigger>
-            <TabsTrigger value="relatorio" className="text-xs whitespace-nowrap">Relatório</TabsTrigger>
-            <TabsTrigger value="saques" className="text-xs whitespace-nowrap">Saques</TabsTrigger>
-          </TabsList>
+          <div className="hidden md:block overflow-x-auto mb-6">
+            <TabsList className="inline-flex w-max gap-1 bg-secondary/30 p-1 rounded-lg border border-border">
+              <TabsTrigger value="calendario-trading" className="text-xs whitespace-nowrap">Calendário</TabsTrigger>
+              <TabsTrigger value="contas" className="text-xs whitespace-nowrap">Contas</TabsTrigger>
+              <TabsTrigger value="autoconhecimento" className="text-xs whitespace-nowrap">Pessoal</TabsTrigger>
+              <TabsTrigger value="ativos" className="text-xs whitespace-nowrap">Ativos</TabsTrigger>
+              <TabsTrigger value="estrategia" className="text-xs whitespace-nowrap">Estratégia</TabsTrigger>
+              <TabsTrigger value="validacao" className="text-xs whitespace-nowrap">Pré-Op</TabsTrigger>
+              <TabsTrigger value="rotina" className="text-xs whitespace-nowrap">Rotina</TabsTrigger>
+              <TabsTrigger value="alertas" className="text-xs whitespace-nowrap">Alertas</TabsTrigger>
+              <TabsTrigger value="analises" className="text-xs whitespace-nowrap">Análises</TabsTrigger>
+              <TabsTrigger value="calculadora" className="text-xs whitespace-nowrap">Calculadora</TabsTrigger>
+              <TabsTrigger value="diario" className="text-xs whitespace-nowrap">Diário</TabsTrigger>
+              <TabsTrigger value="calendario" className="text-xs whitespace-nowrap">Cal. Econômico</TabsTrigger>
+              <TabsTrigger value="insights" className="text-xs whitespace-nowrap">Insights</TabsTrigger>
+              <TabsTrigger value="disciplina" className="text-xs whitespace-nowrap">Disciplina</TabsTrigger>
+              <TabsTrigger value="comparacao" className="text-xs whitespace-nowrap">Comparação</TabsTrigger>
+              <TabsTrigger value="relatorio" className="text-xs whitespace-nowrap">Relatório</TabsTrigger>
+              <TabsTrigger value="saques" className="text-xs whitespace-nowrap">Saques</TabsTrigger>
+            </TabsList>
+          </div>
 
           <AnimatePresence mode="wait">
             <motion.div
