@@ -22,6 +22,7 @@ const tabItems = [
   { value: "diario", label: "Diário", icon: BookOpen },
   { value: "calendario", label: "Cal. Econômico", icon: Globe },
   { value: "insights", label: "Insights", icon: Lightbulb },
+  { value: "disciplina", label: "Disciplina", icon: ClipboardCheck },
   { value: "comparacao", label: "Comparação", icon: GitCompare },
   { value: "relatorio", label: "Relatório", icon: FileText },
   { value: "saques", label: "Saques", icon: ArrowDownToLine },
