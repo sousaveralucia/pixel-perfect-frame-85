@@ -34,6 +34,7 @@ const TradingCalendar = lazy(() => import("@/components/TradingCalendar").then(m
 const CalculationHistory = lazy(() => import("@/components/CalculationHistory"));
 const EquityAndPerformanceCharts = lazy(() => import("@/components/EquityAndPerformanceCharts").then(m => ({ default: m.EquityAndPerformanceCharts })));
 const Withdrawals = lazy(() => import("@/components/Withdrawals"));
+const DisciplineAnalysis = lazy(() => import("@/components/DisciplineAnalysis"));
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
