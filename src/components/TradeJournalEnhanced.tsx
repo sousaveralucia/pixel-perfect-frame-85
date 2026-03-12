@@ -285,7 +285,25 @@ export default function TradeJournalEnhanced() {
       return;
     }
 
-    // Checklist operacional - apenas aviso, não bloqueia
+    // Checklist 50% validation for each group
+    const checkGroups = [
+      { name: "Operacional", items: Object.values(formData.operational) },
+      { name: "Emocional", items: Object.values(formData.emotional) },
+      { name: "Rotina", items: Object.values(formData.routine) },
+      { name: "Racional", items: Object.values(formData.rational) },
+    ];
+
+    for (const group of checkGroups) {
+      if (group.items.length > 0) {
+        const marked = group.items.filter(v => v === true).length;
+        const pct = (marked / group.items.length) * 100;
+        if (pct < 50) {
+          toast.error(`Para registrar este trade é necessário completar pelo menos 50% do checklist ${group.name}.`);
+          return;
+        }
+      }
+    }
+
     const operationalItems = Object.values(formData.operational);
     const allOperationalComplete = operationalItems.every(
       item => item === true
