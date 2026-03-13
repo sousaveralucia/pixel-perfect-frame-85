@@ -359,6 +359,13 @@ export default function TradeJournalEnhanced() {
       marketSession = sessionInfo.marketSession;
     }
 
+    const checklistLabels = {
+      operational: Object.fromEntries(opChecklist.items.map((item) => [item.key, `${item.emoji} ${item.label}`.trim()])),
+      emotional: Object.fromEntries(emChecklist.items.map((item) => [item.key, `${item.emoji} ${item.label}`.trim()])),
+      routine: Object.fromEntries(rtChecklist.items.map((item) => [item.key, `${item.emoji} ${item.label}`.trim()])),
+      rational: Object.fromEntries(raChecklist.items.map((item) => [item.key, `${item.emoji} ${item.label}`.trim()])),
+    };
+
     const newTrade: TradeWithChecklist = {
       id: editingId || Date.now().toString(),
       date: formData.date,
@@ -384,8 +391,9 @@ export default function TradeJournalEnhanced() {
       emotional: formData.emotional,
       routine: formData.routine,
       rational: formData.rational,
+      checklistLabels,
       createdAt: editingId
-        ? trades.find(t => t.id === editingId)?.createdAt || Date.now()
+        ? trades.find((t) => t.id === editingId)?.createdAt || Date.now()
         : Date.now(),
     };
 
