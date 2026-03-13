@@ -131,7 +131,8 @@ export default function Home() {
               <TabsTrigger value="comparacao" className="text-xs whitespace-nowrap">Comparação</TabsTrigger>
               <TabsTrigger value="relatorio" className="text-xs whitespace-nowrap">Relatório</TabsTrigger>
               <TabsTrigger value="saques" className="text-xs whitespace-nowrap">Saques</TabsTrigger>
-            </TabsList>
+              </TabsList>
+            </div>
           </div>
 
           <AnimatePresence mode="wait">
