@@ -111,8 +111,9 @@ export default function Home() {
       <main className="container py-4 md:py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Desktop tabs */}
-          <div className="hidden md:block overflow-x-auto mb-6">
-            <TabsList className="inline-flex w-max gap-1 bg-secondary/30 p-1 rounded-lg border border-border">
+          <div className="hidden md:block mb-6">
+            <div className="overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] touch-pan-x">
+              <TabsList className="inline-flex min-w-max justify-start gap-1 bg-secondary/30 p-1 rounded-lg border border-border">
               <TabsTrigger value="calendario-trading" className="text-xs whitespace-nowrap">Calendário</TabsTrigger>
               <TabsTrigger value="contas" className="text-xs whitespace-nowrap">Contas</TabsTrigger>
               <TabsTrigger value="autoconhecimento" className="text-xs whitespace-nowrap">Pessoal</TabsTrigger>
@@ -130,7 +131,8 @@ export default function Home() {
               <TabsTrigger value="comparacao" className="text-xs whitespace-nowrap">Comparação</TabsTrigger>
               <TabsTrigger value="relatorio" className="text-xs whitespace-nowrap">Relatório</TabsTrigger>
               <TabsTrigger value="saques" className="text-xs whitespace-nowrap">Saques</TabsTrigger>
-            </TabsList>
+              </TabsList>
+            </div>
           </div>
 
           <AnimatePresence mode="wait">

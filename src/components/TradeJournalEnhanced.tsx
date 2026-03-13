@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -21,18 +21,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useTradeJournal } from "@/hooks/useTradeJournal";
 import { useTradeJournalUnified, TradeWithChecklist } from "@/hooks/useTradeJournalUnified";
 import { useAccountManager } from "@/hooks/useAccountManager";
 import { Plus, Trash2, Edit2, Image, FileSpreadsheet, FileDown, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { useTradeAlerts } from "@/hooks/useTradeAlerts";
-
-import {
-  useMarketSession,
-  formatMarketSession,
-  parseTimeString,
-} from "@/hooks/useMarketSession";
+import { parseTimeString } from "@/hooks/useMarketSession";
 import { Download } from "lucide-react";
 import { exportTradesToExcel, exportToCSV as exportToCSVFile } from "@/lib/excelExporter";
 import { SimpleImageViewer } from "./SimpleImageViewer";
@@ -164,11 +158,27 @@ export default function TradeJournalEnhanced() {
   const [selectedTradeForGallery, setSelectedTradeForGallery] =
     useState<TradeWithChecklist | null>(null);
 
-  // Build dynamic initial state from checklist items
   const buildChecklistState = (items: ChecklistItem[]) => {
     const state: Record<string, boolean> = {};
-    items.forEach(i => { state[i.key] = false; });
+    items.forEach((i) => {
+      state[i.key] = false;
+    });
     return state;
+  };
+
+  const normalizeChecklistState = (
+    current: Record<string, boolean>,
+    items: ChecklistItem[],
+  ) => Object.fromEntries(items.map((item) => [item.key, current?.[item.key] === true])) as Record<string, boolean>;
+
+  const getChecklistProgress = (
+    state: Record<string, boolean>,
+    items: ChecklistItem[],
+  ) => {
+    const total = items.length;
+    const checked = items.filter((item) => state?.[item.key] === true).length;
+    const percentage = total === 0 ? 100 : Math.round((checked / total) * 100);
+    return { total, checked, percentage };
   };
 
   const [formData, setFormData] = useState({
@@ -201,16 +211,22 @@ export default function TradeJournalEnhanced() {
     postTradeImage: "",
   });
 
-  // Sync checklist defaults when items load
   useEffect(() => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      operational: { ...buildChecklistState(opChecklist.items), ...prev.operational },
-      emotional: { ...buildChecklistState(emChecklist.items), ...prev.emotional },
-      routine: { ...buildChecklistState(rtChecklist.items), ...prev.routine },
-      rational: { ...buildChecklistState(raChecklist.items), ...prev.rational },
+      operational: normalizeChecklistState(prev.operational, opChecklist.items),
+      emotional: normalizeChecklistState(prev.emotional, emChecklist.items),
+      routine: normalizeChecklistState(prev.routine, rtChecklist.items),
+      rational: normalizeChecklistState(prev.rational, raChecklist.items),
     }));
   }, [opChecklist.items, emChecklist.items, rtChecklist.items, raChecklist.items]);
+
+  const checklistProgress = useMemo(() => ({
+    operacional: getChecklistProgress(formData.operational, opChecklist.items),
+    emocional: getChecklistProgress(formData.emotional, emChecklist.items),
+    rotina: getChecklistProgress(formData.routine, rtChecklist.items),
+    racional: getChecklistProgress(formData.rational, raChecklist.items),
+  }), [formData.operational, formData.emotional, formData.routine, formData.rational, opChecklist.items, emChecklist.items, rtChecklist.items, raChecklist.items]);
 
   // Usar hook de alertas
   useTradeAlerts(trades, activeAccountId);
@@ -285,39 +301,30 @@ export default function TradeJournalEnhanced() {
       return;
     }
 
-    // Checklist 50% validation for each group
     const checkGroups = [
-      { name: "Operacional", items: Object.values(formData.operational) },
-      { name: "Emocional", items: Object.values(formData.emotional) },
-      { name: "Rotina", items: Object.values(formData.routine) },
-      { name: "Racional", items: Object.values(formData.rational) },
+      { name: "Operacional", items: opChecklist.items, values: formData.operational },
+      { name: "Emocional", items: emChecklist.items, values: formData.emotional },
+      { name: "Rotina", items: rtChecklist.items, values: formData.routine },
+      { name: "Racional", items: raChecklist.items, values: formData.rational },
     ];
 
     for (const group of checkGroups) {
-      if (group.items.length > 0) {
-        const marked = group.items.filter(v => v === true).length;
-        const pct = (marked / group.items.length) * 100;
-        if (pct < 50) {
-          toast.error(`Para registrar este trade é necessário completar pelo menos 50% do checklist ${group.name}.`);
-          return;
-        }
+      if (group.items.length === 0) continue;
+
+      const marked = group.items.filter((item) => group.values[item.key] === true).length;
+      const pct = (marked / group.items.length) * 100;
+
+      if (pct < 50) {
+        toast.error(
+          `Para registrar este trade é necessário completar pelo menos 50% do checklist ${group.name}. (${marked}/${group.items.length})`,
+        );
+        return;
       }
     }
 
-    const operationalItems = Object.values(formData.operational);
-    const allOperationalComplete = operationalItems.every(
-      item => item === true
-    );
-
-    if (!allOperationalComplete) {
-      const incompleteCount = operationalItems.filter(
-        item => item === false
-      ).length;
-      toast.warning(
-        `⚠️ Checklist Operacional incompleto: ${incompleteCount} item(ns) não marcado(s)`,
-        { duration: 4000 }
-      );
-    }
+    const allOperationalComplete =
+      opChecklist.items.length > 0 &&
+      opChecklist.items.every((item) => formData.operational[item.key] === true);
 
     // Validar R:R
     const rr = formData.riskReward || 0;
@@ -352,6 +359,13 @@ export default function TradeJournalEnhanced() {
       marketSession = sessionInfo.marketSession;
     }
 
+    const checklistLabels = {
+      operational: Object.fromEntries(opChecklist.items.map((item) => [item.key, `${item.emoji} ${item.label}`.trim()])),
+      emotional: Object.fromEntries(emChecklist.items.map((item) => [item.key, `${item.emoji} ${item.label}`.trim()])),
+      routine: Object.fromEntries(rtChecklist.items.map((item) => [item.key, `${item.emoji} ${item.label}`.trim()])),
+      rational: Object.fromEntries(raChecklist.items.map((item) => [item.key, `${item.emoji} ${item.label}`.trim()])),
+    };
+
     const newTrade: TradeWithChecklist = {
       id: editingId || Date.now().toString(),
       date: formData.date,
@@ -377,8 +391,9 @@ export default function TradeJournalEnhanced() {
       emotional: formData.emotional,
       routine: formData.routine,
       rational: formData.rational,
+      checklistLabels,
       createdAt: editingId
-        ? trades.find(t => t.id === editingId)?.createdAt || Date.now()
+        ? trades.find((t) => t.id === editingId)?.createdAt || Date.now()
         : Date.now(),
     };
 
@@ -497,34 +512,58 @@ export default function TradeJournalEnhanced() {
 
     y = 36;
 
-    // Helper: compact section title
+    const sanitizePdfText = (value: string) =>
+      value
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\x20-\x7E]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    const ensurePdfSpace = (needed = 10) => {
+      if (y + needed > ph - 12) {
+        doc.addPage();
+        y = 14;
+      }
+    };
+
     const secTitle = (title: string, color: [number, number, number]) => {
+      ensurePdfSpace(10);
       doc.setFillColor(...color);
       doc.rect(m, y, 2.5, 6, "F");
       doc.setTextColor(...c.primary);
       doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
-      doc.text(title, m + 5, y + 4.5);
+      doc.text(sanitizePdfText(title), m + 5, y + 4.5);
       y += 8;
     };
 
-    // Helper: compact data row
     const dRow = (label: string, value: string, x: number, w: number, alt: boolean) => {
-      if (alt) { doc.setFillColor(...c.lightBg); doc.rect(x, y - 3, w, 6, "F"); }
-      doc.setTextColor(...c.gray); doc.setFontSize(7.5); doc.setFont("helvetica", "normal");
-      doc.text(label, x + 2, y + 0.5);
-      doc.setTextColor(...c.primary); doc.setFont("helvetica", "bold");
-      doc.text(value, x + w / 2, y + 0.5);
+      ensurePdfSpace(7);
+      if (alt) {
+        doc.setFillColor(...c.lightBg);
+        doc.rect(x, y - 3, w, 6, "F");
+      }
+      doc.setTextColor(...c.gray);
+      doc.setFontSize(7.5);
+      doc.setFont("helvetica", "normal");
+      doc.text(sanitizePdfText(label), x + 2, y + 0.5);
+      doc.setTextColor(...c.primary);
+      doc.setFont("helvetica", "bold");
+      doc.text(sanitizePdfText(value), x + w / 2, y + 0.5);
       y += 6;
     };
 
-    // Helper: compact check item
     const chk = (label: string, checked: boolean, x: number, w: number) => {
+      ensurePdfSpace(6);
       doc.setFillColor(...(checked ? c.green : c.red));
       doc.circle(x + 4, y + 0.5, 1.8, "F");
-      doc.setTextColor(...c.primary); doc.setFontSize(7.5); doc.setFont("helvetica", "normal");
-      doc.text(label, x + 8, y + 1.5);
-      doc.setTextColor(...(checked ? c.green : c.red)); doc.setFont("helvetica", "bold");
+      doc.setTextColor(...c.primary);
+      doc.setFontSize(7.2);
+      doc.setFont("helvetica", "normal");
+      doc.text(sanitizePdfText(label).slice(0, 46), x + 8, y + 1.5);
+      doc.setTextColor(...(checked ? c.green : c.red));
+      doc.setFont("helvetica", "bold");
       doc.text(checked ? "Sim" : "Nao", x + w - 12, y + 1.5);
       y += 5.5;
     };
@@ -1412,58 +1451,29 @@ export default function TradeJournalEnhanced() {
 
             {/* Validation Warning */}
             {(() => {
-              const operationalItems = Object.entries(formData.operational);
-              const emotionalItems = Object.entries(formData.emotional);
-              const rationalItems = Object.entries(formData.rational);
+              const groups = [
+                { title: "Operacional", data: checklistProgress.operacional },
+                { title: "Emocional", data: checklistProgress.emocional },
+                { title: "Rotina", data: checklistProgress.rotina },
+                { title: "Racional", data: checklistProgress.racional },
+              ];
 
-              const allOperational = operationalItems.every(([_, v]) => v);
-              const allEmotional = emotionalItems.every(([_, v]) => v);
-              const allRational = rationalItems.every(([_, v]) => v);
-              const allComplete = allOperational && allEmotional && allRational;
+              const hasInvalid = groups.some((group) => group.data.percentage < 50);
 
-              const incompleteOperational = operationalItems.filter(
-                ([_, v]) => !v
-              ).length;
-              const incompleteEmotional = emotionalItems.filter(
-                ([_, v]) => !v
-              ).length;
-              const incompleteRational = rationalItems.filter(
-                ([_, v]) => !v
-              ).length;
-
-              if (!allComplete) {
-                return (
-                  <div className="bg-red-50 p-4 rounded-lg border-2 border-red-300 space-y-2">
-                    <p className="text-sm text-red-900 font-bold">
-                      🔴 Checklist Incompleto - Não é possível registrar o trade
-                    </p>
-                    {!allOperational && (
-                      <p className="text-xs text-red-800">
-                        • <span className="font-semibold">Operacional:</span>{" "}
-                        {incompleteOperational} item(ns) faltando
-                      </p>
-                    )}
-                    {!allEmotional && (
-                      <p className="text-xs text-red-800">
-                        • <span className="font-semibold">Emocional:</span>{" "}
-                        {incompleteEmotional} item(ns) faltando
-                      </p>
-                    )}
-                    {!allRational && (
-                      <p className="text-xs text-red-800">
-                        • <span className="font-semibold">Racional:</span>{" "}
-                        {incompleteRational} item(ns) faltando
-                      </p>
-                    )}
-                  </div>
-                );
-              }
               return (
-                <div className="bg-green-50 p-3 rounded-lg border-2 border-green-300">
-                  <p className="text-sm text-green-900 font-semibold">
-                    ✅ Todos os checklists foram completados! Pronto para
-                    registrar.
+                <div className={`p-4 rounded-lg border ${hasInvalid ? "bg-destructive/10 border-destructive/30" : "bg-success/10 border-success/30"}`}>
+                  <p className={`text-sm font-semibold ${hasInvalid ? "text-destructive" : "text-success"}`}>
+                    {hasInvalid
+                      ? "Para registrar este trade, complete pelo menos 50% de cada checklist."
+                      : "✅ Requisito mínimo atendido: 50%+ em todos os checklists."}
                   </p>
+                  <div className="mt-2 grid sm:grid-cols-2 gap-2">
+                    {groups.map((group) => (
+                      <p key={group.title} className="text-xs text-foreground/80">
+                        • <span className="font-semibold">{group.title}:</span> {group.data.checked}/{group.data.total} ({group.data.percentage}%)
+                      </p>
+                    ))}
+                  </div>
                 </div>
               );
             })()}

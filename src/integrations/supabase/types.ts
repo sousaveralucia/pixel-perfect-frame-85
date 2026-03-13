@@ -161,6 +161,45 @@ export type Database = {
         }
         Relationships: []
       }
+      community_routine_checks: {
+        Row: {
+          compared_markings: boolean
+          created_at: string
+          id: string
+          reviewed_opportunities: boolean
+          updated_at: string
+          user_id: string
+          watched_daily_close: boolean
+          watched_eow: boolean
+          watched_week_alignment: boolean
+          week_start: string
+        }
+        Insert: {
+          compared_markings?: boolean
+          created_at?: string
+          id?: string
+          reviewed_opportunities?: boolean
+          updated_at?: string
+          user_id: string
+          watched_daily_close?: boolean
+          watched_eow?: boolean
+          watched_week_alignment?: boolean
+          week_start: string
+        }
+        Update: {
+          compared_markings?: boolean
+          created_at?: string
+          id?: string
+          reviewed_opportunities?: boolean
+          updated_at?: string
+          user_id?: string
+          watched_daily_close?: boolean
+          watched_eow?: boolean
+          watched_week_alignment?: boolean
+          week_start?: string
+        }
+        Relationships: []
+      }
       custom_checklists: {
         Row: {
           checklist_group: string
@@ -232,6 +271,65 @@ export type Database = {
           validated_at?: string | null
         }
         Relationships: []
+      }
+      trade_checklist_ticks: {
+        Row: {
+          account_key: string
+          asset: string | null
+          checklist_group: string
+          created_at: string
+          id: string
+          item_key: string
+          item_label: string
+          marked: boolean
+          risk_reward: number | null
+          trade_date: string
+          trade_id: string
+          trade_result: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_key: string
+          asset?: string | null
+          checklist_group: string
+          created_at?: string
+          id?: string
+          item_key: string
+          item_label: string
+          marked?: boolean
+          risk_reward?: number | null
+          trade_date: string
+          trade_id: string
+          trade_result?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_key?: string
+          asset?: string | null
+          checklist_group?: string
+          created_at?: string
+          id?: string
+          item_key?: string
+          item_label?: string
+          marked?: boolean
+          risk_reward?: number | null
+          trade_date?: string
+          trade_id?: string
+          trade_result?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_checklist_ticks_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "trades"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trades: {
         Row: {

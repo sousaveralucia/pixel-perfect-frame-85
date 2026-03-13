@@ -28,8 +28,11 @@ export interface TradeWithChecklist {
   tradingImage?: string;
   postTradeImage?: string;
   createdAt: number;
-  [key: string]: any; // allow extra fields
+  [key: string]: any;
 }
+
+type ChecklistGroup = "operational" | "emotional" | "routine" | "rational";
+const CHECKLIST_GROUPS: ChecklistGroup[] = ["operational", "emotional", "routine", "rational"];
 
 function mapRowToTrade(row: any): TradeWithChecklist {
   return {
@@ -61,22 +64,57 @@ function mapRowToTrade(row: any): TradeWithChecklist {
   };
 }
 
+function buildChecklistTickRows(
+  tradeId: string,
+  userId: string,
+  accountKey: string,
+  trade: Partial<TradeWithChecklist>,
+) {
+  const labelsMap = (trade.checklistLabels || {}) as Partial<Record<ChecklistGroup, Record<string, string>>>;
+
+  return CHECKLIST_GROUPS.flatMap((group) => {
+    const values = ((trade as any)[group] || {}) as Record<string, boolean>;
+    const labels = labelsMap[group] || {};
+
+    return Object.entries(values).map(([itemKey, marked]) => ({
+      trade_id: tradeId,
+      user_id: userId,
+      account_key: accountKey,
+      trade_date: trade.date,
+      asset: trade.asset || null,
+      trade_result: trade.result || null,
+      risk_reward: trade.riskReward ?? null,
+      checklist_group: group,
+      item_key: itemKey,
+      item_label: labels[itemKey] || itemKey,
+      marked: marked === true,
+    }));
+  });
+}
+
 export const useTradeJournalUnified = (accountId: string) => {
   const { user } = useAuth();
   const [trades, setTrades] = useState<TradeWithChecklist[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
   const loadTrades = useCallback(async () => {
-    if (!user || !accountId) { setTrades([]); setIsLoaded(true); return; }
+    if (!user || !accountId) {
+      setTrades([]);
+      setIsLoaded(true);
+      return;
+    }
+
     const { data, error } = await supabase
       .from("trades")
       .select("*")
       .eq("user_id", user.id)
       .eq("account_key", accountId)
       .order("created_at", { ascending: true });
+
     if (!error && data) {
       setTrades(data.map(mapRowToTrade));
     }
+
     setIsLoaded(true);
   }, [user, accountId]);
 
@@ -88,44 +126,80 @@ export const useTradeJournalUnified = (accountId: string) => {
     setTrades(updatedTrades);
   }, []);
 
+  const syncChecklistTicks = useCallback(async (tradeId: string, tradeData: Partial<TradeWithChecklist>) => {
+    if (!user || !accountId || !tradeData.date) return;
+
+    const rows = buildChecklistTickRows(tradeId, user.id, accountId, tradeData);
+
+    const { error: deleteError } = await supabase
+      .from("trade_checklist_ticks" as any)
+      .delete()
+      .eq("trade_id", tradeId)
+      .eq("user_id", user.id);
+
+    if (deleteError) {
+      console.error("Erro ao limpar ticks de checklist:", deleteError);
+      return;
+    }
+
+    if (rows.length === 0) return;
+
+    const { error: insertError } = await supabase
+      .from("trade_checklist_ticks" as any)
+      .insert(rows as any[]);
+
+    if (insertError) {
+      console.error("Erro ao salvar ticks de checklist:", insertError);
+    }
+  }, [user, accountId]);
+
   const addTrade = useCallback(async (trade: Omit<TradeWithChecklist, "id" | "createdAt">) => {
     if (!user) return null;
-    const { data, error } = await supabase.from("trades").insert({
-      user_id: user.id,
-      account_key: accountId,
-      date: trade.date,
-      entry_time: trade.entryTime || null,
-      asset: trade.asset,
-      entry_price: trade.entryPrice,
-      exit_price: trade.exitPrice,
-      stop_loss: trade.stopLoss,
-      take_profit: trade.takeProfit,
-      result: trade.result,
-      result_price: trade.resultPrice,
-      session: trade.session,
-      market_session: trade.marketSession || null,
-      notes: trade.notes,
-      is_favorite: trade.isFavorite,
-      money_result: trade.moneyResult || null,
-      risk_reward: trade.riskReward ?? null,
-      operational: trade.operational as any,
-      emotional: trade.emotional as any,
-      rational: trade.rational as any,
-      routine: trade.routine as any,
-      pre_trade_image: trade.preTradeImage || null,
-      trading_image: trade.tradingImage || null,
-      post_trade_image: trade.postTradeImage || null,
-    }).select().single();
+
+    const { data, error } = await supabase
+      .from("trades")
+      .insert({
+        user_id: user.id,
+        account_key: accountId,
+        date: trade.date,
+        entry_time: trade.entryTime || null,
+        asset: trade.asset,
+        entry_price: trade.entryPrice,
+        exit_price: trade.exitPrice,
+        stop_loss: trade.stopLoss,
+        take_profit: trade.takeProfit,
+        result: trade.result,
+        result_price: trade.resultPrice,
+        session: trade.session,
+        market_session: trade.marketSession || null,
+        notes: trade.notes,
+        is_favorite: trade.isFavorite,
+        money_result: trade.moneyResult || null,
+        risk_reward: trade.riskReward ?? null,
+        operational: trade.operational as any,
+        emotional: trade.emotional as any,
+        rational: trade.rational as any,
+        routine: trade.routine as any,
+        pre_trade_image: trade.preTradeImage || null,
+        trading_image: trade.tradingImage || null,
+        post_trade_image: trade.postTradeImage || null,
+      })
+      .select()
+      .single();
+
     if (!error && data) {
       const newTrade = mapRowToTrade(data);
       setTrades((prev) => [...prev, newTrade]);
+      await syncChecklistTicks(newTrade.id, trade);
       return newTrade;
     }
+
     return null;
-  }, [user, accountId]);
+  }, [user, accountId, syncChecklistTicks]);
 
   const updateTrade = useCallback(async (id: string, updates: Partial<TradeWithChecklist>) => {
     if (!user) return;
+
     const dbUpdates: any = {};
     if (updates.date !== undefined) dbUpdates.date = updates.date;
     if (updates.entryTime !== undefined) dbUpdates.entry_time = updates.entryTime;
@@ -150,21 +224,38 @@ export const useTradeJournalUnified = (accountId: string) => {
     if (updates.tradingImage !== undefined) dbUpdates.trading_image = updates.tradingImage;
     if (updates.postTradeImage !== undefined) dbUpdates.post_trade_image = updates.postTradeImage;
 
-    await supabase.from("trades").update(dbUpdates).eq("id", id).eq("user_id", user.id);
-    setTrades((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)));
-  }, [user]);
+    await supabase
+      .from("trades")
+      .update(dbUpdates)
+      .eq("id", id)
+      .eq("user_id", user.id);
+
+    const currentTrade = trades.find((t) => t.id === id);
+    const mergedTrade = { ...currentTrade, ...updates } as TradeWithChecklist;
+
+    setTrades((prev) => prev.map((t) => (t.id === id ? mergedTrade : t)));
+    await syncChecklistTicks(id, mergedTrade);
+  }, [user, trades, syncChecklistTicks]);
 
   const toggleFavorite = useCallback(async (id: string) => {
     const trade = trades.find((t) => t.id === id);
     if (!trade || !user) return;
+
     const newVal = !trade.isFavorite;
-    await supabase.from("trades").update({ is_favorite: newVal }).eq("id", id).eq("user_id", user.id);
+    await supabase
+      .from("trades")
+      .update({ is_favorite: newVal })
+      .eq("id", id)
+      .eq("user_id", user.id);
+
     setTrades((prev) => prev.map((t) => (t.id === id ? { ...t, isFavorite: newVal } : t)));
   }, [trades, user]);
 
   const deleteTrade = useCallback(async (id: string) => {
     if (!user) return;
+
     await supabase.from("trades").delete().eq("id", id).eq("user_id", user.id);
+    await supabase.from("trade_checklist_ticks" as any).delete().eq("trade_id", id).eq("user_id", user.id);
     setTrades((prev) => prev.filter((t) => t.id !== id));
   }, [user]);
 
