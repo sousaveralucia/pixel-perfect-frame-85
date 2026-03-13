@@ -158,11 +158,27 @@ export default function TradeJournalEnhanced() {
   const [selectedTradeForGallery, setSelectedTradeForGallery] =
     useState<TradeWithChecklist | null>(null);
 
-  // Build dynamic initial state from checklist items
   const buildChecklistState = (items: ChecklistItem[]) => {
     const state: Record<string, boolean> = {};
-    items.forEach(i => { state[i.key] = false; });
+    items.forEach((i) => {
+      state[i.key] = false;
+    });
     return state;
+  };
+
+  const normalizeChecklistState = (
+    current: Record<string, boolean>,
+    items: ChecklistItem[],
+  ) => Object.fromEntries(items.map((item) => [item.key, current?.[item.key] === true])) as Record<string, boolean>;
+
+  const getChecklistProgress = (
+    state: Record<string, boolean>,
+    items: ChecklistItem[],
+  ) => {
+    const total = items.length;
+    const checked = items.filter((item) => state?.[item.key] === true).length;
+    const percentage = total === 0 ? 100 : Math.round((checked / total) * 100);
+    return { total, checked, percentage };
   };
 
   const [formData, setFormData] = useState({
@@ -195,16 +211,22 @@ export default function TradeJournalEnhanced() {
     postTradeImage: "",
   });
 
-  // Sync checklist defaults when items load
   useEffect(() => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      operational: { ...buildChecklistState(opChecklist.items), ...prev.operational },
-      emotional: { ...buildChecklistState(emChecklist.items), ...prev.emotional },
-      routine: { ...buildChecklistState(rtChecklist.items), ...prev.routine },
-      rational: { ...buildChecklistState(raChecklist.items), ...prev.rational },
+      operational: normalizeChecklistState(prev.operational, opChecklist.items),
+      emotional: normalizeChecklistState(prev.emotional, emChecklist.items),
+      routine: normalizeChecklistState(prev.routine, rtChecklist.items),
+      rational: normalizeChecklistState(prev.rational, raChecklist.items),
     }));
   }, [opChecklist.items, emChecklist.items, rtChecklist.items, raChecklist.items]);
+
+  const checklistProgress = useMemo(() => ({
+    operacional: getChecklistProgress(formData.operational, opChecklist.items),
+    emocional: getChecklistProgress(formData.emotional, emChecklist.items),
+    rotina: getChecklistProgress(formData.routine, rtChecklist.items),
+    racional: getChecklistProgress(formData.rational, raChecklist.items),
+  }), [formData.operational, formData.emotional, formData.routine, formData.rational, opChecklist.items, emChecklist.items, rtChecklist.items, raChecklist.items]);
 
   // Usar hook de alertas
   useTradeAlerts(trades, activeAccountId);
