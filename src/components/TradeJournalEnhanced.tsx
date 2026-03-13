@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -21,18 +21,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useTradeJournal } from "@/hooks/useTradeJournal";
 import { useTradeJournalUnified, TradeWithChecklist } from "@/hooks/useTradeJournalUnified";
 import { useAccountManager } from "@/hooks/useAccountManager";
 import { Plus, Trash2, Edit2, Image, FileSpreadsheet, FileDown, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { useTradeAlerts } from "@/hooks/useTradeAlerts";
-
-import {
-  useMarketSession,
-  formatMarketSession,
-  parseTimeString,
-} from "@/hooks/useMarketSession";
+import { parseTimeString } from "@/hooks/useMarketSession";
 import { Download } from "lucide-react";
 import { exportTradesToExcel, exportToCSV as exportToCSVFile } from "@/lib/excelExporter";
 import { SimpleImageViewer } from "./SimpleImageViewer";
