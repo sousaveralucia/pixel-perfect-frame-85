@@ -512,34 +512,58 @@ export default function TradeJournalEnhanced() {
 
     y = 36;
 
-    // Helper: compact section title
+    const sanitizePdfText = (value: string) =>
+      value
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\x20-\x7E]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    const ensurePdfSpace = (needed = 10) => {
+      if (y + needed > ph - 12) {
+        doc.addPage();
+        y = 14;
+      }
+    };
+
     const secTitle = (title: string, color: [number, number, number]) => {
+      ensurePdfSpace(10);
       doc.setFillColor(...color);
       doc.rect(m, y, 2.5, 6, "F");
       doc.setTextColor(...c.primary);
       doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
-      doc.text(title, m + 5, y + 4.5);
+      doc.text(sanitizePdfText(title), m + 5, y + 4.5);
       y += 8;
     };
 
-    // Helper: compact data row
     const dRow = (label: string, value: string, x: number, w: number, alt: boolean) => {
-      if (alt) { doc.setFillColor(...c.lightBg); doc.rect(x, y - 3, w, 6, "F"); }
-      doc.setTextColor(...c.gray); doc.setFontSize(7.5); doc.setFont("helvetica", "normal");
-      doc.text(label, x + 2, y + 0.5);
-      doc.setTextColor(...c.primary); doc.setFont("helvetica", "bold");
-      doc.text(value, x + w / 2, y + 0.5);
+      ensurePdfSpace(7);
+      if (alt) {
+        doc.setFillColor(...c.lightBg);
+        doc.rect(x, y - 3, w, 6, "F");
+      }
+      doc.setTextColor(...c.gray);
+      doc.setFontSize(7.5);
+      doc.setFont("helvetica", "normal");
+      doc.text(sanitizePdfText(label), x + 2, y + 0.5);
+      doc.setTextColor(...c.primary);
+      doc.setFont("helvetica", "bold");
+      doc.text(sanitizePdfText(value), x + w / 2, y + 0.5);
       y += 6;
     };
 
-    // Helper: compact check item
     const chk = (label: string, checked: boolean, x: number, w: number) => {
+      ensurePdfSpace(6);
       doc.setFillColor(...(checked ? c.green : c.red));
       doc.circle(x + 4, y + 0.5, 1.8, "F");
-      doc.setTextColor(...c.primary); doc.setFontSize(7.5); doc.setFont("helvetica", "normal");
-      doc.text(label, x + 8, y + 1.5);
-      doc.setTextColor(...(checked ? c.green : c.red)); doc.setFont("helvetica", "bold");
+      doc.setTextColor(...c.primary);
+      doc.setFontSize(7.2);
+      doc.setFont("helvetica", "normal");
+      doc.text(sanitizePdfText(label).slice(0, 46), x + 8, y + 1.5);
+      doc.setTextColor(...(checked ? c.green : c.red));
+      doc.setFont("helvetica", "bold");
       doc.text(checked ? "Sim" : "Nao", x + w - 12, y + 1.5);
       y += 5.5;
     };
