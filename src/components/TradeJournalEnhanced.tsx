@@ -301,39 +301,30 @@ export default function TradeJournalEnhanced() {
       return;
     }
 
-    // Checklist 50% validation for each group
     const checkGroups = [
-      { name: "Operacional", items: Object.values(formData.operational) },
-      { name: "Emocional", items: Object.values(formData.emotional) },
-      { name: "Rotina", items: Object.values(formData.routine) },
-      { name: "Racional", items: Object.values(formData.rational) },
+      { name: "Operacional", items: opChecklist.items, values: formData.operational },
+      { name: "Emocional", items: emChecklist.items, values: formData.emotional },
+      { name: "Rotina", items: rtChecklist.items, values: formData.routine },
+      { name: "Racional", items: raChecklist.items, values: formData.rational },
     ];
 
     for (const group of checkGroups) {
-      if (group.items.length > 0) {
-        const marked = group.items.filter(v => v === true).length;
-        const pct = (marked / group.items.length) * 100;
-        if (pct < 50) {
-          toast.error(`Para registrar este trade é necessário completar pelo menos 50% do checklist ${group.name}.`);
-          return;
-        }
+      if (group.items.length === 0) continue;
+
+      const marked = group.items.filter((item) => group.values[item.key] === true).length;
+      const pct = (marked / group.items.length) * 100;
+
+      if (pct < 50) {
+        toast.error(
+          `Para registrar este trade é necessário completar pelo menos 50% do checklist ${group.name}. (${marked}/${group.items.length})`,
+        );
+        return;
       }
     }
 
-    const operationalItems = Object.values(formData.operational);
-    const allOperationalComplete = operationalItems.every(
-      item => item === true
-    );
-
-    if (!allOperationalComplete) {
-      const incompleteCount = operationalItems.filter(
-        item => item === false
-      ).length;
-      toast.warning(
-        `⚠️ Checklist Operacional incompleto: ${incompleteCount} item(ns) não marcado(s)`,
-        { duration: 4000 }
-      );
-    }
+    const allOperationalComplete =
+      opChecklist.items.length > 0 &&
+      opChecklist.items.every((item) => formData.operational[item.key] === true);
 
     // Validar R:R
     const rr = formData.riskReward || 0;
