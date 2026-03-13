@@ -1451,58 +1451,29 @@ export default function TradeJournalEnhanced() {
 
             {/* Validation Warning */}
             {(() => {
-              const operationalItems = Object.entries(formData.operational);
-              const emotionalItems = Object.entries(formData.emotional);
-              const rationalItems = Object.entries(formData.rational);
+              const groups = [
+                { title: "Operacional", data: checklistProgress.operacional },
+                { title: "Emocional", data: checklistProgress.emocional },
+                { title: "Rotina", data: checklistProgress.rotina },
+                { title: "Racional", data: checklistProgress.racional },
+              ];
 
-              const allOperational = operationalItems.every(([_, v]) => v);
-              const allEmotional = emotionalItems.every(([_, v]) => v);
-              const allRational = rationalItems.every(([_, v]) => v);
-              const allComplete = allOperational && allEmotional && allRational;
+              const hasInvalid = groups.some((group) => group.data.percentage < 50);
 
-              const incompleteOperational = operationalItems.filter(
-                ([_, v]) => !v
-              ).length;
-              const incompleteEmotional = emotionalItems.filter(
-                ([_, v]) => !v
-              ).length;
-              const incompleteRational = rationalItems.filter(
-                ([_, v]) => !v
-              ).length;
-
-              if (!allComplete) {
-                return (
-                  <div className="bg-red-50 p-4 rounded-lg border-2 border-red-300 space-y-2">
-                    <p className="text-sm text-red-900 font-bold">
-                      🔴 Checklist Incompleto - Não é possível registrar o trade
-                    </p>
-                    {!allOperational && (
-                      <p className="text-xs text-red-800">
-                        • <span className="font-semibold">Operacional:</span>{" "}
-                        {incompleteOperational} item(ns) faltando
-                      </p>
-                    )}
-                    {!allEmotional && (
-                      <p className="text-xs text-red-800">
-                        • <span className="font-semibold">Emocional:</span>{" "}
-                        {incompleteEmotional} item(ns) faltando
-                      </p>
-                    )}
-                    {!allRational && (
-                      <p className="text-xs text-red-800">
-                        • <span className="font-semibold">Racional:</span>{" "}
-                        {incompleteRational} item(ns) faltando
-                      </p>
-                    )}
-                  </div>
-                );
-              }
               return (
-                <div className="bg-green-50 p-3 rounded-lg border-2 border-green-300">
-                  <p className="text-sm text-green-900 font-semibold">
-                    ✅ Todos os checklists foram completados! Pronto para
-                    registrar.
+                <div className={`p-4 rounded-lg border ${hasInvalid ? "bg-destructive/10 border-destructive/30" : "bg-success/10 border-success/30"}`}>
+                  <p className={`text-sm font-semibold ${hasInvalid ? "text-destructive" : "text-success"}`}>
+                    {hasInvalid
+                      ? "Para registrar este trade, complete pelo menos 50% de cada checklist."
+                      : "✅ Requisito mínimo atendido: 50%+ em todos os checklists."}
                   </p>
+                  <div className="mt-2 grid sm:grid-cols-2 gap-2">
+                    {groups.map((group) => (
+                      <p key={group.title} className="text-xs text-foreground/80">
+                        • <span className="font-semibold">{group.title}:</span> {group.data.checked}/{group.data.total} ({group.data.percentage}%)
+                      </p>
+                    ))}
+                  </div>
                 </div>
               );
             })()}
