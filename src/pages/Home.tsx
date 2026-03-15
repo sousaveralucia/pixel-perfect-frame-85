@@ -40,7 +40,7 @@ function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
   return (
     <Button
-      variant="outline"
+      variant="ghost"
       size="icon"
       onClick={toggleTheme}
       className="rounded-full h-8 w-8"
@@ -53,6 +53,25 @@ function ThemeToggle() {
 function LazyTab({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<TabSkeleton />}>{children}</Suspense>;
 }
+
+const TABS = [
+  { value: "calendario-trading", label: "Calendário" },
+  { value: "contas", label: "Contas" },
+  { value: "autoconhecimento", label: "Pessoal" },
+  { value: "estrategia", label: "Estratégia" },
+  { value: "validacao", label: "Pré-Op" },
+  { value: "rotina", label: "Rotina" },
+  { value: "alertas", label: "Alertas" },
+  { value: "analises", label: "Análises" },
+  { value: "calculadora", label: "Calculadora" },
+  { value: "diario", label: "Diário" },
+  { value: "calendario", label: "Cal. Econômico" },
+  { value: "insights", label: "Insights" },
+  { value: "disciplina", label: "Disciplina" },
+  { value: "comparacao", label: "Comparação" },
+  { value: "relatorio", label: "Relatório" },
+  { value: "saques", label: "Saques" },
+];
 
 export default function Home() {
   const { signOut } = useAuth();
@@ -74,13 +93,10 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       {/* Header */}
-      <header className="border-b border-border sticky top-0 z-30 bg-primary/20 backdrop-blur-lg">
-        <div className="container py-3 md:py-5">
+      <header className="border-b border-border sticky top-0 z-30 bg-background/80 backdrop-blur-xl">
+        <div className="container py-3">
           <div className="flex items-center justify-between gap-2">
-            <div className="min-w-0">
-              <h1 className="text-lg md:text-2xl font-bold text-foreground truncate">Trading Journal</h1>
-              <p className="hidden md:block mt-0.5 text-muted-foreground text-sm">Professional trading dashboard</p>
-            </div>
+            <h1 className="text-lg md:text-xl font-semibold text-foreground truncate">Trading Journal</h1>
             <div className="flex items-center gap-2 flex-shrink-0">
               <Select value={activeAccountId} onValueChange={switchAccount}>
                 <SelectTrigger className="w-[110px] md:w-[170px] h-8 text-xs">
@@ -108,29 +124,15 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="container py-4 md:py-8">
+      <main className="container py-4 md:py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Desktop tabs */}
           <div className="hidden md:block mb-6">
             <div className="overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] touch-pan-x">
-              <TabsList className="inline-flex min-w-max justify-start gap-1 bg-secondary/30 p-1 rounded-lg border border-border">
-              <TabsTrigger value="calendario-trading" className="text-xs whitespace-nowrap">Calendário</TabsTrigger>
-              <TabsTrigger value="contas" className="text-xs whitespace-nowrap">Contas</TabsTrigger>
-              <TabsTrigger value="autoconhecimento" className="text-xs whitespace-nowrap">Pessoal</TabsTrigger>
-              <TabsTrigger value="ativos" className="text-xs whitespace-nowrap">Ativos</TabsTrigger>
-              <TabsTrigger value="estrategia" className="text-xs whitespace-nowrap">Estratégia</TabsTrigger>
-              <TabsTrigger value="validacao" className="text-xs whitespace-nowrap">Pré-Op</TabsTrigger>
-              <TabsTrigger value="rotina" className="text-xs whitespace-nowrap">Rotina</TabsTrigger>
-              <TabsTrigger value="alertas" className="text-xs whitespace-nowrap">Alertas</TabsTrigger>
-              <TabsTrigger value="analises" className="text-xs whitespace-nowrap">Análises</TabsTrigger>
-              <TabsTrigger value="calculadora" className="text-xs whitespace-nowrap">Calculadora</TabsTrigger>
-              <TabsTrigger value="diario" className="text-xs whitespace-nowrap">Diário</TabsTrigger>
-              <TabsTrigger value="calendario" className="text-xs whitespace-nowrap">Cal. Econômico</TabsTrigger>
-              <TabsTrigger value="insights" className="text-xs whitespace-nowrap">Insights</TabsTrigger>
-              <TabsTrigger value="disciplina" className="text-xs whitespace-nowrap">Disciplina</TabsTrigger>
-              <TabsTrigger value="comparacao" className="text-xs whitespace-nowrap">Comparação</TabsTrigger>
-              <TabsTrigger value="relatorio" className="text-xs whitespace-nowrap">Relatório</TabsTrigger>
-              <TabsTrigger value="saques" className="text-xs whitespace-nowrap">Saques</TabsTrigger>
+              <TabsList className="inline-flex min-w-max justify-start gap-0.5 bg-secondary p-1 rounded-lg">
+                {TABS.map(tab => (
+                  <TabsTrigger key={tab.value} value={tab.value} className="text-xs whitespace-nowrap">{tab.label}</TabsTrigger>
+                ))}
               </TabsList>
             </div>
           </div>
@@ -138,10 +140,10 @@ export default function Home() {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
-              initial={{ opacity: 0, y: 6 }}
+              initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
+              transition={{ duration: 0.12 }}
             >
 
           <TabsContent value="calendario-trading" className="space-y-6 mt-0">
@@ -159,39 +161,39 @@ export default function Home() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <h3 className="font-bold text-foreground mb-3">Por que você faz trade? Quais são seus objetivos?</h3>
-                  <p className="text-foreground/80">
+                  <h3 className="font-semibold text-foreground mb-3">Por que você faz trade? Quais são seus objetivos?</h3>
+                  <p className="text-foreground/80 text-sm">
                     O principal objetivo é <strong>viver do mercado financeiro e sair do regime CLT</strong>, buscando uma melhor qualidade de vida, mais liberdade e remuneração justa.
                   </p>
                 </div>
                 <Separator />
                 <div>
-                  <h3 className="font-bold text-foreground mb-3">Regime de Operação</h3>
-                  <Badge className="bg-primary/10 text-primary">Meio Período</Badge>
-                  <p className="text-sm text-foreground/80 mt-2">Operações nas horas vagas disponíveis do trabalho CLT</p>
+                  <h3 className="font-semibold text-foreground mb-3">Regime de Operação</h3>
+                  <Badge variant="secondary">Meio Período</Badge>
+                  <p className="text-sm text-muted-foreground mt-2">Operações nas horas vagas disponíveis do trabalho CLT</p>
                 </div>
                 <Separator />
                 <div>
-                  <h3 className="font-bold text-foreground mb-3">Motivação Principal</h3>
-                  <p className="text-foreground/80">
+                  <h3 className="font-semibold text-foreground mb-3">Motivação Principal</h3>
+                  <p className="text-foreground/80 text-sm">
                     A esperança de poder <strong>mudar de vida</strong> para si e para a família é a principal motivação.
                   </p>
                 </div>
                 <Separator />
                 <div>
-                  <h3 className="font-bold text-foreground mb-3">5 Pontos Fortes</h3>
+                  <h3 className="font-semibold text-foreground mb-3">5 Pontos Fortes</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {[
                     { title: "Persistência", desc: "Capacidade de continuar buscando o objetivo" },
                     { title: "Força de vontade", desc: "Determinação para alcançar o sucesso" },
                     { title: "Tempo para estudar", desc: "Dedicação extra ao aprendizado" },
                     { title: "Foco no objetivo", desc: "Clareza sobre viver do mercado" },
-                    { title: "Paciência", desc: "Esperar pelas melhores oportunidades" }].
-                    map((point, idx) =>
-                    <Card key={idx} className="bg-success/5 border-success/20">
+                    { title: "Paciência", desc: "Esperar pelas melhores oportunidades" }
+                    ].map((point, idx) =>
+                    <Card key={idx} className="border-success/20 bg-success/5">
                         <CardContent className="pt-4">
-                          <p className="font-bold text-success">{point.title}</p>
-                          <p className="text-sm text-muted-foreground">{point.desc}</p>
+                          <p className="font-semibold text-success text-sm">{point.title}</p>
+                          <p className="text-xs text-muted-foreground">{point.desc}</p>
                         </CardContent>
                       </Card>
                     )}
@@ -199,19 +201,19 @@ export default function Home() {
                 </div>
                 <Separator />
                 <div>
-                  <h3 className="font-bold text-foreground mb-3">5 Pontos Fracos e Estratégias</h3>
+                  <h3 className="font-semibold text-foreground mb-3">5 Pontos Fracos e Estratégias</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {[
                     { title: "Emocional", strategy: "Controle emocional através de mindfulness e revisão pós-trade" },
                     { title: "Contas apertadas", strategy: "Gerenciar capital de forma conservadora" },
                     { title: "Ansiedade", strategy: "Rotinas pré-trade e técnicas de respiração" },
                     { title: "Falta de disciplina", strategy: "Checklist diário rigoroso" },
-                    { title: "Sair do plano", strategy: "Pausa forçada após cada desvio" }].
-                    map((point, idx) =>
-                    <Card key={idx} className="bg-destructive/5 border-destructive/20">
+                    { title: "Sair do plano", strategy: "Pausa forçada após cada desvio" }
+                    ].map((point, idx) =>
+                    <Card key={idx} className="border-destructive/20 bg-destructive/5">
                         <CardContent className="pt-4">
-                          <p className="font-bold text-destructive">{point.title}</p>
-                          <p className="text-sm text-muted-foreground">{point.strategy}</p>
+                          <p className="font-semibold text-destructive text-sm">{point.title}</p>
+                          <p className="text-xs text-muted-foreground">{point.strategy}</p>
                         </CardContent>
                       </Card>
                     )}
@@ -221,7 +223,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Card className="bg-success/5 border-success/20">
                     <CardContent className="pt-6">
-                      <p className="font-bold text-success mb-2">DIAS BONS</p>
+                      <p className="font-semibold text-success mb-2">DIAS BONS</p>
                       <p className="text-sm text-muted-foreground">
                         "Hoje, a disciplina e a paciência foram recompensadas. Cada trade executado conforme o plano me aproxima da liberdade financeira."
                       </p>
@@ -229,7 +231,7 @@ export default function Home() {
                   </Card>
                   <Card className="bg-destructive/5 border-destructive/20">
                     <CardContent className="pt-6">
-                      <p className="font-bold text-destructive mb-2">DIAS RUINS</p>
+                      <p className="font-semibold text-destructive mb-2">DIAS RUINS</p>
                       <p className="text-sm text-muted-foreground">
                         "Um dia de aprendizado não é um dia perdido. Mantenho o foco no objetivo maior e volto mais forte amanhã."
                       </p>
@@ -244,56 +246,19 @@ export default function Home() {
             <LazyTab><AccountSelector /></LazyTab>
           </TabsContent>
 
-          <TabsContent value="ativos" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="w-5 h-5 text-primary" />
-                  Ativos Operados
-                </CardTitle>
-                <CardDescription>5 ativos principais para operação</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {[
-                  { symbol: "EUR/USD", type: "Forex", session: "Sessão Europeia" },
-                  { symbol: "USDJPY", type: "Forex", session: "Sessão Asiática" },
-                  { symbol: "XAUUSD", type: "Commodity", session: "24 horas" },
-                  { symbol: "NASDAQ", type: "Índice", session: "Sessão Americana" },
-                  { symbol: "BTC USD", type: "Criptomoeda", session: "24 horas" }].
-                  map((asset) =>
-                  <Card key={asset.symbol} className="border-l-4 border-l-primary">
-                      <CardContent className="pt-6">
-                        <p className="text-2xl font-bold text-primary">{asset.symbol}</p>
-                        <p className="text-sm text-muted-foreground">{asset.type}</p>
-                        <p className="text-xs text-muted-foreground mt-2">{asset.session}</p>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-            <LazyTab>
-              <EquityAndPerformanceCharts />
-              <AssetPerformanceAnalysis />
-            </LazyTab>
-          </TabsContent>
-
           <TabsContent value="estrategia" className="space-y-4">
-            {/* Header */}
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div>
-                <h2 className="text-lg md:text-xl font-bold text-foreground">Minha Estratégia</h2>
+                <h2 className="text-lg md:text-xl font-semibold text-foreground">Minha Estratégia</h2>
                 <p className="text-sm text-muted-foreground">Smart Money Concepts — Modelo Operacional Completo</p>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
-                <TrendingUp className="w-3.5 h-3.5 text-primary" />
-                <span className="text-xs font-semibold text-primary">ICT / SMC</span>
-              </div>
+              <Badge variant="secondary" className="gap-1">
+                <TrendingUp className="w-3 h-3" />
+                ICT / SMC
+              </Badge>
             </div>
 
-            {/* Visão Geral da Estratégia */}
-            <Card className="border overflow-hidden">
+            <Card>
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -305,20 +270,17 @@ export default function Home() {
                       Opero com base em <strong className="text-foreground">Smart Money Concepts</strong>: identifico a estrutura 
                       de mercado em timeframes maiores (HTF), busco confirmação de mudança de caráter (CHoCH/BOS), 
                       e entro em <strong className="text-foreground">Order Blocks descontados</strong> dentro da Caixa de Gann 
-                      com RR mínimo de 1:3. Ativos: EUR/USD, USD/JPY, XAU/USD, NAS100, BTC/USD e DXY como referência.
+                      com RR mínimo de 1:3.
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Fluxo Operacional */}
-            <Card className="border">
+            <Card>
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded bg-primary/10 flex items-center justify-center">
-                    <ListChecks className="w-3.5 h-3.5 text-primary" />
-                  </div>
+                  <ListChecks className="w-4 h-4 text-primary" />
                   <CardTitle className="text-sm font-semibold">Checklist Operacional — 8 Passos</CardTitle>
                 </div>
                 <CardDescription className="text-xs">Seguir na ordem. Não pular etapas.</CardDescription>
@@ -326,24 +288,24 @@ export default function Home() {
               <CardContent className="pt-0">
                 <div className="space-y-2">
                   {[
-                  { step: 1, title: "CHoCH Válido em HTF", timeframe: "H4 / H2 / H1", desc: "Identificar mudança de caráter: um LOW ou HIGH protegido rompido com corpo de candle.", detail: "CHoCH = Change of Character. É a primeira confirmação de que o mercado pode estar mudando de direção. Sem CHoCH válido, não há setup.", tag: "Estrutura", tagColor: "bg-primary/10 text-primary border-primary/20" },
-                  { step: 2, title: "Caixa de Gann em M30", timeframe: "M30", desc: "Traçar do início do movimento até o fim do CHoCH. Usar regiões 0%, 50% e 100%.", detail: "A Caixa de Gann define a zona premium (acima de 50%) e discount (abaixo de 50%). Só opero em zonas de desconto para compra e premium para venda.", tag: "Gann", tagColor: "bg-chart-3/10 text-chart-3 border-chart-3/20" },
-                  { step: 3, title: "Order Blocks Descontados", timeframe: "50% da Gann", desc: "Apenas OBs abaixo de 50% (compra) ou acima de 50% (venda).", detail: "Order Blocks fora da zona de desconto têm menor probabilidade. A confluência com a Gann aumenta a taxa de acerto significativamente.", tag: "Desconto", tagColor: "bg-success/10 text-success border-success/20" },
-                  { step: 4, title: "Order Blocks Válidos", timeframe: "H4 / H2 / H1 / M30", desc: "Se candle com muito pavio e pouco corpo → traçar o candle inteiro.", detail: "Um OB válido é o último candle de baixa antes de um impulso de alta (ou vice-versa). Deve ter causado deslocamento significativo no preço.", tag: "OB", tagColor: "bg-warning/10 text-warning border-warning/20" },
-                  { step: 5, title: "Entrada no 50% do Order Block", timeframe: "M15 / M5", desc: "Identificar ineficiências de HTF e entrar sempre no 50% da região.", detail: "O 50% do OB é o ponto ótimo de entrada (OTE — Optimal Trade Entry). Garante melhor RR e stop mais curto. Usar limit order.", tag: "Entrada", tagColor: "bg-destructive/10 text-destructive border-destructive/20" },
-                  { step: 6, title: "Stop Loss com Folga", timeframe: "M30+", desc: "Stop abaixo/acima do OB com folga. Nunca stop no extremo exato.", detail: "Adicionar 5-10 pips de folga além do OB. Stops apertados demais são varridos por liquidez institucional antes do movimento real.", tag: "Proteção", tagColor: "bg-chart-2/10 text-chart-2 border-chart-2/20" },
-                  { step: 7, title: "Take Profit Mínimo 1:3", timeframe: "Obrigatório", desc: "RR mínimo de 1:3. Abaixo disso, não entrar.", detail: "Com 1:3, você pode errar 2 de cada 3 trades e ainda ficar positivo. É a base matemática que torna a estratégia sustentável no longo prazo.", tag: "RR", tagColor: "bg-chart-4/10 text-chart-4 border-chart-4/20" },
-                  { step: 8, title: "Confirmação em LTF", timeframe: "M15 / M5", desc: "Confirmar o setup no tempo gráfico operacional antes de executar.", detail: "Buscar CHoCH ou BOS em M15/M5 dentro do Order Block de HTF. É a confirmação final antes de posicionar a ordem.", tag: "Execução", tagColor: "bg-ring/10 text-ring border-ring/20" }
+                  { step: 1, title: "CHoCH Válido em HTF", timeframe: "H4 / H2 / H1", desc: "Identificar mudança de caráter: um LOW ou HIGH protegido rompido com corpo de candle.", detail: "CHoCH = Change of Character. É a primeira confirmação de que o mercado pode estar mudando de direção.", tag: "Estrutura" },
+                  { step: 2, title: "Caixa de Gann em M30", timeframe: "M30", desc: "Traçar do início do movimento até o fim do CHoCH. Usar regiões 0%, 50% e 100%.", detail: "A Caixa de Gann define a zona premium e discount. Só opero em zonas de desconto para compra e premium para venda.", tag: "Gann" },
+                  { step: 3, title: "Order Blocks Descontados", timeframe: "50% da Gann", desc: "Apenas OBs abaixo de 50% (compra) ou acima de 50% (venda).", detail: "Order Blocks fora da zona de desconto têm menor probabilidade. A confluência com a Gann aumenta a taxa de acerto.", tag: "Desconto" },
+                  { step: 4, title: "Order Blocks Válidos", timeframe: "H4 / H2 / H1 / M30", desc: "Se candle com muito pavio e pouco corpo → traçar o candle inteiro.", detail: "Um OB válido é o último candle de baixa antes de um impulso de alta (ou vice-versa).", tag: "OB" },
+                  { step: 5, title: "Entrada no 50% do Order Block", timeframe: "M15 / M5", desc: "Identificar ineficiências de HTF e entrar sempre no 50% da região.", detail: "O 50% do OB é o ponto ótimo de entrada (OTE). Garante melhor RR e stop mais curto.", tag: "Entrada" },
+                  { step: 6, title: "Stop Loss com Folga", timeframe: "M30+", desc: "Stop abaixo/acima do OB com folga. Nunca stop no extremo exato.", detail: "Adicionar 5-10 pips de folga além do OB.", tag: "Proteção" },
+                  { step: 7, title: "Take Profit Mínimo 1:3", timeframe: "Obrigatório", desc: "RR mínimo de 1:3. Abaixo disso, não entrar.", detail: "Com 1:3, você pode errar 2 de cada 3 trades e ainda ficar positivo.", tag: "RR" },
+                  { step: 8, title: "Confirmação em LTF", timeframe: "M15 / M5", desc: "Confirmar o setup no tempo gráfico operacional antes de executar.", detail: "Buscar CHoCH ou BOS em M15/M5 dentro do Order Block de HTF.", tag: "Execução" }
                   ].map((item, idx) =>
                   <details key={idx} className="group">
-                      <summary className="flex items-center gap-2 md:gap-3 p-3 rounded-lg border border-border hover:border-muted-foreground/30 cursor-pointer transition-colors bg-card">
+                      <summary className="flex items-center gap-2 md:gap-3 p-3 rounded-lg border border-border hover:border-primary/30 cursor-pointer transition-colors bg-card">
                         <div className="w-7 h-7 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs flex-shrink-0">
                           {item.step}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-semibold text-xs md:text-sm text-foreground">{item.title}</span>
-                            <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${item.tagColor}`}>{item.tag}</span>
+                            <span className="font-medium text-xs md:text-sm text-foreground">{item.title}</span>
+                            <Badge variant="secondary" className="text-[10px] h-5">{item.tag}</Badge>
                           </div>
                           <p className="text-xs text-muted-foreground truncate">{item.desc}</p>
                         </div>
@@ -351,7 +313,7 @@ export default function Home() {
                         <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180 flex-shrink-0" />
                       </summary>
                       <div className="mt-1 ml-10 mr-3 mb-2 p-3 rounded-lg bg-muted/50 border border-border">
-                        <p className="text-xs text-foreground/80 leading-relaxed">{item.detail}</p>
+                        <p className="text-xs text-muted-foreground leading-relaxed">{item.detail}</p>
                       </div>
                     </details>
                   )}
@@ -359,7 +321,6 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            {/* Conceitos Chave */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {[
               { icon: <TrendingUp className="w-4 h-4" />, title: "CHoCH", desc: "Mudança de caráter — primeiro sinal de reversão" },
@@ -367,15 +328,15 @@ export default function Home() {
               { icon: <Layers className="w-4 h-4" />, title: "Order Block", desc: "Última vela contrária antes do impulso" },
               { icon: <Grid3X3 className="w-4 h-4" />, title: "Gann Box", desc: "Ferramenta de desconto — 0%, 50%, 100%" },
               { icon: <Droplets className="w-4 h-4" />, title: "Liquidez", desc: "Pools de ordens acima/abaixo de highs/lows" },
-              { icon: <Zap className="w-4 h-4" />, title: "FVG / Imbalance", desc: "Gap de valor justo — região de ineficiência" }].
-              map((concept, idx) =>
-              <Card key={idx} className="border hover:border-primary/30 transition-colors">
+              { icon: <Zap className="w-4 h-4" />, title: "FVG / Imbalance", desc: "Gap de valor justo — região de ineficiência" }
+              ].map((concept, idx) =>
+              <Card key={idx} className="hover:border-primary/30 transition-colors">
                   <CardContent className="p-3">
                     <div className="flex items-center gap-2 mb-1.5">
                       <div className="w-7 h-7 rounded bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
                         {concept.icon}
                       </div>
-                      <span className="font-semibold text-xs text-foreground">{concept.title}</span>
+                      <span className="font-medium text-xs text-foreground">{concept.title}</span>
                     </div>
                     <p className="text-[11px] text-muted-foreground leading-relaxed">{concept.desc}</p>
                   </CardContent>
@@ -383,8 +344,7 @@ export default function Home() {
               )}
             </div>
 
-            {/* Gestão de Risco */}
-            <Card className="border">
+            <Card>
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
                   <Shield className="w-4 h-4 text-destructive" />
@@ -401,30 +361,29 @@ export default function Home() {
                     <p className="text-xl md:text-2xl font-bold text-primary">2</p>
                     <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mt-1">Meta Wins/Dia</p>
                   </div>
-                  <div className="text-center p-3 rounded-lg bg-chart-4/5 border border-chart-4/20">
-                    <p className="text-xl md:text-2xl font-bold text-chart-4">1:3</p>
+                  <div className="text-center p-3 rounded-lg bg-warning/5 border border-warning/20">
+                    <p className="text-xl md:text-2xl font-bold text-warning">1:3</p>
                     <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mt-1">RR Mínimo</p>
                   </div>
                 </div>
-                <div className="mt-3 space-y-2">
+                <div className="mt-3 space-y-1.5">
                   {[
                   { rule: "Nunca arriscar mais de 1-2% do capital por trade", icon: "🛡️" },
-                  { rule: "Se bater 3 losses, parar imediatamente — sem exceções", icon: "🛑" },
+                  { rule: "Se bater 3 losses, parar imediatamente", icon: "🛑" },
                   { rule: "Após 2 wins, considerar encerrar o dia positivo", icon: "✅" },
-                  { rule: "Não operar por vingança ou FOMO — respeitar o plano", icon: "🧠" },
-                  { rule: "DXY é referência — se o dólar diverge, cautela redobrada", icon: "💵" }].
-                  map((item, idx) =>
+                  { rule: "Não operar por vingança ou FOMO", icon: "🧠" },
+                  { rule: "DXY é referência — se o dólar diverge, cautela redobrada", icon: "💵" }
+                  ].map((item, idx) =>
                   <div key={idx} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-muted/50">
                       <span className="text-sm">{item.icon}</span>
-                      <span className="text-xs text-foreground/80">{item.rule}</span>
+                      <span className="text-xs text-muted-foreground">{item.rule}</span>
                     </div>
                   )}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Psicologia */}
-            <Card className="border border-warning/30 bg-warning/5">
+            <Card className="border-warning/20 bg-warning/5">
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-warning/15 flex items-center justify-center flex-shrink-0">
@@ -438,9 +397,9 @@ export default function Home() {
                       "Perdas fazem parte. Um trader lucrativo perde regularmente",
                       "A disciplina de NÃO operar é tão valiosa quanto a de operar",
                       "Consistência > resultados excepcionais esporádicos",
-                      "Analisar à noite, operar de dia — separar emoção de execução"].
-                      map((tip, idx) =>
-                      <p key={idx} className="text-xs text-foreground/70 flex items-start gap-1.5">
+                      "Analisar à noite, operar de dia — separar emoção de execução"
+                      ].map((tip, idx) =>
+                      <p key={idx} className="text-xs text-muted-foreground flex items-start gap-1.5">
                           <span className="text-warning mt-0.5">▸</span>
                           {tip}
                         </p>
@@ -463,61 +422,46 @@ export default function Home() {
                   <Clock className="w-5 h-5 text-primary" />
                   Minha Rotina de Trading
                 </CardTitle>
-                <CardDescription>Rotina pessoal baseada no meu operacional — Análise noturna + Operação diurna</CardDescription>
+                <CardDescription>Rotina pessoal — Análise noturna + Operação diurna</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
-                  {/* Weekly Calendar */}
-                  <Card className="border-2 border-primary/30 bg-primary/5">
+                <div className="space-y-4">
+                  <Card className="border-primary/20 bg-primary/5">
                     <CardContent className="pt-6">
-                      <p className="font-bold text-primary mb-4">📅 Calendário Semanal</p>
+                      <p className="font-semibold text-primary mb-4">📅 Calendário Semanal</p>
                       <div className="grid grid-cols-7 gap-1 md:gap-2">
                         {[
-                        { day: "DOM", analysis: true, operation: false, color: "bg-chart-3/20 border-chart-3" },
-                        { day: "SEG", analysis: true, operation: true, color: "bg-primary/20 border-primary" },
-                        { day: "TER", analysis: true, operation: true, color: "bg-primary/20 border-primary" },
-                        { day: "QUA", analysis: true, operation: true, color: "bg-primary/20 border-primary" },
-                        { day: "QUI", analysis: true, operation: true, color: "bg-primary/20 border-primary" },
-                        { day: "SEX", analysis: false, operation: true, color: "bg-warning/20 border-warning" },
-                        { day: "SÁB", analysis: false, operation: false, color: "bg-muted border-border" }].
-                        map((item) =>
-                        <Card key={item.day} className={`border ${item.color} text-center`}>
+                        { day: "DOM", analysis: true, operation: false },
+                        { day: "SEG", analysis: true, operation: true },
+                        { day: "TER", analysis: true, operation: true },
+                        { day: "QUA", analysis: true, operation: true },
+                        { day: "QUI", analysis: true, operation: true },
+                        { day: "SEX", analysis: false, operation: true },
+                        { day: "SÁB", analysis: false, operation: false }
+                        ].map((item) =>
+                        <Card key={item.day} className="text-center">
                             <CardContent className="pt-2 pb-2 md:pt-3 md:pb-3 px-1">
-                              <p className="font-bold text-foreground text-[10px] md:text-sm">{item.day}</p>
+                              <p className="font-semibold text-foreground text-[10px] md:text-sm">{item.day}</p>
                               <div className="mt-1 md:mt-2 space-y-1">
-                                {item.analysis &&
-                              <Badge variant="outline" className="text-[8px] md:text-[10px] px-0.5 md:px-1 py-0 block bg-chart-3/10 text-chart-3 border-chart-3/30">
-                                    🌙 <span className="hidden sm:inline">Análise</span>
-                                  </Badge>
-                              }
-                                {item.operation &&
-                              <Badge variant="outline" className="text-[8px] md:text-[10px] px-0.5 md:px-1 py-0 block bg-primary/10 text-primary border-primary/30">
-                                    📈 <span className="hidden sm:inline">Operar</span>
-                                  </Badge>
-                              }
-                                {!item.analysis && !item.operation &&
-                              <Badge variant="outline" className="text-[8px] md:text-[10px] px-0.5 md:px-1 py-0 block text-muted-foreground">
-                                    😴
-                                  </Badge>
-                              }
+                                {item.analysis && <Badge variant="secondary" className="text-[8px] md:text-[10px] px-0.5 md:px-1 py-0 block">🌙</Badge>}
+                                {item.operation && <Badge variant="secondary" className="text-[8px] md:text-[10px] px-0.5 md:px-1 py-0 block">📈</Badge>}
+                                {!item.analysis && !item.operation && <Badge variant="secondary" className="text-[8px] md:text-[10px] px-0.5 md:px-1 py-0 block">😴</Badge>}
                               </div>
                             </CardContent>
                           </Card>
                         )}
                       </div>
                       <div className="flex flex-wrap gap-3 mt-4 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-chart-3/30 inline-block"></span> Noite de Análise</span>
-                        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-primary/30 inline-block"></span> Dia de Operação + Análise</span>
-                        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-warning/30 inline-block"></span> Só Operação (sem análise à noite)</span>
-                        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-muted inline-block"></span> Folga</span>
+                        <span>🌙 Noite de Análise</span>
+                        <span>📈 Dia de Operação</span>
+                        <span>😴 Folga</span>
                       </div>
                     </CardContent>
                   </Card>
 
-                  {/* Routine Flow */}
                   {[
                   { period: "Noite (20h-20h30) — Análise", icon: "🌙", description: "Dom, Seg, Ter, Qua, Qui", tasks: ["Análise de mercado dos ativos que opero","Traçar regiões de interesse (Order Blocks, Gann, etc.)","Marcar zonas de liquidez e pontos de entrada","Definir cenários para o dia seguinte","Registrar análises na aba Análises"] },
-                  { period: "Manhã (ao acordar) — Revisão", icon: "🌅", description: "Seg a Sex", tasks: ["Revisar as marcações feitas na noite anterior","Observar como o mercado se moveu durante a madrugada","Verificar se as regiões traçadas estão sendo buscadas ou respeitadas","Entender melhor o contexto sem a pressão de traçar e operar na hora","Ajustar cenários se necessário"] },
+                  { period: "Manhã (ao acordar) — Revisão", icon: "🌅", description: "Seg a Sex", tasks: ["Revisar as marcações feitas na noite anterior","Observar como o mercado se moveu durante a madrugada","Verificar se as regiões traçadas estão sendo respeitadas","Entender melhor o contexto sem a pressão de operar na hora","Ajustar cenários se necessário"] },
                   { period: "Dia — Operação", icon: "📈", description: "Seg a Sex", tasks: ["Operar baseado nas marcações da noite anterior","Aguardar o preço chegar nas regiões marcadas","Executar conforme o checklist operacional","Registrar trades no Diário com todos os checklists","Respeitar limites de perdas e ganhos diários"] }
                   ].map((item, idx) =>
                   <Card key={idx} className="border-l-4 border-l-primary">
@@ -525,11 +469,11 @@ export default function Home() {
                         <div className="flex items-start gap-3 md:gap-4">
                           <div className="text-2xl md:text-3xl">{item.icon}</div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-bold text-foreground text-base md:text-lg">{item.period}</p>
+                            <p className="font-semibold text-foreground text-sm md:text-base">{item.period}</p>
                             <p className="text-xs text-muted-foreground mb-3">{item.description}</p>
-                            <ul className="space-y-2">
+                            <ul className="space-y-1.5">
                               {item.tasks.map((task, taskIdx) =>
-                            <li key={taskIdx} className="flex items-start gap-2 text-sm text-foreground/80">
+                            <li key={taskIdx} className="flex items-start gap-2 text-xs text-muted-foreground">
                                   <span className="text-primary font-bold mt-0.5">•</span>
                                   <span>{task}</span>
                                 </li>
@@ -541,32 +485,30 @@ export default function Home() {
                     </Card>
                   )}
 
-                  {/* Vantagem */}
-                  <Card className="border-2 border-chart-3/30 bg-chart-3/5">
+                  <Card className="border-success/20 bg-success/5">
                     <CardContent className="pt-6">
-                      <p className="font-bold text-chart-3 mb-3">💡 Vantagem dessa Rotina</p>
-                      <p className="text-sm text-foreground/80">
+                      <p className="font-semibold text-success mb-3">💡 Vantagem dessa Rotina</p>
+                      <p className="text-sm text-muted-foreground">
                         Analisando à noite e operando pela manhã, o mercado já terá se movido durante a madrugada. 
-                        Isso permite <strong>ver se as regiões traçadas estão sendo buscadas ou respeitadas</strong>, 
-                        sem a agonia de traçar uma região e em 30 minutos já estar tomando trade lá.
+                        Isso permite ver se as regiões traçadas estão sendo buscadas ou respeitadas.
                       </p>
                     </CardContent>
                   </Card>
 
-                  <Card className="border-2 border-destructive/30 bg-destructive/5">
+                  <Card className="border-destructive/20 bg-destructive/5">
                     <CardContent className="pt-6">
-                      <p className="font-bold text-destructive mb-4">⚠️ Limites Diários Obrigatórios</p>
+                      <p className="font-semibold text-destructive mb-4">⚠️ Limites Diários Obrigatórios</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Card className="border-l-4 border-l-destructive">
                           <CardContent className="pt-4">
-                            <p className="text-sm font-bold text-destructive">Máximo de Perdas</p>
+                            <p className="text-sm font-semibold text-destructive">Máximo de Perdas</p>
                             <p className="text-2xl font-bold text-destructive mt-2">3 Losses</p>
                             <p className="text-xs text-muted-foreground mt-1">Parar operações se atingir 3 perdas</p>
                           </CardContent>
                         </Card>
                         <Card className="border-l-4 border-l-success">
                           <CardContent className="pt-4">
-                            <p className="text-sm font-bold text-success">Máximo de Ganhos</p>
+                            <p className="text-sm font-semibold text-success">Máximo de Ganhos</p>
                             <p className="text-2xl font-bold text-success mt-2">2 Wins</p>
                             <p className="text-xs text-muted-foreground mt-1">Considerar parar após 2 vitórias</p>
                           </CardContent>
@@ -575,12 +517,11 @@ export default function Home() {
                     </CardContent>
                   </Card>
 
-                  <Card className="border-2 border-warning/30 bg-warning/5">
+                  <Card className="border-warning/20 bg-warning/5">
                     <CardContent className="pt-6">
-                      <p className="font-bold text-warning mb-3">🏆 Regra de Ouro</p>
-                      <p className="text-sm text-foreground/80">
-                        <strong>Sexta e sábado à noite: NÃO analiso.</strong> Domingo à noite volto a analisar para 
-                        preparar a semana.
+                      <p className="font-semibold text-warning mb-3">🏆 Regra de Ouro</p>
+                      <p className="text-sm text-muted-foreground">
+                        <strong className="text-foreground">Sexta e sábado à noite: NÃO analiso.</strong> Domingo à noite volto a analisar para preparar a semana.
                       </p>
                     </CardContent>
                   </Card>
@@ -646,8 +587,8 @@ export default function Home() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4">Um plano completo e disciplinado</h2>
-              <p className="text-foreground/80 mb-6">
+              <h2 className="text-lg md:text-xl font-semibold text-foreground mb-3">Um plano completo e disciplinado</h2>
+              <p className="text-sm text-muted-foreground mb-4">
                 Para trading no mercado financeiro. Todas as suas regras, estratégias e rotinas em um único lugar.
               </p>
               <Button onClick={() => setShowPlanDialog(true)}>
@@ -655,8 +596,8 @@ export default function Home() {
                 Visualizar Plano
               </Button>
             </div>
-            <Separator className="my-6" />
-            <p className="text-sm text-foreground/80">
+            <Separator className="my-4" />
+            <p className="text-sm text-muted-foreground">
               Este plano foi estruturado para garantir disciplina, consistência e gestão rigorosa de risco.
             </p>
           </CardContent>
@@ -689,14 +630,14 @@ export default function Home() {
                 const desc = parts[1] || "";
                 return (
                   <div key={item.key} className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
-                    <h3 className="font-bold text-sm text-primary flex items-center gap-2">
+                    <h3 className="font-semibold text-sm text-primary flex items-center gap-2">
                       <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">{idx + 1}</span>
                       {title}
                     </h3>
                     {desc && (
                       <div className="flex items-start gap-2 ml-8">
                         <ArrowRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                        <p className="text-sm text-foreground/80">{desc}</p>
+                        <p className="text-sm text-muted-foreground">{desc}</p>
                       </div>
                     )}
                   </div>
@@ -715,8 +656,8 @@ export default function Home() {
                 const desc = parts[1] || "";
                 return (
                   <div key={item.key} className="rounded-lg border-2 border-primary/50 bg-primary/5 p-4">
-                    <h3 className="font-bold text-sm text-primary mb-2">{item.emoji} {title}</h3>
-                    {desc && <p className="text-sm text-foreground/80">{desc}</p>}
+                    <h3 className="font-semibold text-sm text-primary mb-2">{item.emoji} {title}</h3>
+                    {desc && <p className="text-sm text-muted-foreground">{desc}</p>}
                   </div>
                 );
               })}
@@ -744,7 +685,6 @@ export default function Home() {
         />
       </main>
 
-      {/* Mobile bottom navigation */}
       {isMobile && <MobileNav activeTab={activeTab} onTabChange={setActiveTab} />}
     </div>
   );
