@@ -512,15 +512,12 @@ export default function AnalysisHistory() {
                             <Input
                               type="file"
                               accept="image/*"
-                              onChange={(e) => {
+                              onChange={async (e) => {
                                 const file = e.target.files?.[0];
-                                if (file) {
-                                  const reader = new FileReader();
-                                  reader.onload = (event) => {
-                                    setFormData({ ...formData, [key]: event.target?.result as string });
-                                  };
-                                  reader.readAsDataURL(file);
-                                }
+                                if (!file) return;
+                                const { compressImage } = await import("@/lib/imageOptimizer");
+                                const compressed = await compressImage(file);
+                                setFormData({ ...formData, [key]: compressed });
                               }}
                             />
                             {formData[key] && (

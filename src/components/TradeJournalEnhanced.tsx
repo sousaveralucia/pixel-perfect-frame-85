@@ -33,6 +33,7 @@ import { SimpleImageViewer } from "./SimpleImageViewer";
 import { TradeImageGallery } from "./TradeImageGallery";
 import { useCustomChecklists, ChecklistItem } from "@/hooks/useCustomChecklists";
 import ChecklistEditor from "./ChecklistEditor";
+import { compressImage } from "@/lib/imageOptimizer";
 
 // Using TradeWithChecklist from useTradeJournalUnified
 
@@ -1238,18 +1239,11 @@ export default function TradeJournalEnhanced() {
                   <Input
                     type="file"
                     accept="image/*"
-                    onChange={e => {
+                    onChange={async e => {
                       const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onload = event => {
-                          setFormData({
-                            ...formData,
-                            preTradeImage: event.target?.result as string,
-                          });
-                        };
-                        reader.readAsDataURL(file);
-                      }
+                      if (!file) return;
+                      const compressed = await compressImage(file);
+                      setFormData(prev => ({ ...prev, preTradeImage: compressed }));
                     }}
                   />
                   {formData.preTradeImage && (
@@ -1288,18 +1282,11 @@ export default function TradeJournalEnhanced() {
                   <Input
                     type="file"
                     accept="image/*"
-                    onChange={e => {
+                    onChange={async e => {
                       const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onload = event => {
-                          setFormData({
-                            ...formData,
-                            tradingImage: event.target?.result as string,
-                          });
-                        };
-                        reader.readAsDataURL(file);
-                      }
+                      if (!file) return;
+                      const compressed = await compressImage(file);
+                      setFormData(prev => ({ ...prev, tradingImage: compressed }));
                     }}
                   />
                   {formData.tradingImage && (
@@ -1338,18 +1325,11 @@ export default function TradeJournalEnhanced() {
                   <Input
                     type="file"
                     accept="image/*"
-                    onChange={e => {
+                    onChange={async e => {
                       const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onload = event => {
-                          setFormData({
-                            ...formData,
-                            postTradeImage: event.target?.result as string,
-                          });
-                        };
-                        reader.readAsDataURL(file);
-                      }
+                      if (!file) return;
+                      const compressed = await compressImage(file);
+                      setFormData(prev => ({ ...prev, postTradeImage: compressed }));
                     }}
                   />
                   {formData.postTradeImage && (
