@@ -33,6 +33,7 @@ import { SimpleImageViewer } from "./SimpleImageViewer";
 import { TradeImageGallery } from "./TradeImageGallery";
 import { useCustomChecklists, ChecklistItem } from "@/hooks/useCustomChecklists";
 import ChecklistEditor from "./ChecklistEditor";
+import { compressImage } from "@/lib/imageOptimizer";
 
 // Using TradeWithChecklist from useTradeJournalUnified
 
@@ -157,6 +158,8 @@ export default function TradeJournalEnhanced() {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [selectedTradeForGallery, setSelectedTradeForGallery] =
     useState<TradeWithChecklist | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 20;
 
   const buildChecklistState = (items: ChecklistItem[]) => {
     const state: Record<string, boolean> = {};
@@ -1238,18 +1241,11 @@ export default function TradeJournalEnhanced() {
                   <Input
                     type="file"
                     accept="image/*"
-                    onChange={e => {
+                    onChange={async e => {
                       const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onload = event => {
-                          setFormData({
-                            ...formData,
-                            preTradeImage: event.target?.result as string,
-                          });
-                        };
-                        reader.readAsDataURL(file);
-                      }
+                      if (!file) return;
+                      const compressed = await compressImage(file);
+                      setFormData(prev => ({ ...prev, preTradeImage: compressed }));
                     }}
                   />
                   {formData.preTradeImage && (
@@ -1288,18 +1284,11 @@ export default function TradeJournalEnhanced() {
                   <Input
                     type="file"
                     accept="image/*"
-                    onChange={e => {
+                    onChange={async e => {
                       const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onload = event => {
-                          setFormData({
-                            ...formData,
-                            tradingImage: event.target?.result as string,
-                          });
-                        };
-                        reader.readAsDataURL(file);
-                      }
+                      if (!file) return;
+                      const compressed = await compressImage(file);
+                      setFormData(prev => ({ ...prev, tradingImage: compressed }));
                     }}
                   />
                   {formData.tradingImage && (
@@ -1338,18 +1327,11 @@ export default function TradeJournalEnhanced() {
                   <Input
                     type="file"
                     accept="image/*"
-                    onChange={e => {
+                    onChange={async e => {
                       const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onload = event => {
-                          setFormData({
-                            ...formData,
-                            postTradeImage: event.target?.result as string,
-                          });
-                        };
-                        reader.readAsDataURL(file);
-                      }
+                      if (!file) return;
+                      const compressed = await compressImage(file);
+                      setFormData(prev => ({ ...prev, postTradeImage: compressed }));
                     }}
                   />
                   {formData.postTradeImage && (
@@ -1563,7 +1545,12 @@ export default function TradeJournalEnhanced() {
             </CardContent>
           </Card>
         ) : (
-          trades.map(trade => (
+          (() => {
+            const totalPages = Math.max(1, Math.ceil(trades.length / PAGE_SIZE));
+            const safePage = Math.min(currentPage, totalPages);
+            const start = (safePage - 1) * PAGE_SIZE;
+            const paginatedTrades = trades.slice(start, start + PAGE_SIZE);
+            return paginatedTrades.map(trade => (
             <Card
               key={trade.id}
               className={
@@ -1836,7 +1823,34 @@ export default function TradeJournalEnhanced() {
                 </div>
               </CardContent>
             </Card>
-          ))
+            ));
+          })()
+        )}
+        {trades.length > PAGE_SIZE && (
+          <div className="flex items-center justify-between gap-2 pt-3">
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={currentPage <= 1}
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            >
+              Anterior
+            </Button>
+            <span className="text-xs text-muted-foreground">
+              Página {Math.min(currentPage, Math.ceil(trades.length / PAGE_SIZE))} de{" "}
+              {Math.ceil(trades.length / PAGE_SIZE)} • {trades.length} trades
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={currentPage >= Math.ceil(trades.length / PAGE_SIZE)}
+              onClick={() =>
+                setCurrentPage(p => Math.min(Math.ceil(trades.length / PAGE_SIZE), p + 1))
+              }
+            >
+              Próxima
+            </Button>
+          </div>
         )}
       </div>
 
