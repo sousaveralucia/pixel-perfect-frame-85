@@ -173,6 +173,147 @@ export default function AnalysisHistory() {
     setIsOpen(true);
   };
 
+  // Exporta TODAS as análises filtradas em um único PDF consolidado
+  const handleExportAllPDF = async () => {
+    const list = analyses.filter((a) => a.accountId === activeAccountId);
+    if (list.length === 0) {
+      toast.error("Nenhuma análise para exportar");
+      return;
+    }
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 20;
+    const contentWidth = pageWidth - margin * 2;
+
+    // ===== Capa =====
+    doc.setFillColor(15, 23, 42);
+    doc.rect(0, 0, pageWidth, pageHeight, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(28);
+    doc.setFont(undefined as any, "bold");
+    doc.text("Relatório de Análises", pageWidth / 2, pageHeight / 2 - 20, { align: "center" });
+    doc.setFontSize(12);
+    doc.setFont(undefined as any, "normal");
+    doc.setTextColor(148, 163, 184);
+    doc.text(`${list.length} análises • Gerado em ${new Date().toLocaleDateString("pt-BR")}`, pageWidth / 2, pageHeight / 2, { align: "center" });
+
+    // Resumo de status na capa
+    const active = list.filter((a) => a.status === "ATIVO").length;
+    const tested = list.filter((a) => a.status === "TESTADO").length;
+    const discarded = list.filter((a) => a.status === "DESCARTADO").length;
+    doc.setFontSize(10);
+    doc.setTextColor(16, 185, 129);
+    doc.text(`Ativas: ${active}`, pageWidth / 2 - 40, pageHeight / 2 + 20, { align: "center" });
+    doc.setTextColor(245, 158, 11);
+    doc.text(`Testadas: ${tested}`, pageWidth / 2, pageHeight / 2 + 20, { align: "center" });
+    doc.setTextColor(239, 68, 68);
+    doc.text(`Descartadas: ${discarded}`, pageWidth / 2 + 40, pageHeight / 2 + 20, { align: "center" });
+
+    // Carrega imagens em paralelo
+    const loadImg = (src: string): Promise<HTMLImageElement | null> =>
+      new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = src;
+      });
+
+    // Uma página por análise
+    for (const analysis of list) {
+      doc.addPage();
+      let y = 20;
+
+      // Header
+      doc.setFillColor(16, 185, 129);
+      doc.rect(0, 0, pageWidth, 32, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(18);
+      doc.setFont(undefined as any, "bold");
+      doc.text(`${analysis.asset}`, margin, 18);
+      doc.setFontSize(9);
+      doc.setFont(undefined as any, "normal");
+      doc.text(`${analysis.date}  •  ${analysis.timeframe}  •  ${analysis.status}`, margin, 26);
+      y = 42;
+      doc.setTextColor(30, 41, 59);
+
+      const drawSection = (title: string, content: string) => {
+        if (!content) return;
+        const lines = doc.splitTextToSize(content, contentWidth - 16);
+        const blockHeight = 10 + lines.length * 5 + 8;
+        if (y + blockHeight > pageHeight - 20) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.setFillColor(241, 245, 249);
+        doc.roundedRect(margin, y, contentWidth, blockHeight, 3, 3, "F");
+        doc.setFontSize(10);
+        doc.setFont(undefined as any, "bold");
+        doc.setTextColor(16, 185, 129);
+        doc.text(title, margin + 8, y + 7);
+        doc.setFont(undefined as any, "normal");
+        doc.setTextColor(51, 65, 85);
+        doc.setFontSize(9);
+        doc.text(lines as string[], margin + 8, y + 14);
+        y += blockHeight + 6;
+      };
+
+      drawSection("Nível de Fibonacci", analysis.fibonacciLevel || "N/A");
+      drawSection("Nível de Order Block", analysis.orderBlockLevel || "N/A");
+      drawSection("Zona de Liquidez", analysis.liquidityZone || "N/A");
+      drawSection("Notas e Observações", analysis.notes || "");
+
+      const imgs = [analysis.imageUrl1, analysis.imageUrl2, analysis.imageUrl3].filter(Boolean) as string[];
+      if (imgs.length > 0) {
+        if (y + 10 > pageHeight - 20) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.setFontSize(11);
+        doc.setFont(undefined as any, "bold");
+        doc.setTextColor(16, 185, 129);
+        doc.text("Imagens da Análise", margin, y + 5);
+        y += 10;
+
+        const loaded = await Promise.all(imgs.map((u) => loadImg(u)));
+        for (let i = 0; i < loaded.length; i++) {
+          const img = loaded[i];
+          if (!img) continue;
+          if (y + 100 > pageHeight - 20) {
+            doc.addPage();
+            y = 20;
+          }
+          doc.setFontSize(9);
+          doc.setTextColor(100, 116, 139);
+          doc.setFont(undefined as any, "normal");
+          doc.text(`Imagem ${i + 1}`, margin, y + 4);
+          y += 7;
+          doc.setDrawColor(203, 213, 225);
+          doc.roundedRect(margin, y, contentWidth, 95, 2, 2, "S");
+          try {
+            doc.addImage(img, "JPEG", margin + 2, y + 2, contentWidth - 4, 91);
+          } catch {
+            // fallback se a imagem não puder ser embutida
+          }
+          y += 102;
+        }
+      }
+    }
+
+    // Footer em todas as páginas
+    const totalPages = doc.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(148, 163, 184);
+      doc.text(`Página ${i} de ${totalPages}`, pageWidth / 2, pageHeight - 8, { align: "center" });
+    }
+    doc.save(`relatorio_analises_${new Date().toISOString().split("T")[0]}.pdf`);
+    toast.success(`${list.length} análises exportadas em PDF!`);
+  };
+
   const handleExportPDF = (analysis: Analysis) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -559,7 +700,7 @@ export default function AnalysisHistory() {
                 <FileSpreadsheet className="w-4 h-4 mr-2" />
                 Exportar Excel
               </Button>
-              <Button variant="outline" className="w-full" disabled title="Exporte análises individuais clicando no ícone de PDF em cada análise">
+              <Button onClick={handleExportAllPDF} variant="outline" className="w-full" title="Exportar todas as análises em um único PDF">
                 <FileText className="w-4 h-4 mr-2" />
                 Exportar PDF
               </Button>
