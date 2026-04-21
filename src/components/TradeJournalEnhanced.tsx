@@ -1474,30 +1474,72 @@ export default function TradeJournalEnhanced() {
               </div>
             ))}
 
-            {/* Validation Warning */}
+            {/* Score de Execução + Validação */}
             {(() => {
-              const groups = [
-                { title: "Operacional", data: checklistProgress.operacional },
+              const opPct = checklistProgress.operacional.percentage;
+              const score = getExecutionScore(opPct);
+              const opItemsReal = opChecklist.items.filter((i) => !isSectionItem(i));
+              const missingCritical = CRITICAL_OPERATIONAL_KEYS.filter(
+                (k) =>
+                  opItemsReal.some((i) => i.key === k) &&
+                  formData.operational[k] !== true,
+              );
+              const labelMap: Record<string, string> = {
+                htfZoneInteraction: "Interação HTF/MTF",
+                chochExterno: "CHOCH externo",
+                bosExterno: "BOS externo",
+                chochInterno: "CHOCH interno",
+              };
+              const opBlocked = opPct < 80 || missingCritical.length > 0;
+              const otherGroups = [
                 { title: "Emocional", data: checklistProgress.emocional },
                 { title: "Rotina", data: checklistProgress.rotina },
                 { title: "Racional", data: checklistProgress.racional },
               ];
-
-              const hasInvalid = groups.some((group) => group.data.percentage < 50);
+              const otherInvalid = otherGroups.some((g) => g.data.percentage < 50);
+              const blocked = opBlocked || otherInvalid;
 
               return (
-                <div className={`p-4 rounded-lg border ${hasInvalid ? "bg-destructive/10 border-destructive/30" : "bg-success/10 border-success/30"}`}>
-                  <p className={`text-sm font-semibold ${hasInvalid ? "text-destructive" : "text-success"}`}>
-                    {hasInvalid
-                      ? "Para registrar este trade, complete pelo menos 50% de cada checklist."
-                      : "✅ Requisito mínimo atendido: 50%+ em todos os checklists."}
-                  </p>
-                  <div className="mt-2 grid sm:grid-cols-2 gap-2">
-                    {groups.map((group) => (
-                      <p key={group.title} className="text-xs text-foreground/80">
-                        • <span className="font-semibold">{group.title}:</span> {group.data.checked}/{group.data.total} ({group.data.percentage}%)
+                <div className="space-y-3">
+                  {/* Score de Execução (Operacional) */}
+                  <div
+                    className={`p-4 rounded-lg border-2 ${
+                      blocked
+                        ? "bg-destructive/10 border-destructive/40"
+                        : "bg-success/10 border-success/40"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+                      <span className="text-sm font-bold flex items-center gap-2">
+                        {blocked ? "🔴 TRADE BLOQUEADO" : "🟢 TRADE PERMITIDO"}
+                      </span>
+                      <Badge className={`${score.colorClass} text-xs`}>
+                        {score.emoji} {score.label} — {opPct}%
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      <span className="font-semibold">Operacional:</span>{" "}
+                      {checklistProgress.operacional.checked}/
+                      {checklistProgress.operacional.total} • mínimo 80% + itens críticos
+                    </p>
+                    {missingCritical.length > 0 && (
+                      <p className="text-xs text-destructive font-semibold">
+                        ⚠️ Faltando: {missingCritical.map((k) => labelMap[k]).join(", ")}
                       </p>
-                    ))}
+                    )}
+                    <div className="mt-2 grid sm:grid-cols-3 gap-2">
+                      {otherGroups.map((group) => (
+                        <p
+                          key={group.title}
+                          className={`text-xs ${
+                            group.data.percentage < 50 ? "text-destructive" : "text-foreground/80"
+                          }`}
+                        >
+                          • <span className="font-semibold">{group.title}:</span>{" "}
+                          {group.data.checked}/{group.data.total} ({group.data.percentage}%)
+                        </p>
+                      ))}
+                    </div>
                   </div>
                 </div>
               );
