@@ -1438,29 +1438,42 @@ export default function TradeJournalEnhanced() {
                   <p className="text-xs opacity-70">3 Perguntas Essenciais</p>
                 )}
 
-                {checklist.items.map((item) => (
-                  <div key={item.key} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`${group}-${item.key}`}
-                      checked={!!formData[formKey]?.[item.key]}
-                      onCheckedChange={checked =>
-                        setFormData({
-                          ...formData,
-                          [formKey]: {
-                            ...formData[formKey],
-                            [item.key]: checked as boolean,
-                          },
-                        })
-                      }
-                    />
-                    <Label
-                      htmlFor={`${group}-${item.key}`}
-                      className={`text-sm ${textClass} cursor-pointer`}
-                    >
-                      {item.emoji} {item.label}
-                    </Label>
-                  </div>
-                ))}
+                {checklist.items.map((item) => {
+                  if (isSectionItem(item)) {
+                    return (
+                      <div
+                        key={item.key}
+                        className={`mt-3 pt-2 border-t ${borderClass} text-xs font-bold uppercase tracking-wider opacity-80 ${textClass}`}
+                      >
+                        {item.emoji} {item.label}
+                      </div>
+                    );
+                  }
+                  return (
+                    <div key={item.key} className="flex items-start space-x-2">
+                      <Checkbox
+                        id={`${group}-${item.key}`}
+                        checked={!!formData[formKey]?.[item.key]}
+                        onCheckedChange={(checked) =>
+                          setFormData({
+                            ...formData,
+                            [formKey]: {
+                              ...formData[formKey],
+                              [item.key]: checked as boolean,
+                            },
+                          })
+                        }
+                        className="mt-0.5"
+                      />
+                      <Label
+                        htmlFor={`${group}-${item.key}`}
+                        className={`text-sm ${textClass} cursor-pointer leading-snug`}
+                      >
+                        {item.emoji} {item.label}
+                      </Label>
+                    </div>
+                  );
+                })}
 
                 <ChecklistEditor
                   items={checklist.items}
