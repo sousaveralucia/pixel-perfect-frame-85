@@ -34,6 +34,12 @@ import { TradeImageGallery } from "./TradeImageGallery";
 import { useCustomChecklists, ChecklistItem } from "@/hooks/useCustomChecklists";
 import ChecklistEditor from "./ChecklistEditor";
 import { compressImage } from "@/lib/imageOptimizer";
+import {
+  isSectionItem,
+  getExecutionScore,
+  CRITICAL_OPERATIONAL_KEYS,
+  migrateLegacyOperational,
+} from "@/lib/executionScore";
 
 // Using TradeWithChecklist from useTradeJournalUnified
 
