@@ -9,15 +9,58 @@ export interface ChecklistItem {
 }
 
 // Default checklist items for each group
+// NOTE: Items with key starting in "_section_" are treated as visual headers,
+// not counted in progress/score. See src/lib/executionScore.ts
 const DEFAULTS: Record<string, ChecklistItem[]> = {
   operational: [
-    { key: "chochValidoHTF", emoji: "📊", label: "CHoCH válido em HTF (H4, H2 ou H1): Identificar um Change of Character válido em timeframes superiores" },
-    { key: "caixaGannTracada", emoji: "📦", label: "Caixa de Gann em M30: Traçar do início do show até o fim do CHoCH" },
-    { key: "regiaoDescontada50", emoji: "📉", label: "Order Blocks abaixo da Gann (50% para compra) ou acima (50% para venda)" },
-    { key: "orderBlockIdentificado", emoji: "🎯", label: "Order Blocks de HTF (H4, H2, H1 ou M30): Identificar Order Blocks válidos" },
-    { key: "entrada50OB", emoji: "💰", label: "Entrada nos 50% do Order Block de HTF" },
-    { key: "stopRiskManagement", emoji: "🛑", label: "Stop Loss e Take Profit 1:3: Stop abaixo/acima do Order Block de HTF" },
-    { key: "tempoGraficoOperacional", emoji: "⏱️", label: "Tempo Gráfico Operacional em M15 ou M5: Confirmar entrada em timeframe operacional" },
+    // 1 — CONTEXTO HTF / MTF
+    { key: "_section_htf", emoji: "🧠", label: "1 — CONTEXTO HTF / MTF (OBRIGATÓRIO)" },
+    { key: "structureClear", emoji: "📊", label: "Mercado com estrutura clara (HH/HL ou LL/LH)" },
+    { key: "highsLowsIdentified", emoji: "📌", label: "Identifiquei Highs e Lows relevantes" },
+    { key: "orderFlowKnown", emoji: "🧭", label: "Sei qual é o OrderFlow dominante" },
+    { key: "htfZoneMarked", emoji: "📦", label: "Existe zona HTF/MTF válida marcada (OB, FVG ou Ineficiência em H1/H2/M30/M15)" },
+    { key: "htfZoneInteraction", emoji: "🎯", label: "Preço está interagindo com essa zona (CRÍTICO)" },
+    { key: "liquidityNearby", emoji: "💧", label: "Existe liquidez próxima" },
+    { key: "liquiditySwept", emoji: "🌊", label: "Liquidez já liquidada antes da reação" },
+    { key: "noProtectedExtreme", emoji: "🛡️", label: "Não estou entrando em topo/fundo protegido" },
+
+    // 2 — CONFIRMAÇÃO EXTERNA
+    { key: "_section_external", emoji: "🔄", label: "2 — CONFIRMAÇÃO EXTERNA (HTF/MTF)" },
+    { key: "chochExterno", emoji: "🔁", label: "Houve CHOCH externo (H1/H2/M30/M15) — CRÍTICO" },
+    { key: "bosExterno", emoji: "💥", label: "Houve BOS externo após o CHOCH — CRÍTICO" },
+    { key: "noFalseBreak", emoji: "✋", label: "CHOCH+BOS não é falso rompimento" },
+    { key: "structureChanged", emoji: "🔀", label: "A estrutura realmente mudou" },
+
+    // 3 — TRANSIÇÃO PARA LTF
+    { key: "_section_transition", emoji: "⚡", label: "3 — TRANSIÇÃO PARA LTF" },
+    { key: "movedToLTF", emoji: "🔬", label: "Após reagir no HTF/MTF, preço foi para LTF (M5/M1)" },
+    { key: "waitChochInterno", emoji: "⏳", label: "Aguardando CHOCH interno (sem antecipação)" },
+
+    // 4 — CONFIRMAÇÃO INTERNA
+    { key: "_section_internal", emoji: "🎯", label: "4 — CONFIRMAÇÃO INTERNA (LTF)" },
+    { key: "chochInterno", emoji: "🔁", label: "Houve CHOCH interno — CRÍTICO" },
+    { key: "bosInterno", emoji: "💥", label: "Houve BOS interno" },
+    { key: "noFalseBreakInternal", emoji: "✋", label: "Movimento não é falso rompimento" },
+
+    // 5 — EXECUÇÃO
+    { key: "_section_execution", emoji: "💰", label: "5 — EXECUÇÃO" },
+    { key: "waitedCorrection", emoji: "⏱️", label: "Esperei a correção após o CHOCH interno" },
+    { key: "validZone", emoji: "🎯", label: "Identifiquei zona válida (Order Block ou FVG/Ineficiência)" },
+    { key: "zoneAligned", emoji: "🧭", label: "Zona alinhada com o movimento" },
+    { key: "gannTraced", emoji: "📦", label: "Tracei a Caixa de Gann" },
+    { key: "gannSideAligned", emoji: "⚖️", label: "Entrada no lado correto da Gann (abaixo 50% = Compra / acima 50% = Venda)" },
+
+    // 6 — PRECISÃO
+    { key: "_section_precision", emoji: "🎯", label: "6 — PRECISÃO" },
+    { key: "discountedRegion", emoji: "📉", label: "Entrada em região descontada" },
+    { key: "noMidMove", emoji: "🚫", label: "Não estou entrando no meio do movimento" },
+    { key: "alignedAll", emoji: "✅", label: "Entrada alinhada com Estrutura, Liquidez e Execução" },
+
+    // 7 — GESTÃO
+    { key: "_section_management", emoji: "🛑", label: "7 — GESTÃO" },
+    { key: "stopCorrect", emoji: "🛑", label: "Stop Loss correto (com folga)" },
+    { key: "stopProtected", emoji: "🛡️", label: "Protegido contra liquidez" },
+    { key: "rrMin", emoji: "🎯", label: "R:R mínimo = 1:3" },
   ],
   emotional: [
     { key: "hydration", emoji: "❓", label: "Estou mentalmente preparado para fazer este trade?" },
