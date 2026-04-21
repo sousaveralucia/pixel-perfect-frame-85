@@ -310,30 +310,67 @@ export default function TradeJournalEnhanced() {
       return;
     }
 
+    // === MODO DISCIPLINA: Operacional exige >=80% + itens críticos marcados ===
+    const opItemsReal = opChecklist.items.filter((i) => !isSectionItem(i));
+    if (opItemsReal.length > 0) {
+      const opMarked = opItemsReal.filter((i) => formData.operational[i.key] === true).length;
+      const opPct = (opMarked / opItemsReal.length) * 100;
+
+      // Itens críticos (apenas se existirem no checklist atual)
+      const missingCritical = CRITICAL_OPERATIONAL_KEYS.filter(
+        (k) => opItemsReal.some((i) => i.key === k) && formData.operational[k] !== true,
+      );
+
+      if (missingCritical.length > 0) {
+        const labelMap: Record<string, string> = {
+          htfZoneInteraction: "Interação com zona HTF/MTF",
+          chochExterno: "CHOCH externo",
+          bosExterno: "BOS externo",
+          chochInterno: "CHOCH interno",
+        };
+        toast.error(
+          `🔴 Trade inválido — fora do modelo operacional. Faltando: ${missingCritical
+            .map((k) => labelMap[k])
+            .join(", ")}.`,
+          { duration: 6000 },
+        );
+        return;
+      }
+
+      if (opPct < 80) {
+        toast.error(
+          `🔴 Checklist Operacional incompleto (${opMarked}/${opItemsReal.length} = ${Math.round(opPct)}%). Mínimo: 80%.`,
+          { duration: 6000 },
+        );
+        return;
+      }
+    }
+
+    // Demais checklists mantêm a regra de >=50%
     const checkGroups = [
-      { name: "Operacional", items: opChecklist.items, values: formData.operational },
       { name: "Emocional", items: emChecklist.items, values: formData.emotional },
       { name: "Rotina", items: rtChecklist.items, values: formData.routine },
       { name: "Racional", items: raChecklist.items, values: formData.rational },
     ];
 
     for (const group of checkGroups) {
-      if (group.items.length === 0) continue;
+      const realItems = group.items.filter((i) => !isSectionItem(i));
+      if (realItems.length === 0) continue;
 
-      const marked = group.items.filter((item) => group.values[item.key] === true).length;
-      const pct = (marked / group.items.length) * 100;
+      const marked = realItems.filter((item) => group.values[item.key] === true).length;
+      const pct = (marked / realItems.length) * 100;
 
       if (pct < 50) {
         toast.error(
-          `Para registrar este trade é necessário completar pelo menos 50% do checklist ${group.name}. (${marked}/${group.items.length})`,
+          `Para registrar este trade é necessário completar pelo menos 50% do checklist ${group.name}. (${marked}/${realItems.length})`,
         );
         return;
       }
     }
 
     const allOperationalComplete =
-      opChecklist.items.length > 0 &&
-      opChecklist.items.every((item) => formData.operational[item.key] === true);
+      opItemsReal.length > 0 &&
+      opItemsReal.every((item) => formData.operational[item.key] === true);
 
     // Validar R:R
     const rr = formData.riskReward || 0;
