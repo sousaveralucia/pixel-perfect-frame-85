@@ -489,7 +489,7 @@ export default function TradeJournalEnhanced() {
       moneyResult: trade.moneyResult || 0,
       notes: trade.notes,
       isFavorite: trade.isFavorite || false,
-      operational: trade.operational,
+      operational: { ...migrateLegacyOperational(trade.operational), ...(trade.operational || {}) },
       emotional: trade.emotional,
       routine: trade.routine || {
         nightAnalysis: false,
@@ -1661,46 +1661,30 @@ export default function TradeJournalEnhanced() {
 
                     {/* Checklists */}
                     <div className="grid md:grid-cols-4 gap-3 text-xs">
-                      <div className="bg-white p-2 rounded border border-purple-200">
-                        <p className="font-semibold text-purple-900 mb-1">
-                          ⚠️ Operacional:
+                      <div className="bg-card p-2 rounded border border-purple-200 dark:border-purple-800">
+                        <p className="font-semibold text-purple-900 dark:text-purple-200 mb-1 flex items-center justify-between gap-2">
+                          <span>⚠️ Operacional:</span>
+                          {(() => {
+                            const real = opChecklist.items.filter((i) => !isSectionItem(i));
+                            const marked = real.filter((i) => (trade.operational as any)?.[i.key] === true).length;
+                            const pct = real.length === 0 ? 0 : Math.round((marked / real.length) * 100);
+                            const score = getExecutionScore(pct);
+                            return (
+                              <Badge className={`text-[10px] ${score.colorClass}`}>
+                                {score.emoji} {pct}%
+                              </Badge>
+                            );
+                          })()}
                         </p>
-                        {trade.operational && (
-                          <>
-                            <p>
-                              {trade.operational.chochValidoHTF ? "✓" : "✗"}{" "}
-                              CHoCH HTF
+                        {(() => {
+                          const real = opChecklist.items.filter((i) => !isSectionItem(i));
+                          const marked = real.filter((i) => (trade.operational as any)?.[i.key] === true).length;
+                          return (
+                            <p className="text-muted-foreground">
+                              {marked}/{real.length} itens marcados
                             </p>
-                            <p>
-                              {trade.operational.caixaGannTracada ? "✓" : "✗"}{" "}
-                              Gann
-                            </p>
-                            <p>
-                              {trade.operational.regiaoDescontada50 ? "✓" : "✗"}{" "}
-                              Região 50%
-                            </p>
-                            <p>
-                              {trade.operational.orderBlockIdentificado
-                                ? "✓"
-                                : "✗"}{" "}
-                              OB HTF
-                            </p>
-                            <p>
-                              {trade.operational.entrada50OB ? "✓" : "✗"}{" "}
-                              Entrada 50%
-                            </p>
-                            <p>
-                              {trade.operational.stopRiskManagement ? "✓" : "✗"}{" "}
-                              Stop/TP
-                            </p>
-                            <p>
-                              {trade.operational.tempoGraficoOperacional
-                                ? "✓"
-                                : "✗"}{" "}
-                              Tempo Gráfico
-                            </p>
-                          </>
-                        )}
+                          );
+                        })()}
                       </div>
                       <div className="bg-white p-2 rounded border border-red-200">
                         <p className="font-semibold text-red-900 mb-1">
