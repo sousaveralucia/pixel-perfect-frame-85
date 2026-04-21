@@ -34,6 +34,12 @@ import { TradeImageGallery } from "./TradeImageGallery";
 import { useCustomChecklists, ChecklistItem } from "@/hooks/useCustomChecklists";
 import ChecklistEditor from "./ChecklistEditor";
 import { compressImage } from "@/lib/imageOptimizer";
+import {
+  isSectionItem,
+  getExecutionScore,
+  CRITICAL_OPERATIONAL_KEYS,
+  migrateLegacyOperational,
+} from "@/lib/executionScore";
 
 // Using TradeWithChecklist from useTradeJournalUnified
 
@@ -304,30 +310,67 @@ export default function TradeJournalEnhanced() {
       return;
     }
 
+    // === MODO DISCIPLINA: Operacional exige >=80% + itens críticos marcados ===
+    const opItemsReal = opChecklist.items.filter((i) => !isSectionItem(i));
+    if (opItemsReal.length > 0) {
+      const opMarked = opItemsReal.filter((i) => formData.operational[i.key] === true).length;
+      const opPct = (opMarked / opItemsReal.length) * 100;
+
+      // Itens críticos (apenas se existirem no checklist atual)
+      const missingCritical = CRITICAL_OPERATIONAL_KEYS.filter(
+        (k) => opItemsReal.some((i) => i.key === k) && formData.operational[k] !== true,
+      );
+
+      if (missingCritical.length > 0) {
+        const labelMap: Record<string, string> = {
+          htfZoneInteraction: "Interação com zona HTF/MTF",
+          chochExterno: "CHOCH externo",
+          bosExterno: "BOS externo",
+          chochInterno: "CHOCH interno",
+        };
+        toast.error(
+          `🔴 Trade inválido — fora do modelo operacional. Faltando: ${missingCritical
+            .map((k) => labelMap[k])
+            .join(", ")}.`,
+          { duration: 6000 },
+        );
+        return;
+      }
+
+      if (opPct < 80) {
+        toast.error(
+          `🔴 Checklist Operacional incompleto (${opMarked}/${opItemsReal.length} = ${Math.round(opPct)}%). Mínimo: 80%.`,
+          { duration: 6000 },
+        );
+        return;
+      }
+    }
+
+    // Demais checklists mantêm a regra de >=50%
     const checkGroups = [
-      { name: "Operacional", items: opChecklist.items, values: formData.operational },
       { name: "Emocional", items: emChecklist.items, values: formData.emotional },
       { name: "Rotina", items: rtChecklist.items, values: formData.routine },
       { name: "Racional", items: raChecklist.items, values: formData.rational },
     ];
 
     for (const group of checkGroups) {
-      if (group.items.length === 0) continue;
+      const realItems = group.items.filter((i) => !isSectionItem(i));
+      if (realItems.length === 0) continue;
 
-      const marked = group.items.filter((item) => group.values[item.key] === true).length;
-      const pct = (marked / group.items.length) * 100;
+      const marked = realItems.filter((item) => group.values[item.key] === true).length;
+      const pct = (marked / realItems.length) * 100;
 
       if (pct < 50) {
         toast.error(
-          `Para registrar este trade é necessário completar pelo menos 50% do checklist ${group.name}. (${marked}/${group.items.length})`,
+          `Para registrar este trade é necessário completar pelo menos 50% do checklist ${group.name}. (${marked}/${realItems.length})`,
         );
         return;
       }
     }
 
     const allOperationalComplete =
-      opChecklist.items.length > 0 &&
-      opChecklist.items.every((item) => formData.operational[item.key] === true);
+      opItemsReal.length > 0 &&
+      opItemsReal.every((item) => formData.operational[item.key] === true);
 
     // Validar R:R
     const rr = formData.riskReward || 0;
@@ -446,7 +489,7 @@ export default function TradeJournalEnhanced() {
       moneyResult: trade.moneyResult || 0,
       notes: trade.notes,
       isFavorite: trade.isFavorite || false,
-      operational: trade.operational,
+      operational: { ...migrateLegacyOperational(trade.operational), ...(trade.operational || {}) },
       emotional: trade.emotional,
       routine: trade.routine || {
         nightAnalysis: false,
@@ -1395,29 +1438,42 @@ export default function TradeJournalEnhanced() {
                   <p className="text-xs opacity-70">3 Perguntas Essenciais</p>
                 )}
 
-                {checklist.items.map((item) => (
-                  <div key={item.key} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`${group}-${item.key}`}
-                      checked={!!formData[formKey]?.[item.key]}
-                      onCheckedChange={checked =>
-                        setFormData({
-                          ...formData,
-                          [formKey]: {
-                            ...formData[formKey],
-                            [item.key]: checked as boolean,
-                          },
-                        })
-                      }
-                    />
-                    <Label
-                      htmlFor={`${group}-${item.key}`}
-                      className={`text-sm ${textClass} cursor-pointer`}
-                    >
-                      {item.emoji} {item.label}
-                    </Label>
-                  </div>
-                ))}
+                {checklist.items.map((item) => {
+                  if (isSectionItem(item)) {
+                    return (
+                      <div
+                        key={item.key}
+                        className={`mt-3 pt-2 border-t ${borderClass} text-xs font-bold uppercase tracking-wider opacity-80 ${textClass}`}
+                      >
+                        {item.emoji} {item.label}
+                      </div>
+                    );
+                  }
+                  return (
+                    <div key={item.key} className="flex items-start space-x-2">
+                      <Checkbox
+                        id={`${group}-${item.key}`}
+                        checked={!!formData[formKey]?.[item.key]}
+                        onCheckedChange={(checked) =>
+                          setFormData({
+                            ...formData,
+                            [formKey]: {
+                              ...formData[formKey],
+                              [item.key]: checked as boolean,
+                            },
+                          })
+                        }
+                        className="mt-0.5"
+                      />
+                      <Label
+                        htmlFor={`${group}-${item.key}`}
+                        className={`text-sm ${textClass} cursor-pointer leading-snug`}
+                      >
+                        {item.emoji} {item.label}
+                      </Label>
+                    </div>
+                  );
+                })}
 
                 <ChecklistEditor
                   items={checklist.items}
@@ -1431,30 +1487,72 @@ export default function TradeJournalEnhanced() {
               </div>
             ))}
 
-            {/* Validation Warning */}
+            {/* Score de Execução + Validação */}
             {(() => {
-              const groups = [
-                { title: "Operacional", data: checklistProgress.operacional },
+              const opPct = checklistProgress.operacional.percentage;
+              const score = getExecutionScore(opPct);
+              const opItemsReal = opChecklist.items.filter((i) => !isSectionItem(i));
+              const missingCritical = CRITICAL_OPERATIONAL_KEYS.filter(
+                (k) =>
+                  opItemsReal.some((i) => i.key === k) &&
+                  formData.operational[k] !== true,
+              );
+              const labelMap: Record<string, string> = {
+                htfZoneInteraction: "Interação HTF/MTF",
+                chochExterno: "CHOCH externo",
+                bosExterno: "BOS externo",
+                chochInterno: "CHOCH interno",
+              };
+              const opBlocked = opPct < 80 || missingCritical.length > 0;
+              const otherGroups = [
                 { title: "Emocional", data: checklistProgress.emocional },
                 { title: "Rotina", data: checklistProgress.rotina },
                 { title: "Racional", data: checklistProgress.racional },
               ];
-
-              const hasInvalid = groups.some((group) => group.data.percentage < 50);
+              const otherInvalid = otherGroups.some((g) => g.data.percentage < 50);
+              const blocked = opBlocked || otherInvalid;
 
               return (
-                <div className={`p-4 rounded-lg border ${hasInvalid ? "bg-destructive/10 border-destructive/30" : "bg-success/10 border-success/30"}`}>
-                  <p className={`text-sm font-semibold ${hasInvalid ? "text-destructive" : "text-success"}`}>
-                    {hasInvalid
-                      ? "Para registrar este trade, complete pelo menos 50% de cada checklist."
-                      : "✅ Requisito mínimo atendido: 50%+ em todos os checklists."}
-                  </p>
-                  <div className="mt-2 grid sm:grid-cols-2 gap-2">
-                    {groups.map((group) => (
-                      <p key={group.title} className="text-xs text-foreground/80">
-                        • <span className="font-semibold">{group.title}:</span> {group.data.checked}/{group.data.total} ({group.data.percentage}%)
+                <div className="space-y-3">
+                  {/* Score de Execução (Operacional) */}
+                  <div
+                    className={`p-4 rounded-lg border-2 ${
+                      blocked
+                        ? "bg-destructive/10 border-destructive/40"
+                        : "bg-success/10 border-success/40"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+                      <span className="text-sm font-bold flex items-center gap-2">
+                        {blocked ? "🔴 TRADE BLOQUEADO" : "🟢 TRADE PERMITIDO"}
+                      </span>
+                      <Badge className={`${score.colorClass} text-xs`}>
+                        {score.emoji} {score.label} — {opPct}%
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      <span className="font-semibold">Operacional:</span>{" "}
+                      {checklistProgress.operacional.checked}/
+                      {checklistProgress.operacional.total} • mínimo 80% + itens críticos
+                    </p>
+                    {missingCritical.length > 0 && (
+                      <p className="text-xs text-destructive font-semibold">
+                        ⚠️ Faltando: {missingCritical.map((k) => labelMap[k]).join(", ")}
                       </p>
-                    ))}
+                    )}
+                    <div className="mt-2 grid sm:grid-cols-3 gap-2">
+                      {otherGroups.map((group) => (
+                        <p
+                          key={group.title}
+                          className={`text-xs ${
+                            group.data.percentage < 50 ? "text-destructive" : "text-foreground/80"
+                          }`}
+                        >
+                          • <span className="font-semibold">{group.title}:</span>{" "}
+                          {group.data.checked}/{group.data.total} ({group.data.percentage}%)
+                        </p>
+                      ))}
+                    </div>
                   </div>
                 </div>
               );
@@ -1618,46 +1716,30 @@ export default function TradeJournalEnhanced() {
 
                     {/* Checklists */}
                     <div className="grid md:grid-cols-4 gap-3 text-xs">
-                      <div className="bg-white p-2 rounded border border-purple-200">
-                        <p className="font-semibold text-purple-900 mb-1">
-                          ⚠️ Operacional:
+                      <div className="bg-card p-2 rounded border border-purple-200 dark:border-purple-800">
+                        <p className="font-semibold text-purple-900 dark:text-purple-200 mb-1 flex items-center justify-between gap-2">
+                          <span>⚠️ Operacional:</span>
+                          {(() => {
+                            const real = opChecklist.items.filter((i) => !isSectionItem(i));
+                            const marked = real.filter((i) => (trade.operational as any)?.[i.key] === true).length;
+                            const pct = real.length === 0 ? 0 : Math.round((marked / real.length) * 100);
+                            const score = getExecutionScore(pct);
+                            return (
+                              <Badge className={`text-[10px] ${score.colorClass}`}>
+                                {score.emoji} {pct}%
+                              </Badge>
+                            );
+                          })()}
                         </p>
-                        {trade.operational && (
-                          <>
-                            <p>
-                              {trade.operational.chochValidoHTF ? "✓" : "✗"}{" "}
-                              CHoCH HTF
+                        {(() => {
+                          const real = opChecklist.items.filter((i) => !isSectionItem(i));
+                          const marked = real.filter((i) => (trade.operational as any)?.[i.key] === true).length;
+                          return (
+                            <p className="text-muted-foreground">
+                              {marked}/{real.length} itens marcados
                             </p>
-                            <p>
-                              {trade.operational.caixaGannTracada ? "✓" : "✗"}{" "}
-                              Gann
-                            </p>
-                            <p>
-                              {trade.operational.regiaoDescontada50 ? "✓" : "✗"}{" "}
-                              Região 50%
-                            </p>
-                            <p>
-                              {trade.operational.orderBlockIdentificado
-                                ? "✓"
-                                : "✗"}{" "}
-                              OB HTF
-                            </p>
-                            <p>
-                              {trade.operational.entrada50OB ? "✓" : "✗"}{" "}
-                              Entrada 50%
-                            </p>
-                            <p>
-                              {trade.operational.stopRiskManagement ? "✓" : "✗"}{" "}
-                              Stop/TP
-                            </p>
-                            <p>
-                              {trade.operational.tempoGraficoOperacional
-                                ? "✓"
-                                : "✗"}{" "}
-                              Tempo Gráfico
-                            </p>
-                          </>
-                        )}
+                          );
+                        })()}
                       </div>
                       <div className="bg-white p-2 rounded border border-red-200">
                         <p className="font-semibold text-red-900 mb-1">
