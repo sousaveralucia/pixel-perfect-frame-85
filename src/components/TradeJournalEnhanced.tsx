@@ -184,8 +184,9 @@ export default function TradeJournalEnhanced() {
     state: Record<string, boolean>,
     items: ChecklistItem[],
   ) => {
-    const total = items.length;
-    const checked = items.filter((item) => state?.[item.key] === true).length;
+    const real = items.filter((item) => !isSectionItem(item));
+    const total = real.length;
+    const checked = real.filter((item) => state?.[item.key] === true).length;
     const percentage = total === 0 ? 100 : Math.round((checked / total) * 100);
     return { total, checked, percentage };
   };
