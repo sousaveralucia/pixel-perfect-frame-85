@@ -323,18 +323,19 @@ export default function TradeJournalEnhanced() {
       );
 
       if (missingCritical.length > 0) {
-        const labelMap: Record<string, string> = {
-          htfZoneInteraction: "Interação com zona HTF/MTF",
-          chochExterno: "CHOCH externo",
-          bosExterno: "BOS externo",
-          chochInterno: "CHOCH interno",
-        };
-        toast.error(
-          `🔴 Trade inválido — fora do modelo operacional. Faltando: ${missingCritical
-            .map((k) => labelMap[k])
-            .join(", ")}.`,
-          { duration: 6000 },
-        );
+        const missingHtf = missingCritical.includes("htfZoneInteraction");
+        const missingExternal = missingCritical.some((k) => k === "chochExterno" || k === "bosExterno");
+        const missingInternal = missingCritical.some((k) => k === "chochInterno" || k === "bosInterno");
+
+        if (missingHtf) {
+          toast.error("🔴 Você está entrando fora de zona HTF/MTF — trade bloqueado.", { duration: 6000 });
+        }
+        if (missingExternal) {
+          toast.error("🔴 Sem confirmação estrutural externa válida (CHOCH + BOS) — trade inválido.", { duration: 6000 });
+        }
+        if (missingInternal && !missingExternal) {
+          toast.error("🔴 Sem confirmação interna (CHOCH + BOS interno) — entrada antecipada.", { duration: 6000 });
+        }
         return;
       }
 
