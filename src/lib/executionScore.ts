@@ -68,7 +68,33 @@ export const CRITICAL_OPERATIONAL_KEYS = [
   "chochExterno",
   "bosExterno",
   "chochInterno",
+  "bosInterno",
 ] as const;
+
+/** External confirmation keys (CHOCH + BOS externo). */
+export const EXTERNAL_CONFIRMATION_KEYS = ["chochExterno", "bosExterno"] as const;
+/** Internal confirmation keys (CHOCH + BOS interno). */
+export const INTERNAL_CONFIRMATION_KEYS = ["chochInterno", "bosInterno"] as const;
+
+export type ConfirmationStatus = "FULL" | "PARTIAL" | "BLOCKED";
+
+/**
+ * Tristate visual indicator:
+ * 🔴 BLOCKED: missing HTF interaction OR external (CHOCH+BOS) confirmation
+ * 🟡 PARTIAL: external OK but internal (CHOCH+BOS interno) incomplete
+ * 🟢 FULL: HTF + external + internal confirmed
+ */
+export function getConfirmationStatus(
+  values: Record<string, boolean> | undefined,
+): ConfirmationStatus {
+  const v = values || {};
+  const htfOk = v["htfZoneInteraction"] === true;
+  const externalOk = EXTERNAL_CONFIRMATION_KEYS.every((k) => v[k] === true);
+  const internalOk = INTERNAL_CONFIRMATION_KEYS.every((k) => v[k] === true);
+  if (!htfOk || !externalOk) return "BLOCKED";
+  if (!internalOk) return "PARTIAL";
+  return "FULL";
+}
 
 /** Map old operational keys (legacy 7-item checklist) to closest new keys. */
 export const LEGACY_OPERATIONAL_MAP: Record<string, string[]> = {

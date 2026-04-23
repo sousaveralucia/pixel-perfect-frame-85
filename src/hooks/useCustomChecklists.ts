@@ -14,33 +14,35 @@ export interface ChecklistItem {
 const DEFAULTS: Record<string, ChecklistItem[]> = {
   operational: [
     // 1 — CONTEXTO HTF / MTF
-    { key: "_section_htf", emoji: "🧠", label: "1 — CONTEXTO HTF / MTF (OBRIGATÓRIO)" },
+    { key: "_section_htf", emoji: "🧠", label: "1 — CONTEXTO (HTF / MTF)" },
     { key: "structureClear", emoji: "📊", label: "Mercado com estrutura clara (HH/HL ou LL/LH)" },
     { key: "highsLowsIdentified", emoji: "📌", label: "Identifiquei Highs e Lows relevantes" },
-    { key: "orderFlowKnown", emoji: "🧭", label: "Sei qual é o OrderFlow dominante" },
-    { key: "htfZoneMarked", emoji: "📦", label: "Existe zona HTF/MTF válida marcada (OB, FVG ou Ineficiência em H1/H2/M30/M15)" },
-    { key: "htfZoneInteraction", emoji: "🎯", label: "Preço está interagindo com essa zona (CRÍTICO)" },
+    { key: "htfZoneMarked", emoji: "📦", label: "Existe zona HTF/MTF válida (OB, FVG ou Ineficiência — H1/H2/M30/M15)" },
+    { key: "htfZoneInteraction", emoji: "🎯", label: "Preço tocou/interagiu com essa zona (CRÍTICO)" },
     { key: "liquidityNearby", emoji: "💧", label: "Existe liquidez próxima" },
     { key: "liquiditySwept", emoji: "🌊", label: "Liquidez já liquidada antes da reação" },
     { key: "noProtectedExtreme", emoji: "🛡️", label: "Não estou entrando em topo/fundo protegido" },
 
-    // 2 — CONFIRMAÇÃO EXTERNA
-    { key: "_section_external", emoji: "🔄", label: "2 — CONFIRMAÇÃO EXTERNA (HTF/MTF)" },
+    // 2 — CONFIRMAÇÃO EXTERNA (FOCO PRINCIPAL)
+    { key: "_section_external", emoji: "🔄", label: "2 — CONFIRMAÇÃO EXTERNA (FOCO PRINCIPAL)" },
     { key: "chochExterno", emoji: "🔁", label: "Houve CHOCH externo (H1/H2/M30/M15) — CRÍTICO" },
     { key: "bosExterno", emoji: "💥", label: "Houve BOS externo após o CHOCH — CRÍTICO" },
-    { key: "noFalseBreak", emoji: "✋", label: "CHOCH+BOS não é falso rompimento" },
-    { key: "structureChanged", emoji: "🔀", label: "A estrutura realmente mudou" },
+    { key: "externalSameSequence", emoji: "🔗", label: "CHOCH + BOS no mesmo movimento ou sequência válida" },
+    { key: "noFalseBreak", emoji: "✋", label: "Não é falso rompimento" },
+    { key: "structureChanged", emoji: "🔀", label: "A estrutura realmente mudou (não é ruído)" },
 
     // 3 — TRANSIÇÃO PARA LTF
     { key: "_section_transition", emoji: "⚡", label: "3 — TRANSIÇÃO PARA LTF" },
-    { key: "movedToLTF", emoji: "🔬", label: "Após reagir no HTF/MTF, preço foi para LTF (M5/M1)" },
-    { key: "waitChochInterno", emoji: "⏳", label: "Aguardando CHOCH interno (sem antecipação)" },
+    { key: "movedToLTF", emoji: "🔬", label: "Após confirmação externa, desci para LTF (M5/M1)" },
+    { key: "noAnticipation", emoji: "🙅", label: "NÃO antecipei entrada" },
+    { key: "waitChochInterno", emoji: "⏳", label: "Aguardando confirmação interna" },
 
-    // 4 — CONFIRMAÇÃO INTERNA
-    { key: "_section_internal", emoji: "🎯", label: "4 — CONFIRMAÇÃO INTERNA (LTF)" },
-    { key: "chochInterno", emoji: "🔁", label: "Houve CHOCH interno — CRÍTICO" },
-    { key: "bosInterno", emoji: "💥", label: "Houve BOS interno" },
-    { key: "noFalseBreakInternal", emoji: "✋", label: "Movimento não é falso rompimento" },
+    // 4 — CONFIRMAÇÃO INTERNA (EDGE)
+    { key: "_section_internal", emoji: "🎯", label: "4 — CONFIRMAÇÃO INTERNA (SEU EDGE)" },
+    { key: "chochInterno", emoji: "🔁", label: "Houve CHOCH interno (M5 ou M1) — CRÍTICO" },
+    { key: "bosInterno", emoji: "💥", label: "Houve BOS interno após o CHOCH — CRÍTICO" },
+    { key: "noFalseBreakInternal", emoji: "✋", label: "Movimento interno não é falso rompimento" },
+    { key: "internalConfirmsExternal", emoji: "🤝", label: "Estrutura interna confirma o movimento externo" },
 
     // 5 — EXECUÇÃO
     { key: "_section_execution", emoji: "💰", label: "5 — EXECUÇÃO" },

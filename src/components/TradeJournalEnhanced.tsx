@@ -39,6 +39,7 @@ import {
   getExecutionScore,
   CRITICAL_OPERATIONAL_KEYS,
   migrateLegacyOperational,
+  getConfirmationStatus,
 } from "@/lib/executionScore";
 
 // Using TradeWithChecklist from useTradeJournalUnified
@@ -323,18 +324,19 @@ export default function TradeJournalEnhanced() {
       );
 
       if (missingCritical.length > 0) {
-        const labelMap: Record<string, string> = {
-          htfZoneInteraction: "Interação com zona HTF/MTF",
-          chochExterno: "CHOCH externo",
-          bosExterno: "BOS externo",
-          chochInterno: "CHOCH interno",
-        };
-        toast.error(
-          `🔴 Trade inválido — fora do modelo operacional. Faltando: ${missingCritical
-            .map((k) => labelMap[k])
-            .join(", ")}.`,
-          { duration: 6000 },
-        );
+        const missingHtf = missingCritical.includes("htfZoneInteraction");
+        const missingExternal = missingCritical.some((k) => k === "chochExterno" || k === "bosExterno");
+        const missingInternal = missingCritical.some((k) => k === "chochInterno" || k === "bosInterno");
+
+        if (missingHtf) {
+          toast.error("🔴 Você está entrando fora de zona HTF/MTF — trade bloqueado.", { duration: 6000 });
+        }
+        if (missingExternal) {
+          toast.error("🔴 Sem confirmação estrutural externa válida (CHOCH + BOS) — trade inválido.", { duration: 6000 });
+        }
+        if (missingInternal && !missingExternal) {
+          toast.error("🔴 Sem confirmação interna (CHOCH + BOS interno) — entrada antecipada.", { duration: 6000 });
+        }
         return;
       }
 
@@ -1503,12 +1505,7 @@ export default function TradeJournalEnhanced() {
                   opItemsReal.some((i) => i.key === k) &&
                   formData.operational[k] !== true,
               );
-              const labelMap: Record<string, string> = {
-                htfZoneInteraction: "Interação HTF/MTF",
-                chochExterno: "CHOCH externo",
-                bosExterno: "BOS externo",
-                chochInterno: "CHOCH interno",
-              };
+              const confirmStatus = getConfirmationStatus(formData.operational);
               const opBlocked = opPct < 80 || missingCritical.length > 0;
               const otherGroups = [
                 { title: "Emocional", data: checklistProgress.emocional },
@@ -1518,8 +1515,23 @@ export default function TradeJournalEnhanced() {
               const otherInvalid = otherGroups.some((g) => g.data.percentage < 50);
               const blocked = opBlocked || otherInvalid;
 
+              const statusMeta =
+                confirmStatus === "FULL"
+                  ? { emoji: "🟢", label: "Estrutura completa — trade válido", cls: "bg-success/10 border-success/40 text-success" }
+                  : confirmStatus === "PARTIAL"
+                    ? { emoji: "🟡", label: "Falta confirmação interna — atenção", cls: "bg-amber-500/10 border-amber-500/40 text-amber-600 dark:text-amber-400" }
+                    : { emoji: "🔴", label: "Sem confirmação externa — BLOQUEADO", cls: "bg-destructive/10 border-destructive/40 text-destructive" };
+
               return (
                 <div className="space-y-3">
+                  {/* Tristate de Confirmação Estrutural */}
+                  <div className={`p-3 rounded-lg border-2 ${statusMeta.cls}`}>
+                    <p className="text-sm font-bold flex items-center gap-2">
+                      <span className="text-base">{statusMeta.emoji}</span>
+                      {statusMeta.label}
+                    </p>
+                  </div>
+
                   {/* Score de Execução (Operacional) */}
                   <div
                     className={`p-4 rounded-lg border-2 ${
@@ -1543,7 +1555,17 @@ export default function TradeJournalEnhanced() {
                     </p>
                     {missingCritical.length > 0 && (
                       <p className="text-xs text-destructive font-semibold">
-                        ⚠️ Faltando: {missingCritical.map((k) => labelMap[k]).join(", ")}
+                        ⚠️ Faltando crítico: {missingCritical
+                          .map((k) =>
+                            ({
+                              htfZoneInteraction: "Interação HTF/MTF",
+                              chochExterno: "CHOCH externo",
+                              bosExterno: "BOS externo",
+                              chochInterno: "CHOCH interno",
+                              bosInterno: "BOS interno",
+                            } as Record<string, string>)[k],
+                          )
+                          .join(", ")}
                       </p>
                     )}
                     <div className="mt-2 grid sm:grid-cols-3 gap-2">
