@@ -70,10 +70,16 @@ export default function ReportExportEnhanced({ trades: allTradesRaw }: ReportExp
     const profitFactor = avgLoss !== 0 ? Math.abs(avgWin / avgLoss) : 0;
     const pnlPct = initialBalance > 0 ? (totalPnL / initialBalance) * 100 : 0;
 
-    // Checklist
-    const checklistKeys = ["chochValidoHTF", "caixaGannTracada", "regiaoDescontada50", "orderBlockIdentificado", "entrada50OB", "stopRiskManagement", "tempoGraficoOperacional"];
+    // Checklist score = % de itens operacionais marcados (modelo novo, ignora cabeçalhos)
+    const opCompliance = (op: any): number => {
+      if (!op || typeof op !== "object") return 0;
+      const realKeys = Object.keys(op).filter((k) => !k.startsWith("_section_"));
+      if (realKeys.length === 0) return 0;
+      const marked = realKeys.filter((k) => op[k] === true).length;
+      return marked / realKeys.length; // 0..1
+    };
     const avgChecklist = filteredTrades.length > 0
-      ? filteredTrades.reduce((s, t) => s + checklistKeys.reduce((cs, k) => cs + ((t.operational as any)?.[k] ? 1 : 0), 0), 0) / filteredTrades.length
+      ? (filteredTrades.reduce((s, t) => s + opCompliance(t.operational), 0) / filteredTrades.length) * 100
       : 0;
 
     // Best/worst
