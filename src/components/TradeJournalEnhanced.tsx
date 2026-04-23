@@ -559,7 +559,7 @@ export default function TradeJournalEnhanced() {
     y = 36;
 
     const sanitizePdfText = (value: string) =>
-      value
+      (value || "")
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .replace(/[^\x20-\x7E]/g, " ")
@@ -600,18 +600,27 @@ export default function TradeJournalEnhanced() {
       y += 6;
     };
 
+    // Render a checklist row that wraps long labels and skips section headers.
     const chk = (label: string, checked: boolean, x: number, w: number) => {
-      ensurePdfSpace(6);
+      const cleaned = sanitizePdfText(label);
+      const textW = w - 22; // space for bullet + sim/nao tag on the right
+      doc.setFontSize(7);
+      const lines: string[] = doc.splitTextToSize(cleaned, textW);
+      const lineH = 3.2;
+      const rowH = Math.max(5, lines.length * lineH + 1.5);
+      ensurePdfSpace(rowH + 1);
       doc.setFillColor(...(checked ? c.green : c.red));
-      doc.circle(x + 4, y + 0.5, 1.8, "F");
+      doc.circle(x + 4, y + 1.2, 1.7, "F");
       doc.setTextColor(...c.primary);
-      doc.setFontSize(7.2);
       doc.setFont("helvetica", "normal");
-      doc.text(sanitizePdfText(label).slice(0, 46), x + 8, y + 1.5);
+      lines.forEach((ln, idx) => {
+        doc.text(ln, x + 8, y + 1.5 + idx * lineH);
+      });
       doc.setTextColor(...(checked ? c.green : c.red));
       doc.setFont("helvetica", "bold");
-      doc.text(checked ? "Sim" : "Nao", x + w - 12, y + 1.5);
-      y += 5.5;
+      doc.setFontSize(6.8);
+      doc.text(checked ? "SIM" : "NAO", x + w - 2, y + 1.5, { align: "right" });
+      y += rowH;
     };
 
     // === TRADE DATA (two columns) ===
@@ -634,64 +643,60 @@ export default function TradeJournalEnhanced() {
     const leftEnd = y;
     y = savedY;
     dataRight.forEach(([l, v], i) => dRow(l, v, m + halfW, halfW, i % 2 === 0));
-    y = Math.max(leftEnd, y) + 3;
+    y = Math.max(leftEnd, y) + 4;
 
-    // === CHECKLISTS in 2-column grid ===
-    const colW = (pw - 2 * m - 4) / 2;
+    // === CHECKLISTS — full width, full labels, skip section headers ===
+    // Migrate legacy operational on the fly so old trades show meaningful data.
+    const opMerged = { ...migrateLegacyOperational(trade.operational), ...(trade.operational || {}) };
 
-    // Left: Operacional
-    secTitle("Checklist Operacional", c.accent);
-    const opItems: [string, boolean][] = opChecklist.items.map(i => [
-      `${i.emoji} ${i.label.substring(0, 30)}`, !!(trade.operational as any)?.[i.key]
-    ]);
-    opItems.forEach(([l, v]) => chk(l, v, m, colW));
-    y += 3;
+    const renderChecklist = (
+      title: string,
+      titleColor: [number, number, number],
+      items: typeof opChecklist.items,
+      values: Record<string, boolean> | undefined,
+    ) => {
+      const real = items.filter((i) => !isSectionItem(i));
+      if (real.length === 0) return;
+      const marked = real.filter((i) => values?.[i.key] === true).length;
+      const pct = Math.round((marked / real.length) * 100);
+      ensurePdfSpace(10);
+      doc.setFillColor(...titleColor);
+      doc.rect(m, y, 2.5, 6, "F");
+      doc.setTextColor(...c.primary);
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "bold");
+      doc.text(sanitizePdfText(title), m + 5, y + 4.5);
+      // Score pill on the right
+      const scoreColor = pct >= 80 ? c.green : pct >= 60 ? c.yellow : c.red;
+      doc.setFillColor(...scoreColor);
+      doc.roundedRect(pw - m - 28, y, 28, 6, 1.5, 1.5, "F");
+      doc.setTextColor(...c.white);
+      doc.setFontSize(7.5);
+      doc.text(`${marked}/${real.length}  ${pct}%`, pw - m - 14, y + 4.2, { align: "center" });
+      y += 9;
 
-    // Side-by-side: Emocional + Racional
-    const twoColY = y;
-    secTitle("Emocional", [139, 92, 246]);
-    const emoItems: [string, boolean][] = emChecklist.items.map(i => [
-      `${i.emoji} ${i.label.substring(0, 25)}`, !!(trade.emotional as any)?.[i.key]
-    ]);
-    emoItems.forEach(([l, v]) => chk(l, v, m, colW));
-    const emoEnd = y;
+      items.forEach((item) => {
+        if (isSectionItem(item)) {
+          // Section header row
+          ensurePdfSpace(7);
+          doc.setFillColor(...c.lightBg);
+          doc.rect(m, y - 1, pw - 2 * m, 5.5, "F");
+          doc.setTextColor(...c.gray);
+          doc.setFontSize(7.2);
+          doc.setFont("helvetica", "bold");
+          doc.text(sanitizePdfText(`${item.emoji} ${item.label}`), m + 2, y + 2.5);
+          y += 6;
+          return;
+        }
+        chk(`${item.emoji} ${item.label}`, values?.[item.key] === true, m, pw - 2 * m);
+      });
+      y += 3;
+    };
 
-    y = twoColY;
-    // Racional on right side
-    doc.setFillColor(14, 165, 233);
-    doc.rect(m + colW + 4, y, 2.5, 6, "F");
-    doc.setTextColor(...c.primary); doc.setFontSize(9); doc.setFont("helvetica", "bold");
-    doc.text("Racional", m + colW + 9, y + 4.5);
-    y += 8;
-    const ratItems: [string, boolean][] = raChecklist.items.map(i => [
-      `${i.emoji} ${i.label.substring(0, 25)}`, !!(trade.rational as any)?.[i.key]
-    ]);
-    ratItems.forEach(([l, v]) => {
-      doc.setFillColor(...(v ? c.green : c.red));
-      doc.circle(m + colW + 8, y + 0.5, 1.8, "F");
-      doc.setTextColor(...c.primary); doc.setFontSize(7.5); doc.setFont("helvetica", "normal");
-      doc.text(l, m + colW + 12, y + 1.5);
-      doc.setTextColor(...(v ? c.green : c.red)); doc.setFont("helvetica", "bold");
-      doc.text(v ? "Sim" : "Nao", m + colW + colW - 8, y + 1.5);
-      y += 5.5;
-    });
-    y = Math.max(emoEnd, y) + 3;
-
-    // Rotina (compact single row)
-    secTitle("Rotina", c.green);
-    const routItems: [string, boolean][] = rtChecklist.items.map(i => [
-      `${i.emoji} ${i.label.substring(0, 20)}`, !!(trade.routine as any)?.[i.key]
-    ]);
-    // Inline horizontal
-    const rItemW = (pw - 2 * m) / routItems.length;
-    routItems.forEach(([l, v], i) => {
-      const rx = m + i * rItemW;
-      doc.setFillColor(...(v ? c.green : c.red));
-      doc.circle(rx + 4, y + 0.5, 1.8, "F");
-      doc.setTextColor(...c.primary); doc.setFontSize(7); doc.setFont("helvetica", "normal");
-      doc.text(l, rx + 8, y + 1.5);
-    });
-    y += 8;
+    renderChecklist("Checklist Operacional", c.accent, opChecklist.items, opMerged);
+    renderChecklist("Checklist Emocional", [139, 92, 246], emChecklist.items, trade.emotional as any);
+    renderChecklist("Checklist Rotina", c.green, rtChecklist.items, trade.routine as any);
+    renderChecklist("Checklist Racional", [14, 165, 233], raChecklist.items, trade.rational as any);
 
     // === NOTAS (compact) ===
     if (trade.notes) {
