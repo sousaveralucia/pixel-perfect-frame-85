@@ -346,11 +346,11 @@ export default function TradeJournalEnhanced() {
       }
     }
 
-    // Demais checklists mantêm a regra de >=50%
+    // Demais checklists com pesos: Emocional / Rotina / Racional exigem >=65%
     const checkGroups = [
-      { name: "Emocional", items: emChecklist.items, values: formData.emotional },
-      { name: "Rotina", items: rtChecklist.items, values: formData.routine },
-      { name: "Racional", items: raChecklist.items, values: formData.rational },
+      { name: "Emocional", items: emChecklist.items, values: formData.emotional, min: 65 },
+      { name: "Rotina", items: rtChecklist.items, values: formData.routine, min: 65 },
+      { name: "Racional", items: raChecklist.items, values: formData.rational, min: 65 },
     ];
 
     for (const group of checkGroups) {
@@ -360,9 +360,9 @@ export default function TradeJournalEnhanced() {
       const marked = realItems.filter((item) => group.values[item.key] === true).length;
       const pct = (marked / realItems.length) * 100;
 
-      if (pct < 50) {
+      if (pct < group.min) {
         toast.error(
-          `Para registrar este trade é necessário completar pelo menos 50% do checklist ${group.name}. (${marked}/${realItems.length})`,
+          `Checklist ${group.name} insuficiente: ${marked}/${realItems.length} (${Math.round(pct)}%). Mínimo: ${group.min}%.`,
         );
         return;
       }
