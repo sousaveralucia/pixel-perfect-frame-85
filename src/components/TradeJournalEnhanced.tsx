@@ -39,6 +39,7 @@ import {
   getExecutionScore,
   CRITICAL_OPERATIONAL_KEYS,
   migrateLegacyOperational,
+  getConfirmationStatus,
 } from "@/lib/executionScore";
 
 // Using TradeWithChecklist from useTradeJournalUnified
