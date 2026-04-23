@@ -14,6 +14,8 @@ import { exportCompleteReportToExcel } from "@/lib/excelExporter";
 import { useAccountManager } from "@/hooks/useAccountManager";
 import { subDays, subMonths, parseISO, isAfter } from "date-fns";
 import { TradeWithChecklist } from "@/hooks/useTradeJournalUnified";
+import { getDefaultItems } from "@/hooks/useCustomChecklists";
+import { isSectionItem } from "@/lib/executionScore";
 
 interface ReportExportEnhancedProps {
   trades: TradeWithChecklist[];
@@ -70,10 +72,16 @@ export default function ReportExportEnhanced({ trades: allTradesRaw }: ReportExp
     const profitFactor = avgLoss !== 0 ? Math.abs(avgWin / avgLoss) : 0;
     const pnlPct = initialBalance > 0 ? (totalPnL / initialBalance) * 100 : 0;
 
-    // Checklist
-    const checklistKeys = ["chochValidoHTF", "caixaGannTracada", "regiaoDescontada50", "orderBlockIdentificado", "entrada50OB", "stopRiskManagement", "tempoGraficoOperacional"];
+    // Checklist score = % de itens operacionais marcados (modelo novo, ignora cabeçalhos)
+    const opCompliance = (op: any): number => {
+      if (!op || typeof op !== "object") return 0;
+      const realKeys = Object.keys(op).filter((k) => !k.startsWith("_section_"));
+      if (realKeys.length === 0) return 0;
+      const marked = realKeys.filter((k) => op[k] === true).length;
+      return marked / realKeys.length; // 0..1
+    };
     const avgChecklist = filteredTrades.length > 0
-      ? filteredTrades.reduce((s, t) => s + checklistKeys.reduce((cs, k) => cs + ((t.operational as any)?.[k] ? 1 : 0), 0), 0) / filteredTrades.length
+      ? (filteredTrades.reduce((s, t) => s + opCompliance(t.operational), 0) / filteredTrades.length) * 100
       : 0;
 
     // Best/worst
@@ -117,21 +125,21 @@ export default function ReportExportEnhanced({ trades: allTradesRaw }: ReportExp
     });
   }, [filteredTrades]);
 
-  // Discipline per item
+  // Discipline per item — uses live operational checklist (skips section headers)
   const disciplineItems = useMemo(() => {
-    const items = [
-      { key: "chochValidoHTF", label: "CHoCH HTF" },
-      { key: "caixaGannTracada", label: "Gann Box" },
-      { key: "regiaoDescontada50", label: "Região 50%" },
-      { key: "orderBlockIdentificado", label: "Order Block" },
-      { key: "entrada50OB", label: "Entrada 50% OB" },
-      { key: "stopRiskManagement", label: "Stop/Risk" },
-      { key: "tempoGraficoOperacional", label: "Timeframe Op." },
-    ];
-    return items.map(item => {
-      const followed = filteredTrades.filter(t => (t.operational as any)?.[item.key]);
-      const wrF = followed.length > 0 ? (followed.filter(t => t.result === "WIN").length / followed.length) * 100 : 0;
-      return { label: item.label, compliance: filteredTrades.length > 0 ? (followed.length / filteredTrades.length) * 100 : 0, wrFollowed: wrF };
+    const items = getDefaultItems("operational")
+      .filter((i) => !isSectionItem(i))
+      .map((i) => ({ key: i.key, label: i.label.length > 32 ? i.label.slice(0, 30) + "…" : i.label }));
+    return items.map((item) => {
+      const followed = filteredTrades.filter((t) => (t.operational as any)?.[item.key]);
+      const wrF = followed.length > 0
+        ? (followed.filter((t) => t.result === "WIN").length / followed.length) * 100
+        : 0;
+      return {
+        label: item.label,
+        compliance: filteredTrades.length > 0 ? (followed.length / filteredTrades.length) * 100 : 0,
+        wrFollowed: wrF,
+      };
     });
   }, [filteredTrades]);
 
@@ -244,7 +252,7 @@ export default function ReportExportEnhanced({ trades: allTradesRaw }: ReportExp
         { l: "Perda Média", v: `$${stats.avgLoss.toFixed(2)}`, c: co.red },
         { l: "Fator Lucro", v: `${stats.profitFactor.toFixed(2)}`, c: co.accent },
         { l: "Retorno", v: `${stats.pnlPct >= 0 ? "+" : ""}${stats.pnlPct.toFixed(1)}%`, c: stats.pnlPct >= 0 ? co.green : co.red },
-        { l: "Checklist", v: `${stats.avgChecklist.toFixed(1)}/7`, c: co.accent },
+        { l: "Checklist", v: `${stats.avgChecklist.toFixed(0)}%`, c: co.accent },
       ];
       kpis.forEach((k, i) => {
         const col = i % 5;
@@ -275,15 +283,18 @@ export default function ReportExportEnhanced({ trades: allTradesRaw }: ReportExp
           doc.rect(m, y - 3, tableW, 5.5, "F");
         }
         const mr = trade.moneyResult || 0;
-        const opKeys = ["chochValidoHTF", "caixaGannTracada", "regiaoDescontada50", "orderBlockIdentificado", "entrada50OB", "stopRiskManagement", "tempoGraficoOperacional"];
-        const clScore = opKeys.reduce((s, k) => s + ((trade.operational as any)?.[k] ? 1 : 0), 0);
+        const opObj = (trade.operational as any) || {};
+        const opRealKeys = Object.keys(opObj).filter((k) => !k.startsWith("_section_"));
+        const opMarked = opRealKeys.filter((k) => opObj[k] === true).length;
+        const opTotal = opRealKeys.length || 1;
+        const clPct = Math.round((opMarked / opTotal) * 100);
 
         const rowData = [
           trade.date || "-", trade.asset || "-", trade.entryPrice || "-", trade.stopLoss || "-",
           trade.takeProfit || "-", trade.exitPrice || "-", `$${mr.toFixed(2)}`,
           trade.riskReward ? `${trade.riskReward}:1` : "-", trade.session || "-",
           trade.result === "WIN" ? "WIN" : trade.result === "LOSS" ? "LOSS" : "BE",
-          `${clScore}/7`,
+          `${clPct}%`,
         ];
 
         xP = m;
@@ -295,7 +306,7 @@ export default function ReportExportEnhanced({ trades: allTradesRaw }: ReportExp
             doc.setTextColor(...(mr >= 0 ? co.green : co.red));
             doc.setFont("helvetica", "bold");
           } else if (i === 10) {
-            doc.setTextColor(...(clScore >= 5 ? co.green : clScore >= 3 ? co.yellow : co.red));
+            doc.setTextColor(...(clPct >= 80 ? co.green : clPct >= 60 ? co.yellow : co.red));
             doc.setFont("helvetica", "bold");
           } else {
             doc.setTextColor(...co.primary);
@@ -396,7 +407,7 @@ export default function ReportExportEnhanced({ trades: allTradesRaw }: ReportExp
       secHeader("Disciplina Operacional", "🛡️");
       doc.setFontSize(7);
       doc.setTextColor(...co.gray);
-      doc.text(`Score Médio: ${stats.avgChecklist.toFixed(1)}/7 • Streaks: ${streaks.maxWin} wins / ${streaks.maxLoss} losses`, m, y);
+      doc.text(`Score Médio: ${stats.avgChecklist.toFixed(0)}% • Streaks: ${streaks.maxWin} wins / ${streaks.maxLoss} losses`, m, y);
       y += 5;
 
       doc.setFillColor(...co.primary);
@@ -623,7 +634,7 @@ export default function ReportExportEnhanced({ trades: allTradesRaw }: ReportExp
           { label: "Win Rate", value: `${stats.winRate.toFixed(1)}%`, icon: Target, color: "text-primary" },
           { label: "P&L Total", value: `$${stats.totalPnL.toFixed(2)}`, icon: DollarSign, color: stats.totalPnL >= 0 ? "text-green-600" : "text-red-600" },
           { label: "Fator Lucro", value: `${stats.profitFactor.toFixed(2)}`, icon: TrendingUp, color: "text-primary" },
-          { label: "Checklist", value: `${stats.avgChecklist.toFixed(1)}/7`, icon: Shield, color: "text-primary" },
+          { label: "Checklist", value: `${stats.avgChecklist.toFixed(0)}%`, icon: Shield, color: "text-primary" },
         ].map((kpi, i) => (
           <Card key={i}>
             <CardContent className="pt-4 pb-3">
