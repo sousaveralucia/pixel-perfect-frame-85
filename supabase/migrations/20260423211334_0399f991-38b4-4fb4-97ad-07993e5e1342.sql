@@ -1,0 +1,1 @@
+DELETE FROM public.custom_checklists WHERE checklist_group = 'operational';
