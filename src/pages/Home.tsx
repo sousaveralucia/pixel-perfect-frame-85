@@ -553,46 +553,68 @@ export default function Home() {
           </TabsContent>
 
           <TabsContent value="alertas" className="space-y-6">
-            <LazyTab><NewsAlerts /></LazyTab>
+            <OperationGate allowReadOnly onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab><NewsAlerts /></LazyTab>
+            </OperationGate>
           </TabsContent>
 
           <TabsContent value="analises" className="space-y-6">
-            <LazyTab><AnalysisHistory /></LazyTab>
+            <OperationGate allowReadOnly onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab><AnalysisHistory /></LazyTab>
+            </OperationGate>
           </TabsContent>
 
           <TabsContent value="calculadora" className="space-y-6">
-            <LazyTab><TradingCalculator /></LazyTab>
+            <OperationGate allowReadOnly onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab><TradingCalculator /></LazyTab>
+            </OperationGate>
           </TabsContent>
 
           <TabsContent value="diario" className="space-y-6">
-            <LazyTab><TradeJournalEnhanced /></LazyTab>
+            <OperationGate onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab><TradeJournalEnhanced /></LazyTab>
+            </OperationGate>
           </TabsContent>
 
           <TabsContent value="calendario" className="space-y-6">
-            <LazyTab><EconomicCalendar /></LazyTab>
+            <OperationGate allowReadOnly onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab><EconomicCalendar /></LazyTab>
+            </OperationGate>
           </TabsContent>
 
           <TabsContent value="insights" className="space-y-6">
-            <LazyTab>
-              <PerformanceDashboard />
-              <AssetPerformanceAnalysis />
-            </LazyTab>
+            <OperationGate allowReadOnly onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab>
+                <PerformanceDashboard />
+                <AssetPerformanceAnalysis />
+              </LazyTab>
+            </OperationGate>
           </TabsContent>
 
           <TabsContent value="comparacao" className="space-y-6">
-            <LazyTab><StrategyComparisonEnhanced trades={trades} /></LazyTab>
+            <OperationGate allowReadOnly onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab><StrategyComparisonEnhanced trades={trades} /></LazyTab>
+            </OperationGate>
           </TabsContent>
 
           <TabsContent value="relatorio" className="space-y-6">
-            <LazyTab><ReportExportEnhanced trades={trades} /></LazyTab>
+            <OperationGate allowReadOnly onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab><ReportExportEnhanced trades={trades} /></LazyTab>
+            </OperationGate>
           </TabsContent>
 
           <TabsContent value="validacao" className="space-y-6">
             <LazyTab><DailyValidation /></LazyTab>
           </TabsContent>
 
+          <TabsContent value="preparacao" className="space-y-6">
+            <LazyTab><PreparationHistory /></LazyTab>
+          </TabsContent>
+
           <TabsContent value="disciplina" className="space-y-6">
-            <LazyTab><DisciplineAnalysis /></LazyTab>
+            <OperationGate allowReadOnly onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab><DisciplineAnalysis /></LazyTab>
+            </OperationGate>
           </TabsContent>
 
             </motion.div>
