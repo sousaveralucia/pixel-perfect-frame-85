@@ -138,6 +138,13 @@ export default function Home() {
         </div>
       </header>
 
+      <DailyStatusBar
+        onGoCheckin={() => setActiveTab("validacao")}
+        onGoCheckout={() => setShowCheckout(true)}
+      />
+
+      <DailyCheckout open={showCheckout} onClose={() => setShowCheckout(false)} />
+
       {/* Main Content */}
       <main className="container py-4 md:py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
