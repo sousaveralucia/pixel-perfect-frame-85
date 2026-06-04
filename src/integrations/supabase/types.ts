@@ -230,42 +230,87 @@ export type Database = {
       daily_validations: {
         Row: {
           account_key: string
+          checkin_completed_at: string | null
+          checkout_completed_at: string | null
+          checkout_notes: string | null
           created_at: string
+          daily_intention: string | null
           date: string
+          day_result: number | null
           emotional_ready: string | null
+          emotional_state: string | null
           environment: boolean | null
+          hydration: string | null
           id: string
+          lockout_reason: string | null
+          lockout_until: string | null
+          mental_clarity: number | null
           mental_ready: string | null
           objective: boolean | null
+          performance_score: number | null
+          physical_state: string | null
+          readiness_score: number | null
+          sleep_hours: number | null
           timer_started_at: string | null
+          trades_count: number | null
           updated_at: string
           user_id: string
           validated_at: string | null
         }
         Insert: {
           account_key: string
+          checkin_completed_at?: string | null
+          checkout_completed_at?: string | null
+          checkout_notes?: string | null
           created_at?: string
+          daily_intention?: string | null
           date: string
+          day_result?: number | null
           emotional_ready?: string | null
+          emotional_state?: string | null
           environment?: boolean | null
+          hydration?: string | null
           id?: string
+          lockout_reason?: string | null
+          lockout_until?: string | null
+          mental_clarity?: number | null
           mental_ready?: string | null
           objective?: boolean | null
+          performance_score?: number | null
+          physical_state?: string | null
+          readiness_score?: number | null
+          sleep_hours?: number | null
           timer_started_at?: string | null
+          trades_count?: number | null
           updated_at?: string
           user_id: string
           validated_at?: string | null
         }
         Update: {
           account_key?: string
+          checkin_completed_at?: string | null
+          checkout_completed_at?: string | null
+          checkout_notes?: string | null
           created_at?: string
+          daily_intention?: string | null
           date?: string
+          day_result?: number | null
           emotional_ready?: string | null
+          emotional_state?: string | null
           environment?: boolean | null
+          hydration?: string | null
           id?: string
+          lockout_reason?: string | null
+          lockout_until?: string | null
+          mental_clarity?: number | null
           mental_ready?: string | null
           objective?: boolean | null
+          performance_score?: number | null
+          physical_state?: string | null
+          readiness_score?: number | null
+          sleep_hours?: number | null
           timer_started_at?: string | null
+          trades_count?: number | null
           updated_at?: string
           user_id?: string
           validated_at?: string | null

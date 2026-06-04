@@ -35,6 +35,11 @@ const CalculationHistory = lazy(() => import("@/components/CalculationHistory"))
 const EquityAndPerformanceCharts = lazy(() => import("@/components/EquityAndPerformanceCharts").then(m => ({ default: m.EquityAndPerformanceCharts })));
 const Withdrawals = lazy(() => import("@/components/Withdrawals"));
 const DisciplineAnalysis = lazy(() => import("@/components/DisciplineAnalysis"));
+const PreparationHistory = lazy(() => import("@/components/PreparationHistory"));
+import DailyStatusBar from "@/components/DailyStatusBar";
+import OperationGate from "@/components/OperationGate";
+import DailyCheckout from "@/components/DailyCheckout";
+import { useDailyGate } from "@/contexts/DailyGateContext";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -71,7 +76,15 @@ const TABS = [
   { value: "comparacao", label: "Comparação" },
   { value: "relatorio", label: "Relatório" },
   { value: "saques", label: "Saques" },
+  { value: "preparacao", label: "Preparação" },
 ];
+
+// Tabs que continuam acessíveis em modo consulta (fim de semana / locked_out)
+const READ_ONLY_TABS = new Set([
+  "calendario-trading", "contas", "autoconhecimento", "estrategia",
+  "calendario", "insights", "comparacao", "relatorio", "alertas",
+  "disciplina", "saques", "preparacao", "validacao",
+]);
 
 export default function Home() {
   const { signOut } = useAuth();
@@ -81,6 +94,8 @@ export default function Home() {
   const [editingPlan, setEditingPlan] = useState(false);
   const [editingGoldenRule, setEditingGoldenRule] = useState(false);
   const [activeTab, setActiveTab] = useState("calendario-trading");
+  const [showCheckout, setShowCheckout] = useState(false);
+  const dailyGate = useDailyGate();
   const planChecklist = useCustomChecklists("plan");
   const goldenRuleChecklist = useCustomChecklists("goldenRule");
   const isMobile = useIsMobile();
@@ -122,6 +137,13 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      <DailyStatusBar
+        onGoCheckin={() => setActiveTab("validacao")}
+        onGoCheckout={() => setShowCheckout(true)}
+      />
+
+      <DailyCheckout open={showCheckout} onClose={() => setShowCheckout(false)} />
 
       {/* Main Content */}
       <main className="container py-4 md:py-6">
@@ -531,46 +553,68 @@ export default function Home() {
           </TabsContent>
 
           <TabsContent value="alertas" className="space-y-6">
-            <LazyTab><NewsAlerts /></LazyTab>
+            <OperationGate allowReadOnly onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab><NewsAlerts /></LazyTab>
+            </OperationGate>
           </TabsContent>
 
           <TabsContent value="analises" className="space-y-6">
-            <LazyTab><AnalysisHistory /></LazyTab>
+            <OperationGate allowReadOnly onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab><AnalysisHistory /></LazyTab>
+            </OperationGate>
           </TabsContent>
 
           <TabsContent value="calculadora" className="space-y-6">
-            <LazyTab><TradingCalculator /></LazyTab>
+            <OperationGate allowReadOnly onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab><TradingCalculator /></LazyTab>
+            </OperationGate>
           </TabsContent>
 
           <TabsContent value="diario" className="space-y-6">
-            <LazyTab><TradeJournalEnhanced /></LazyTab>
+            <OperationGate onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab><TradeJournalEnhanced /></LazyTab>
+            </OperationGate>
           </TabsContent>
 
           <TabsContent value="calendario" className="space-y-6">
-            <LazyTab><EconomicCalendar /></LazyTab>
+            <OperationGate allowReadOnly onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab><EconomicCalendar /></LazyTab>
+            </OperationGate>
           </TabsContent>
 
           <TabsContent value="insights" className="space-y-6">
-            <LazyTab>
-              <PerformanceDashboard />
-              <AssetPerformanceAnalysis />
-            </LazyTab>
+            <OperationGate allowReadOnly onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab>
+                <PerformanceDashboard />
+                <AssetPerformanceAnalysis />
+              </LazyTab>
+            </OperationGate>
           </TabsContent>
 
           <TabsContent value="comparacao" className="space-y-6">
-            <LazyTab><StrategyComparisonEnhanced trades={trades} /></LazyTab>
+            <OperationGate allowReadOnly onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab><StrategyComparisonEnhanced trades={trades} /></LazyTab>
+            </OperationGate>
           </TabsContent>
 
           <TabsContent value="relatorio" className="space-y-6">
-            <LazyTab><ReportExportEnhanced trades={trades} /></LazyTab>
+            <OperationGate allowReadOnly onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab><ReportExportEnhanced trades={trades} /></LazyTab>
+            </OperationGate>
           </TabsContent>
 
           <TabsContent value="validacao" className="space-y-6">
             <LazyTab><DailyValidation /></LazyTab>
           </TabsContent>
 
+          <TabsContent value="preparacao" className="space-y-6">
+            <LazyTab><PreparationHistory /></LazyTab>
+          </TabsContent>
+
           <TabsContent value="disciplina" className="space-y-6">
-            <LazyTab><DisciplineAnalysis /></LazyTab>
+            <OperationGate allowReadOnly onGoCheckin={() => setActiveTab("validacao")}>
+              <LazyTab><DisciplineAnalysis /></LazyTab>
+            </OperationGate>
           </TabsContent>
 
             </motion.div>

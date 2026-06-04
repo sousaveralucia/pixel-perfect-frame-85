@@ -2,7 +2,7 @@ import { useState } from "react";
 import { 
   Calendar, Wallet, User, Zap, ClipboardCheck, Clock, Bell, 
   BarChart3, Calculator, BookOpen, Globe, Lightbulb, GitCompare, 
-  FileText, ArrowDownToLine, Menu, Shield
+  FileText, ArrowDownToLine, Menu, Shield, Brain
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ const tabItems = [
   { value: "autoconhecimento", label: "Pessoal", icon: User },
   { value: "estrategia", label: "Estratégia", icon: Zap },
   { value: "validacao", label: "Pré-Op", icon: ClipboardCheck },
+  { value: "preparacao", label: "Preparação", icon: Brain },
   { value: "rotina", label: "Rotina", icon: Clock },
   { value: "alertas", label: "Alertas", icon: Bell },
   { value: "analises", label: "Análises", icon: BarChart3 },

@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import PreMarketCheckin from "./PreMarketCheckin";
 import { useAccountManager } from "@/hooks/useAccountManager";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -152,6 +153,8 @@ export default function DailyValidation() {
 
   return (
     <div className="space-y-4">
+      <PreMarketCheckin />
+
       {/* Header com data e status principal */}
       <div className="flex items-center justify-between">
         <div>

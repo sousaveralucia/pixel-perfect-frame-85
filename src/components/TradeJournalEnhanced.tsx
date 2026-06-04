@@ -32,6 +32,7 @@ import { exportTradesToExcel, exportToCSV as exportToCSVFile } from "@/lib/excel
 import { SimpleImageViewer } from "./SimpleImageViewer";
 import { TradeImageGallery } from "./TradeImageGallery";
 import { useCustomChecklists, ChecklistItem } from "@/hooks/useCustomChecklists";
+import { useDailyGate } from "@/contexts/DailyGateContext";
 import ChecklistEditor from "./ChecklistEditor";
 import { compressImage } from "@/lib/imageOptimizer";
 import {
@@ -151,6 +152,7 @@ export default function TradeJournalEnhanced() {
   // Custom checklists
   const opChecklist = useCustomChecklists("operational");
   const emChecklist = useCustomChecklists("emotional");
+  const dailyGate = useDailyGate();
   const rtChecklist = useCustomChecklists("routine");
   const raChecklist = useCustomChecklists("rational");
   const [editingChecklist, setEditingChecklist] = useState<string | null>(null);
@@ -462,6 +464,19 @@ export default function TradeJournalEnhanced() {
     } else {
       addTradeUnified(newTrade);
       toast.success("Trade registrado!");
+
+      // Gate de operação: aciona lockout ao atingir limites diários
+      try {
+        const newWins = todayWins + (newTrade.result === "WIN" ? 1 : 0);
+        const newLosses = todayLosses + (newTrade.result === "LOSS" ? 1 : 0);
+        if (newWins >= 2) {
+          dailyGate.triggerLockout("Meta diária de 2 WINs atingida");
+        } else if (newLosses >= 3) {
+          dailyGate.triggerLockout("Limite de 3 LOSSes atingido");
+        } else {
+          dailyGate.markTrading();
+        }
+      } catch { /* contexto pode não estar disponível em testes */ }
     }
 
 
