@@ -462,6 +462,19 @@ export default function TradeJournalEnhanced() {
     } else {
       addTradeUnified(newTrade);
       toast.success("Trade registrado!");
+
+      // Gate de operação: aciona lockout ao atingir limites diários
+      try {
+        const newWins = todayWins + (newTrade.result === "WIN" ? 1 : 0);
+        const newLosses = todayLosses + (newTrade.result === "LOSS" ? 1 : 0);
+        if (newWins >= 2) {
+          dailyGate.triggerLockout("Meta diária de 2 WINs atingida");
+        } else if (newLosses >= 3) {
+          dailyGate.triggerLockout("Limite de 3 LOSSes atingido");
+        } else {
+          dailyGate.markTrading();
+        }
+      } catch { /* contexto pode não estar disponível em testes */ }
     }
 
 
