@@ -94,6 +94,8 @@ export default function Home() {
   const [editingPlan, setEditingPlan] = useState(false);
   const [editingGoldenRule, setEditingGoldenRule] = useState(false);
   const [activeTab, setActiveTab] = useState("calendario-trading");
+  const [showCheckout, setShowCheckout] = useState(false);
+  const dailyGate = useDailyGate();
   const planChecklist = useCustomChecklists("plan");
   const goldenRuleChecklist = useCustomChecklists("goldenRule");
   const isMobile = useIsMobile();
