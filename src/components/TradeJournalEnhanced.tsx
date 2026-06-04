@@ -32,6 +32,7 @@ import { exportTradesToExcel, exportToCSV as exportToCSVFile } from "@/lib/excel
 import { SimpleImageViewer } from "./SimpleImageViewer";
 import { TradeImageGallery } from "./TradeImageGallery";
 import { useCustomChecklists, ChecklistItem } from "@/hooks/useCustomChecklists";
+import { useDailyGate } from "@/contexts/DailyGateContext";
 import ChecklistEditor from "./ChecklistEditor";
 import { compressImage } from "@/lib/imageOptimizer";
 import {
@@ -151,6 +152,7 @@ export default function TradeJournalEnhanced() {
   // Custom checklists
   const opChecklist = useCustomChecklists("operational");
   const emChecklist = useCustomChecklists("emotional");
+  const dailyGate = useDailyGate();
   const rtChecklist = useCustomChecklists("routine");
   const raChecklist = useCustomChecklists("rational");
   const [editingChecklist, setEditingChecklist] = useState<string | null>(null);
