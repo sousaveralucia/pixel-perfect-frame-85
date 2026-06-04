@@ -153,6 +153,8 @@ export default function DailyValidation() {
 
   return (
     <div className="space-y-4">
+      <PreMarketCheckin />
+
       {/* Header com data e status principal */}
       <div className="flex items-center justify-between">
         <div>
