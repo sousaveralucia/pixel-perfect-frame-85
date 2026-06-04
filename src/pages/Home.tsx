@@ -35,6 +35,11 @@ const CalculationHistory = lazy(() => import("@/components/CalculationHistory"))
 const EquityAndPerformanceCharts = lazy(() => import("@/components/EquityAndPerformanceCharts").then(m => ({ default: m.EquityAndPerformanceCharts })));
 const Withdrawals = lazy(() => import("@/components/Withdrawals"));
 const DisciplineAnalysis = lazy(() => import("@/components/DisciplineAnalysis"));
+const PreparationHistory = lazy(() => import("@/components/PreparationHistory"));
+import DailyStatusBar from "@/components/DailyStatusBar";
+import OperationGate from "@/components/OperationGate";
+import DailyCheckout from "@/components/DailyCheckout";
+import { useDailyGate } from "@/contexts/DailyGateContext";
 
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -71,7 +76,15 @@ const TABS = [
   { value: "comparacao", label: "Comparação" },
   { value: "relatorio", label: "Relatório" },
   { value: "saques", label: "Saques" },
+  { value: "preparacao", label: "Preparação" },
 ];
+
+// Tabs que continuam acessíveis em modo consulta (fim de semana / locked_out)
+const READ_ONLY_TABS = new Set([
+  "calendario-trading", "contas", "autoconhecimento", "estrategia",
+  "calendario", "insights", "comparacao", "relatorio", "alertas",
+  "disciplina", "saques", "preparacao", "validacao",
+]);
 
 export default function Home() {
   const { signOut } = useAuth();
