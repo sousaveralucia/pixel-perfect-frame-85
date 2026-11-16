@@ -317,6 +317,54 @@ export type Database = {
         }
         Relationships: []
       }
+      op_entries: {
+        Row: {
+          created_at: string
+          data: Json
+          id: string
+          kind: string
+          trading_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          id?: string
+          kind: string
+          trading_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          id?: string
+          kind?: string
+          trading_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      op_settings: {
+        Row: {
+          data: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          data?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          data?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trade_checklist_ticks: {
         Row: {
           account_key: string
