@@ -2,12 +2,19 @@ import { useState } from "react";
 import { 
   Calendar, Wallet, User, Zap, ClipboardCheck, Clock, Bell, 
   BarChart3, Calculator, BookOpen, Globe, Lightbulb, GitCompare, 
-  FileText, ArrowDownToLine, Menu, Shield, Brain
+  FileText, ArrowDownToLine, Menu, Shield, Brain, Home, Crosshair, Map, Heart, GraduationCap, Settings
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 const tabItems = [
+  { value: "op-hoje", label: "Hoje", icon: Home },
+  { value: "op-trade", label: "Trade", icon: Crosshair },
+  { value: "op-mapa", label: "Mapa", icon: Map },
+  { value: "op-rotina", label: "Rotina", icon: Heart },
+  { value: "op-dados", label: "Dados", icon: BarChart3 },
+  { value: "op-estudo", label: "Estudo", icon: GraduationCap },
+  { value: "op-config", label: "Config", icon: Settings },
   { value: "calendario-trading", label: "Calendário", icon: Calendar },
   { value: "contas", label: "Contas", icon: Wallet },
   { value: "autoconhecimento", label: "Pessoal", icon: User },

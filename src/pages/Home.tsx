@@ -34,6 +34,7 @@ const TradingCalendar = lazy(() => import("@/components/TradingCalendar").then(m
 const CalculationHistory = lazy(() => import("@/components/CalculationHistory"));
 const EquityAndPerformanceCharts = lazy(() => import("@/components/EquityAndPerformanceCharts").then(m => ({ default: m.EquityAndPerformanceCharts })));
 const Withdrawals = lazy(() => import("@/components/Withdrawals"));
+const SmcModule = lazy(() => import("@/components/smc/SmcModule"));
 const DisciplineAnalysis = lazy(() => import("@/components/DisciplineAnalysis"));
 const PreparationHistory = lazy(() => import("@/components/PreparationHistory"));
 import DailyStatusBar from "@/components/DailyStatusBar";
@@ -59,7 +60,18 @@ function LazyTab({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<TabSkeleton />}>{children}</Suspense>;
 }
 
+const OP_TABS = [
+  { value: "op-hoje", label: "Hoje" },
+  { value: "op-trade", label: "Trade" },
+  { value: "op-mapa", label: "Mapa & Scan" },
+  { value: "op-rotina", label: "Rotina & Emocional" },
+  { value: "op-dados", label: "Dados" },
+  { value: "op-estudo", label: "Estudo" },
+  { value: "op-config", label: "Config" },
+];
+
 const TABS = [
+  ...OP_TABS,
   { value: "calendario-trading", label: "Calendário" },
   { value: "contas", label: "Contas" },
   { value: "autoconhecimento", label: "Pessoal" },
@@ -81,6 +93,7 @@ const TABS = [
 
 // Tabs que continuam acessíveis em modo consulta (fim de semana / locked_out)
 const READ_ONLY_TABS = new Set([
+  "op-hoje", "op-trade", "op-mapa", "op-rotina", "op-dados", "op-estudo", "op-config",
   "calendario-trading", "contas", "autoconhecimento", "estrategia",
   "calendario", "insights", "comparacao", "relatorio", "alertas",
   "disciplina", "saques", "preparacao", "validacao",
@@ -93,7 +106,7 @@ export default function Home() {
   const [showPlanDialog, setShowPlanDialog] = useState(false);
   const [editingPlan, setEditingPlan] = useState(false);
   const [editingGoldenRule, setEditingGoldenRule] = useState(false);
-  const [activeTab, setActiveTab] = useState("calendario-trading");
+  const [activeTab, setActiveTab] = useState("op-hoje");
   const [showCheckout, setShowCheckout] = useState(false);
   const dailyGate = useDailyGate();
   const planChecklist = useCustomChecklists("plan");
@@ -167,6 +180,12 @@ export default function Home() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.12 }}
             >
+
+          {OP_TABS.map(t => (
+            <TabsContent key={t.value} value={t.value} className="space-y-6 mt-0">
+              <LazyTab><SmcModule tab={t.value} go={setActiveTab} /></LazyTab>
+            </TabsContent>
+          ))}
 
           <TabsContent value="calendario-trading" className="space-y-6 mt-0">
             <LazyTab><TradingCalendar activeAccountId={activeAccountId} /></LazyTab>
